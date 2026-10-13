@@ -53,4 +53,8 @@ return [
         'model' => env('OPENROUTER_MODEL', 'google/gemini-2.5-flash'),
     ],
 
+    'ai' => [
+        'provider' => env('AI_PROVIDER', 'gemini'),
+    ],
+
 ];

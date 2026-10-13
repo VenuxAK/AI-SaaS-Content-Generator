@@ -16,11 +16,7 @@ class CreditService
      */
     public function getBalance(User $user): int
     {
-        return DB::transaction(function () use ($user) {
-            $lockedUser = User::where('id', $user->id)->lockForUpdate()->first();
-
-            return $lockedUser ? $lockedUser->credit_balance : 0;
-        });
+        return (int) (User::where('id', $user->id)->value('credit_balance') ?? 0);
     }
 
     /**

@@ -21,7 +21,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Generations
     Route::get('generate', [GenerationController::class, 'create'])->name('generate.create');
-    Route::post('generate', [GenerationController::class, 'store'])->middleware('credits')->name('generate.store');
+    Route::post('generate', [GenerationController::class, 'store'])->middleware(['credits', 'throttle:generate'])->name('generate.store');
     Route::get('generate/{generation}/stream', [GenerationStreamController::class, 'stream'])->name('generate.stream');
 
     Route::get('history', [GenerationController::class, 'index'])->name('history.index');
@@ -37,7 +37,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Billing
     Route::get('billing', [BillingController::class, 'index'])->name('billing.index');
-    Route::post('billing/checkout', [BillingController::class, 'checkout'])->name('billing.checkout');
+    Route::post('billing/checkout', [BillingController::class, 'checkout'])->middleware('throttle:checkout')->name('billing.checkout');
     Route::get('billing/success', [BillingController::class, 'success'])->name('billing.success');
     Route::get('billing/cancel', [BillingController::class, 'cancel'])->name('billing.cancel');
     Route::get('billing/transactions', [TransactionController::class, 'index'])->name('billing.transactions');

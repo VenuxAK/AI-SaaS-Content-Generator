@@ -36,8 +36,10 @@ class GenerationStreamController extends Controller
             set_time_limit(120);
 
             // Clean any existing output buffers
-            while (ob_get_level() > 0) {
-                ob_end_clean();
+            if (! app()->runningUnitTests()) {
+                while (ob_get_level() > 0) {
+                    ob_end_clean();
+                }
             }
 
             try {

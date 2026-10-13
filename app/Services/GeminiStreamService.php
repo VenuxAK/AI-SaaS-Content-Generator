@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Log;
 
 class GeminiStreamService
 {
-    protected string $apiKey;
+    protected ?string $apiKey;
 
     protected string $model;
 
@@ -28,7 +28,7 @@ class GeminiStreamService
      */
     public function stream(string $prompt, callable $onChunk, callable $onComplete): void
     {
-        $provider = env('AI_PROVIDER', 'gemini');
+        $provider = config('services.ai.provider', 'gemini');
 
         if ($provider === 'openrouter') {
             $openRouterKey = config('services.openrouter.key');

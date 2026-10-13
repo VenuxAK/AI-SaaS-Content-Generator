@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Actions\Credit\AdjustCreditAction;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\AdjustCreditRequest;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -49,12 +50,9 @@ class UserController extends Controller
     /**
      * Adjust credits manually for a user.
      */
-    public function adjustCredits(Request $request, User $user, AdjustCreditAction $action): RedirectResponse
+    public function adjustCredits(AdjustCreditRequest $request, User $user, AdjustCreditAction $action): RedirectResponse
     {
-        $validated = $request->validate([
-            'amount' => ['required', 'integer'],
-            'reason' => ['required', 'string', 'max:255'],
-        ]);
+        $validated = $request->validated();
 
         try {
             $action->execute($user, $validated['amount'], $validated['reason']);

@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Log;
 
 class GeminiService
 {
-    protected string $apiKey;
+    protected ?string $apiKey;
 
     protected string $model;
 
@@ -22,7 +22,7 @@ class GeminiService
 
     public function generate(string $prompt): string
     {
-        $provider = env('AI_PROVIDER', 'gemini');
+        $provider = config('services.ai.provider', 'gemini');
 
         if ($provider === 'openrouter') {
             $openRouterKey = config('services.openrouter.key');

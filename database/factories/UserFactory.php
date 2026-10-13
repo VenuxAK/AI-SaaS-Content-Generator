@@ -33,7 +33,39 @@ class UserFactory extends Factory
             'two_factor_secret' => null,
             'two_factor_recovery_codes' => null,
             'two_factor_confirmed_at' => null,
+            'credit_balance' => 10,
+            'is_admin' => false,
         ];
+    }
+
+    /**
+     * Indicate that the user is an administrator.
+     */
+    public function admin(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'is_admin' => true,
+        ]);
+    }
+
+    /**
+     * Indicate that the user has zero credits.
+     */
+    public function noCredits(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'credit_balance' => 0,
+        ]);
+    }
+
+    /**
+     * Set a specific credit balance for the user.
+     */
+    public function credits(int $amount): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'credit_balance' => $amount,
+        ]);
     }
 
     /**

@@ -16,7 +16,7 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
-#[Fillable(['name', 'description'])]
+#[Fillable(['user_id', 'name', 'description'])]
 class UserTone extends Model
 {
     use HasFactory;
