@@ -15,10 +15,18 @@ export default function AuthSimpleLayout({
                     <div className="flex flex-col items-center gap-4">
                         <Link
                             href={home()}
-                            className="flex flex-col items-center gap-2 font-medium"
+                            className="group flex flex-col items-center gap-2 font-medium"
                         >
-                            <div className="mb-1 flex h-9 w-9 items-center justify-center rounded-md">
-                                <AppLogoIcon className="size-9 fill-current text-[var(--foreground)] dark:text-white" />
+                            <div className="flex size-12 items-center justify-center rounded-2xl border border-indigo-500/20 bg-indigo-500/10 p-2 shadow-sm shadow-indigo-500/10 transition-transform duration-300 group-hover:scale-105 dark:bg-indigo-500/20">
+                                <AppLogoIcon className="size-8 object-contain" />
+                            </div>
+                            <div className="flex flex-col items-center">
+                                <span className="text-lg font-black tracking-tight text-slate-900 dark:text-white">
+                                    Nexus<span className="text-indigo-600 dark:text-indigo-400">AI</span>
+                                </span>
+                                <span className="text-[10px] font-semibold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 -mt-1">
+                                    BYOK Studio
+                                </span>
                             </div>
                             <span className="sr-only">{title}</span>
                         </Link>

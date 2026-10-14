@@ -24,10 +24,18 @@ export default function AuthCardLayout({
             <div className="flex w-full max-w-md flex-col gap-6">
                 <Link
                     href={home()}
-                    className="flex items-center gap-2 self-center font-medium"
+                    className="group flex flex-col items-center gap-2 self-center font-medium"
                 >
-                    <div className="flex h-9 w-9 items-center justify-center">
-                        <AppLogoIcon className="size-9 fill-current text-black dark:text-white" />
+                    <div className="flex size-12 items-center justify-center rounded-2xl border border-indigo-500/20 bg-indigo-500/10 p-2 shadow-sm shadow-indigo-500/10 transition-transform duration-300 group-hover:scale-105 dark:bg-indigo-500/20">
+                        <AppLogoIcon className="size-8 object-contain" />
+                    </div>
+                    <div className="flex flex-col items-center">
+                        <span className="text-lg font-black tracking-tight text-slate-900 dark:text-white">
+                            Nexus<span className="text-indigo-600 dark:text-indigo-400">AI</span>
+                        </span>
+                        <span className="text-[10px] font-semibold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 -mt-1">
+                            BYOK Studio
+                        </span>
                     </div>
                 </Link>
 

@@ -122,7 +122,7 @@ export function AuroraBackground({
             {showRadialGradient && (
                 <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_20%,transparent_0%,rgba(248,250,252,0.85)_75%)] dark:bg-[radial-gradient(circle_at_50%_20%,transparent_0%,rgba(7,8,14,0.92)_80%)]" />
             )}
-            <div className="relative z-10">{children}</div>
+            <div className="relative z-10 w-full">{children}</div>
         </div>
     );
 }

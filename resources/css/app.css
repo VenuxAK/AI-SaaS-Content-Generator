@@ -7,6 +7,10 @@
 
 @custom-variant dark (&:is(.dark *));
 
+html {
+    scroll-behavior: smooth;
+}
+
 @theme {
     --font-sans:
         'Plus Jakarta Sans', 'Noto Sans Myanmar', 'Padauk', 'Pyidaungsu',

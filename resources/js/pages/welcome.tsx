@@ -24,6 +24,8 @@ import {
     FileText,
     Megaphone,
     X as CloseIcon,
+    ChevronDown,
+    ArrowUp,
 } from 'lucide-react';
 
 import { AuroraBackground } from '@/components/ui/aurora-background';
@@ -184,13 +186,28 @@ export default function Welcome() {
         updateAppearance(resolvedAppearance === 'dark' ? 'light' : 'dark');
     };
 
+    const [showScrollTop, setShowScrollTop] = useState(false);
+
+    useEffect(() => {
+        const handleScroll = () => {
+            setShowScrollTop(window.scrollY > 400);
+        };
+
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
+
+    const scrollToTop = () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
     const logoTheme = mounted ? resolvedAppearance : 'dark';
 
     return (
         <>
             <Head title="Nexus AI - Bring Your Own Key AI Content Studio" />
 
-            <div className="min-h-screen bg-[#f8fafc] text-slate-900 transition-colors duration-300 dark:bg-[#07080e] dark:text-slate-100 selection:bg-indigo-500/20 selection:text-indigo-600 dark:selection:text-indigo-300">
+            <div className="min-h-screen bg-[#f8fafc] text-slate-900 transition-colors duration-300 dark:bg-[#07080e] dark:text-slate-100 selection:bg-indigo-500/20 selection:text-indigo-600 dark:selection:text-indigo-300 scroll-smooth">
                 {/* 1. Header Navigation */}
                 <header className="sticky top-0 z-50 w-full border-b border-slate-200/80 bg-white/70 backdrop-blur-xl dark:border-slate-800/80 dark:bg-[#07080e]/75">
                     <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
@@ -272,7 +289,7 @@ export default function Welcome() {
                 </header>
 
                 {/* 2. Hero Section with Aurora Background */}
-                <AuroraBackground className="pt-16 pb-24 md:pt-24 md:pb-32 px-4 sm:px-6 lg:px-8">
+                <AuroraBackground className="min-h-[calc(100vh-4rem)] min-h-[calc(100dvh-4rem)] flex flex-col justify-center items-center px-4 sm:px-6 lg:px-8 py-12 md:py-16">
                     <div className="mx-auto max-w-5xl text-center">
                         {/* Glow Badge */}
                         <motion.div
@@ -352,11 +369,30 @@ export default function Welcome() {
                                 <span>SSE Sub-Second Streaming</span>
                             </div>
                         </motion.div>
+
+                        {/* Scroll Down Indicator */}
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ duration: 0.6, delay: 0.5 }}
+                            className="mt-10 flex justify-center"
+                        >
+                            <a
+                                href="#playground"
+                                aria-label="Scroll to interactive studio demo"
+                                className="group inline-flex flex-col items-center gap-1.5 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+                            >
+                                <span className="text-[11px] font-semibold tracking-wider uppercase opacity-75 group-hover:opacity-100">
+                                    Explore Studio Demo
+                                </span>
+                                <ChevronDown className="size-4 animate-bounce text-indigo-500/80 group-hover:text-indigo-500" />
+                            </a>
+                        </motion.div>
                     </div>
                 </AuroraBackground>
 
                 {/* 3. Interactive Studio Demo Showcase */}
-                <section id="playground" className="relative -mt-12 z-20 mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 pb-24">
+                <section id="playground" className="min-h-screen flex flex-col justify-center scroll-mt-16 relative z-20 mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-16 sm:py-20 w-full">
                     <motion.div
                         initial={{ opacity: 0, y: 30 }}
                         whileInView={{ opacity: 1, y: 0 }}
@@ -497,8 +533,8 @@ export default function Welcome() {
                 </section>
 
                 {/* 4. Supported Models Showcase */}
-                <section id="models" className="py-24 border-t border-slate-200/80 dark:border-slate-800/80 bg-slate-50/50 dark:bg-[#090b14]/50">
-                    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                <section id="models" className="min-h-screen flex flex-col justify-center scroll-mt-16 py-16 sm:py-20 border-t border-slate-200/80 dark:border-slate-800/80 bg-slate-50/50 dark:bg-[#090b14]/50">
+                    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 w-full">
                         <div className="text-center max-w-3xl mx-auto mb-16">
                             <h2 className="text-xs font-bold uppercase tracking-widest text-indigo-600 dark:text-indigo-400">
                                 Unrestricted Model Access
@@ -630,7 +666,7 @@ export default function Welcome() {
                 </section>
 
                 {/* 5. Why BYOK vs Traditional AI SaaS Comparison */}
-                <section id="why-byok" className="py-24 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
+                <section id="why-byok" className="min-h-screen flex flex-col justify-center scroll-mt-16 py-16 sm:py-20 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto w-full">
                     <div className="text-center max-w-3xl mx-auto mb-16">
                         <h2 className="text-xs font-bold uppercase tracking-widest text-indigo-600 dark:text-indigo-400">
                             The Math is Simple
@@ -703,8 +739,8 @@ export default function Welcome() {
                 </section>
 
                 {/* 6. Feature Grid */}
-                <section id="features" className="py-24 border-t border-slate-200/80 dark:border-slate-800/80 bg-slate-50/50 dark:bg-[#090b14]/50">
-                    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                <section id="features" className="min-h-screen flex flex-col justify-center scroll-mt-16 py-16 sm:py-20 border-t border-slate-200/80 dark:border-slate-800/80 bg-slate-50/50 dark:bg-[#090b14]/50">
+                    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 w-full">
                         <div className="text-center max-w-3xl mx-auto mb-16">
                             <h2 className="text-xs font-bold uppercase tracking-widest text-indigo-600 dark:text-indigo-400">
                                 Built for Speed & Precision
@@ -791,7 +827,7 @@ export default function Welcome() {
                 </section>
 
                 {/* 7. Bottom CTA Banner */}
-                <section className="py-24 px-4 sm:px-6 lg:px-8">
+                <section className="py-20 sm:py-24 px-4 sm:px-6 lg:px-8">
                     <div className="mx-auto max-w-5xl rounded-3xl border border-indigo-500/30 bg-gradient-to-br from-indigo-900/40 via-purple-900/30 to-[#07080e] p-10 sm:p-16 text-center shadow-2xl relative overflow-hidden glow-indigo">
                         <div className="relative z-10">
                             <span className="inline-flex items-center gap-1.5 rounded-full bg-indigo-500/20 px-3.5 py-1 text-xs font-bold text-indigo-300 mb-4">
@@ -818,8 +854,8 @@ export default function Welcome() {
                 </section>
 
                 {/* 8. Footer */}
-                <footer className="border-t border-slate-200/80 py-12 dark:border-slate-800/80 bg-white dark:bg-[#07080e]">
-                    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-6">
+                <footer className="border-t border-slate-200/80 py-10 dark:border-slate-800/80 bg-white dark:bg-[#07080e]">
+                    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6">
                         <div className="flex items-center gap-2.5">
                             <img
                                 src={`/images/logo/icon-only-${logoTheme}.png`}
@@ -830,9 +866,24 @@ export default function Welcome() {
                                 Nexus AI Content Studio
                             </span>
                         </div>
-                        <p className="text-xs text-slate-500 dark:text-slate-400 text-center sm:text-left">
-                            Bring Your Own API Key AI SaaS. Your keys are encrypted locally with AES-256-GCM.
-                        </p>
+
+                        <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-3 text-xs text-slate-500 dark:text-slate-400 text-center">
+                            <span>Bring Your Own Key AI SaaS. AES-256-GCM Encrypted.</span>
+                            <span className="hidden sm:inline text-slate-300 dark:text-slate-700">•</span>
+                            <a
+                                href="https://venuxlabs.com"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1.5 font-semibold text-slate-700 hover:text-indigo-600 dark:text-slate-300 dark:hover:text-indigo-400 transition-colors"
+                            >
+                                <span>Powered by</span>
+                                <span className="font-bold text-indigo-600 dark:text-indigo-400 underline decoration-indigo-400/50 hover:decoration-indigo-400 underline-offset-4">
+                                    Venux Labs
+                                </span>
+                                <ExternalLink className="size-3 text-indigo-500" />
+                            </a>
+                        </div>
+
                         <div className="flex items-center gap-4 text-xs font-semibold text-slate-600 dark:text-slate-400">
                             {auth?.user ? (
                                 <Link href={dashboard()} className="hover:text-indigo-600 dark:hover:text-white">
@@ -851,6 +902,24 @@ export default function Welcome() {
                         </div>
                     </div>
                 </footer>
+
+                {/* 9. Floating Scroll-to-Top Button */}
+                <AnimatePresence>
+                    {showScrollTop && (
+                        <motion.button
+                            onClick={scrollToTop}
+                            initial={{ opacity: 0, scale: 0.7, y: 15 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.7, y: 15 }}
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.95 }}
+                            aria-label="Scroll to top"
+                            className="fixed bottom-6 right-6 z-50 flex size-11 cursor-pointer items-center justify-center rounded-2xl border border-indigo-500/30 bg-white/90 text-indigo-600 shadow-xl shadow-indigo-600/20 backdrop-blur-xl transition-colors duration-200 hover:bg-indigo-600 hover:text-white dark:border-indigo-500/30 dark:bg-slate-900/90 dark:text-indigo-400 dark:hover:bg-indigo-600 dark:hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+                        >
+                            <ArrowUp className="size-5" />
+                        </motion.button>
+                    )}
+                </AnimatePresence>
             </div>
         </>
     );
