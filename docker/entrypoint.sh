@@ -42,7 +42,7 @@ fi
 case "$*" in
     *octane:start*)
         echo "Running production migrations..."
-        php artisan migrate --force --isolated || true
+        php artisan migrate --force || true
 
         echo "Warming Laravel production caches..."
         php artisan config:cache

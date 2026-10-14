@@ -16,8 +16,10 @@ RUN npm run build
 # ==============================================================================
 FROM dunglas/frankenphp:php8.4-alpine AS production
 
-# Install system packages (ca-certificates for TiDB Cloud TLS verification)
-RUN apk add --no-cache ca-certificates
+# Install system packages (ca-certificates for TiDB Cloud TLS, libcap for container compatibility)
+RUN apk add --no-cache ca-certificates libcap \
+    && setcap -r /usr/local/bin/frankenphp || true \
+    && chmod +x /usr/local/bin/frankenphp
 
 # Install essential production PHP extensions using FrankenPHP helper
 RUN install-php-extensions \
