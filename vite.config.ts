@@ -6,7 +6,7 @@ import laravel from 'laravel-vite-plugin';
 import { bunny } from 'laravel-vite-plugin/fonts';
 import { defineConfig } from 'vite';
 
-export default defineConfig({
+export default defineConfig(({ command }) => ({
     plugins: [
         laravel({
             input: ['resources/css/app.css', 'resources/js/app.tsx'],
@@ -24,8 +24,13 @@ export default defineConfig({
             },
         }),
         tailwindcss(),
-        wayfinder({
-            formVariants: true,
-        }),
-    ],
-});
+        // Wayfinder requires PHP to generate route types. Skip during
+        // production builds (e.g. Docker) where PHP is not available.
+        // The generated types are committed to the repository.
+        command === 'serve'
+            ? wayfinder({
+                  formVariants: true,
+              })
+            : null,
+    ].filter(Boolean),
+}));
