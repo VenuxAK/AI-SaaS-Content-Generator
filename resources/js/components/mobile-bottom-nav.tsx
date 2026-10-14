@@ -7,7 +7,6 @@ import {
     PenTool,
 } from 'lucide-react';
 import { useCurrentUrl } from '@/hooks/use-current-url';
-import { useRouteLoading } from '@/hooks/use-route-loading';
 import { dashboard } from '@/routes';
 import { index as tonesIndex } from '@/routes/tones';
 import { index as historyIndex } from '@/routes/history';
@@ -15,7 +14,6 @@ import { create as generateCreate } from '@/routes/generate';
 
 export function MobileBottomNav() {
     const { isCurrentUrl } = useCurrentUrl();
-    const isRouteLoading = useRouteLoading();
 
     const isStudio = isCurrentUrl(generateCreate.url());
     const isDashboard = isCurrentUrl(dashboard());
@@ -28,11 +26,6 @@ export function MobileBottomNav() {
             aria-label="Mobile Navigation"
             className="fixed bottom-0 inset-x-0 z-30 md:hidden bg-white/90 dark:bg-[#07080e]/95 backdrop-blur-2xl border-t border-slate-200/80 dark:border-slate-800/80 pb-safe shadow-[0_-4px_20px_rgba(0,0,0,0.06)] dark:shadow-[0_-4px_20px_rgba(0,0,0,0.4)]"
         >
-            {/* Navigation progress indicator line */}
-            {isRouteLoading && (
-                <div className="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 animate-pulse z-40" />
-            )}
-
             <div className="grid grid-cols-5 items-center px-1 h-14">
                 {/* 1. Cockpit */}
                 <Link

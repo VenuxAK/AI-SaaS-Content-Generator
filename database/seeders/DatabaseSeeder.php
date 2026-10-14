@@ -17,9 +17,14 @@ class DatabaseSeeder extends Seeder
     {
         $this->call(SystemToneSeeder::class);
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+        if (app()->environment('local', 'testing')) {
+            User::firstOrCreate(
+                ['email' => 'test@example.com'],
+                [
+                    'name' => 'Test User',
+                    'password' => bcrypt('password'),
+                ]
+            );
+        }
     }
 }

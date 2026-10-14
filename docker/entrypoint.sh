@@ -69,6 +69,9 @@ case "$*" in
         echo "Running production migrations..."
         php artisan migrate --force || true
 
+        echo "Seeding built-in system tones..."
+        php artisan db:seed --class=SystemToneSeeder --force || true
+
         echo "Warming Laravel production caches..."
         php artisan config:cache
         php artisan route:cache
