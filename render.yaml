@@ -32,6 +32,8 @@ services:
         value: mysql
       - key: DB_URL
         sync: false # Paste your TiDB Cloud connection string here
+      - key: MYSQL_ATTR_SSL_CA
+        value: /etc/ssl/certs/ca-certificates.crt
 
       # In-Database Sessions & Caches (Free Tier friendly, no Redis required)
       - key: SESSION_DRIVER
