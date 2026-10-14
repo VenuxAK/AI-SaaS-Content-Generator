@@ -25,7 +25,10 @@ import { Card } from '@/components/ui/card';
 import {
     Select,
     SelectContent,
+    SelectGroup,
     SelectItem,
+    SelectLabel,
+    SelectSeparator,
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
@@ -36,6 +39,7 @@ import { index as tonesIndex } from '@/routes/tones';
 interface Tone {
     id: number;
     name: string;
+    is_system?: boolean;
 }
 
 interface Option {
@@ -108,9 +112,12 @@ export default function Create({
     const { data, setData, post, processing, errors } = useForm({
         content_type: contentTypes[0]?.value || 'facebook_post',
         output_language: 'en',
-        tone_id: tones[0]?.id || '',
+        tone_id: '',
         user_prompt: '',
     });
+
+    const systemTones = tones.filter((t) => t.is_system);
+    const customTones = tones.filter((t) => !t.is_system);
 
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -268,11 +275,34 @@ export default function Create({
                                                 <SelectItem value="none">
                                                     Neutral & Natural (Standard Default)
                                                 </SelectItem>
-                                                {tones.map((t) => (
-                                                    <SelectItem key={t.id} value={String(t.id)}>
-                                                        ✨ {t.name}
-                                                    </SelectItem>
-                                                ))}
+                                                {systemTones.length > 0 && (
+                                                    <SelectGroup>
+                                                        <SelectSeparator className="my-1 border-slate-200/60 dark:border-slate-800/60" />
+                                                        <SelectLabel className="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-2 py-1.5 flex items-center gap-1.5">
+                                                            <Sparkles className="size-3 text-indigo-500" />
+                                                            Built-in Presets
+                                                        </SelectLabel>
+                                                        {systemTones.map((t) => (
+                                                            <SelectItem key={t.id} value={String(t.id)}>
+                                                                {t.name}
+                                                            </SelectItem>
+                                                        ))}
+                                                    </SelectGroup>
+                                                )}
+                                                {customTones.length > 0 && (
+                                                    <SelectGroup>
+                                                        <SelectSeparator className="my-1 border-slate-200/60 dark:border-slate-800/60" />
+                                                        <SelectLabel className="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-2 py-1.5 flex items-center gap-1.5">
+                                                            <Layers className="size-3 text-emerald-500" />
+                                                            My Custom Tones
+                                                        </SelectLabel>
+                                                        {customTones.map((t) => (
+                                                            <SelectItem key={t.id} value={String(t.id)}>
+                                                                {t.name}
+                                                            </SelectItem>
+                                                        ))}
+                                                    </SelectGroup>
+                                                )}
                                             </SelectContent>
                                         </Select>
                                         {errors.tone_id && (

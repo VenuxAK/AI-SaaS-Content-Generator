@@ -12,7 +12,7 @@ class UserTonePolicy
      */
     public function view(User $user, UserTone $userTone): bool
     {
-        return $user->id === $userTone->user_id;
+        return $userTone->is_system || $user->id === $userTone->user_id;
     }
 
     /**
@@ -20,7 +20,7 @@ class UserTonePolicy
      */
     public function update(User $user, UserTone $userTone): bool
     {
-        return $user->id === $userTone->user_id;
+        return ! $userTone->is_system && $user->id === $userTone->user_id;
     }
 
     /**
@@ -28,6 +28,6 @@ class UserTonePolicy
      */
     public function delete(User $user, UserTone $userTone): bool
     {
-        return $user->id === $userTone->user_id;
+        return ! $userTone->is_system && $user->id === $userTone->user_id;
     }
 }

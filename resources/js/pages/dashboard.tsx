@@ -29,6 +29,7 @@ import { index as tonesIndex } from '@/routes/tones';
 interface Tone {
     id: number;
     name: string;
+    is_system?: boolean;
 }
 
 interface Option {

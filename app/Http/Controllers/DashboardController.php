@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Enums\ContentType;
 use App\Enums\OutputLanguage;
 use App\Models\Generation;
+use App\Models\UserTone;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -39,7 +40,11 @@ class DashboardController extends Controller
             'aiProvider' => $user->ai_provider ?? 'gemini',
             'aiModel' => $user->getActiveModel(),
             'hasApiKey' => $user->hasActiveApiKey(),
-            'tones' => $user->tones()->select('id', 'name')->get(),
+            'tones' => UserTone::availableFor($user)
+                ->select('id', 'name', 'is_system')
+                ->orderBy('is_system', 'desc')
+                ->orderBy('name')
+                ->get(),
             'contentTypes' => $contentTypes,
             'outputLanguages' => $outputLanguages,
             'recentGenerations' => $recentGenerations,

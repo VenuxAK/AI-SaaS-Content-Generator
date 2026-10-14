@@ -22,6 +22,7 @@ interface Tone {
     name: string;
     description: string;
     created_at: string;
+    is_system?: boolean;
 }
 
 interface TonesIndexProps {
@@ -337,26 +338,51 @@ export default function TonesIndex({ tones }: TonesIndexProps) {
                                 className="group rounded-3xl border border-slate-200/80 bg-white/80 shadow-md backdrop-blur-xl transition duration-200 hover:shadow-xl hover:border-indigo-400 dark:border-slate-800/80 dark:bg-[#0c0e1a]/80 dark:hover:border-indigo-500/40 flex flex-col justify-between overflow-hidden"
                             >
                                 <CardHeader className="pb-3 pt-5 px-6 bg-slate-50/50 dark:bg-[#080911]/60 border-b border-slate-100 dark:border-slate-800/60">
-                                    <div className="flex justify-between items-center">
-                                        <CardTitle className="text-sm font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
-                                            <span className="flex size-2 rounded-full bg-indigo-500" />
-                                            {tone.name}
-                                        </CardTitle>
-                                        <div className="flex items-center gap-1">
-                                            <button
-                                                onClick={() => openEdit(tone)}
-                                                className="p-1.5 rounded-lg text-slate-400 hover:text-indigo-600 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
-                                                title="Edit tone"
-                                            >
-                                                <Edit2 className="size-3.5" />
-                                            </button>
-                                            <button
-                                                onClick={() => handleDelete(tone.id)}
-                                                className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
-                                                title="Delete tone"
-                                            >
-                                                <Trash2 className="size-3.5" />
-                                            </button>
+                                    <div className="flex justify-between items-center gap-2">
+                                        <div className="flex items-center gap-2 flex-wrap">
+                                            <CardTitle className="text-sm font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                                                <span className={`flex size-2 rounded-full ${tone.is_system ? 'bg-indigo-500 animate-pulse' : 'bg-emerald-500'}`} />
+                                                {tone.name}
+                                            </CardTitle>
+                                            {tone.is_system && (
+                                                <span className="inline-flex items-center gap-1 rounded-full bg-indigo-500/10 px-2 py-0.5 text-[10px] font-bold text-indigo-600 border border-indigo-500/20 dark:text-indigo-400">
+                                                    <Sparkles className="size-2.5" /> Preset
+                                                </span>
+                                            )}
+                                        </div>
+                                        <div>
+                                            {tone.is_system ? (
+                                                <button
+                                                    type="button"
+                                                    onClick={() =>
+                                                        handleApplyTemplate({
+                                                            name: `${tone.name} (Custom)`,
+                                                            description: tone.description,
+                                                        })
+                                                    }
+                                                    className="px-2.5 py-1 rounded-xl text-[11px] font-bold text-indigo-600 hover:bg-indigo-50 dark:text-indigo-400 dark:hover:bg-indigo-950/40 transition cursor-pointer flex items-center gap-1 border border-indigo-500/20 shadow-2xs"
+                                                    title="Duplicate as customizable template"
+                                                >
+                                                    <Plus className="size-3" /> Duplicate
+                                                </button>
+                                            ) : (
+                                                <div className="flex items-center gap-1">
+                                                    <button
+                                                        onClick={() => openEdit(tone)}
+                                                        className="p-1.5 rounded-lg text-slate-400 hover:text-indigo-600 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+                                                        title="Edit tone"
+                                                    >
+                                                        <Edit2 className="size-3.5" />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleDelete(tone.id)}
+                                                        className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+                                                        title="Delete tone"
+                                                    >
+                                                        <Trash2 className="size-3.5" />
+                                                    </button>
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
                                 </CardHeader>
@@ -365,8 +391,15 @@ export default function TonesIndex({ tones }: TonesIndexProps) {
                                         {tone.description}
                                     </p>
                                 </CardContent>
-                                <CardFooter className="py-3 px-6 bg-slate-50/30 dark:bg-[#080911]/40 border-t border-slate-100 dark:border-slate-800/60 text-[10px] text-slate-400 font-mono">
-                                    Configured on {new Date(tone.created_at).toLocaleDateString()}
+                                <CardFooter className="py-3 px-6 bg-slate-50/30 dark:bg-[#080911]/40 border-t border-slate-100 dark:border-slate-800/60 text-[10px] text-slate-400 font-mono flex items-center justify-between">
+                                    <span>
+                                        {tone.is_system
+                                            ? 'Built-in system preset'
+                                            : `Configured on ${new Date(tone.created_at).toLocaleDateString()}`}
+                                    </span>
+                                    {tone.is_system && (
+                                        <span className="text-emerald-500 font-semibold">Active in Generator</span>
+                                    )}
                                 </CardFooter>
                             </Card>
                         ))}

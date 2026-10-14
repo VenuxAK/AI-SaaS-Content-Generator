@@ -21,7 +21,10 @@ class ToneController extends Controller
      */
     public function index(Request $request): Response
     {
-        $tones = $request->user()->tones()->orderBy('name')->get();
+        $tones = UserTone::availableFor($request->user())
+            ->orderBy('is_system', 'desc')
+            ->orderBy('name')
+            ->get();
 
         return Inertia::render('Tones/Index', [
             'tones' => $tones,

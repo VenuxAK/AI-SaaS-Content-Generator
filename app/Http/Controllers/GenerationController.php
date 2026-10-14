@@ -8,6 +8,7 @@ use App\Enums\ContentType;
 use App\Enums\OutputLanguage;
 use App\Http\Requests\GenerateContentRequest;
 use App\Models\Generation;
+use App\Models\UserTone;
 use App\Services\ContentHistoryService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -45,7 +46,11 @@ class GenerationController extends Controller
             ->get();
 
         return Inertia::render('Generate/Create', [
-            'tones' => $user->tones()->select('id', 'name')->get(),
+            'tones' => UserTone::availableFor($user)
+                ->select('id', 'name', 'is_system')
+                ->orderBy('is_system', 'desc')
+                ->orderBy('name')
+                ->get(),
             'contentTypes' => $contentTypes,
             'outputLanguages' => $outputLanguages,
             'recentGenerations' => $recentGenerations,

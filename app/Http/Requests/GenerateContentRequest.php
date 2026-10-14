@@ -33,7 +33,8 @@ class GenerateContentRequest extends FormRequest
                 'nullable',
                 'integer',
                 Rule::exists('user_tones', 'id')->where(function ($query) {
-                    return $query->where('user_id', $this->user()->id);
+                    return $query->where('is_system', true)
+                        ->orWhere('user_id', $this->user()->id);
                 }),
             ],
         ];

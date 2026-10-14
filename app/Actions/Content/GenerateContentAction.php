@@ -29,7 +29,7 @@ class GenerateContentAction
         $toneSnapshot = null;
 
         if ($toneId) {
-            $tone = UserTone::where('user_id', $user->id)->findOrFail($toneId);
+            $tone = UserTone::availableFor($user)->findOrFail($toneId);
             $toneDescription = $tone->description;
             $toneSnapshot = $tone->name.': '.$tone->description;
         }
