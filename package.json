@@ -67,11 +67,12 @@
         "vite": "^8.0.0"
     },
     "optionalDependencies": {
-        "@rollup/rollup-linux-x64-gnu": "4.9.5",
-        "@rollup/rollup-win32-x64-msvc": "4.9.5",
+        "@rolldown/binding-linux-x64-musl": "^1.0.0",
         "@tailwindcss/oxide-linux-x64-gnu": "^4.0.1",
+        "@tailwindcss/oxide-linux-x64-musl": "^4.0.1",
         "@tailwindcss/oxide-win32-x64-msvc": "^4.0.1",
         "lightningcss-linux-x64-gnu": "^1.29.1",
+        "lightningcss-linux-x64-musl": "^1.29.1",
         "lightningcss-win32-x64-msvc": "^1.29.1"
     }
 }
