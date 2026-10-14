@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\User;
 use GuzzleHttp\Client as GuzzleClient;
 use Illuminate\Support\Facades\Log;
 
@@ -16,125 +17,90 @@ class GeminiStreamService
     public function __construct()
     {
         $this->apiKey = config('services.gemini.key');
-        $this->model = config('services.gemini.model', 'gemini-1.5-pro');
-        $this->streamTimeout = config('services.gemini.stream_timeout', 120);
+        $this->model = config('services.gemini.model', 'gemini-2.5-flash');
+        $this->streamTimeout = (int) config('services.gemini.stream_timeout', 120);
     }
 
     /**
-     * Streams content token-by-token from Gemini API.
+     * Streams content token-by-token from Gemini, OpenAI, or OpenRouter API.
      *
      * @param  callable  $onChunk  Called with ($textChunk)
      * @param  callable  $onComplete  Called with ($fullText)
      */
-    public function stream(string $prompt, callable $onChunk, callable $onComplete): void
+    public function stream(string $prompt, callable $onChunk, callable $onComplete, ?User $user = null): void
     {
-        $provider = config('services.ai.provider', 'gemini');
+        $provider = $user ? ($user->ai_provider ?? 'gemini') : config('services.ai.provider', 'gemini');
+        $apiKey = $user ? $user->getActiveApiKey() : null;
+        $model = $user ? $user->getActiveModel() : null;
+
+        if ($provider === 'openai') {
+            $apiKey = $apiKey ?: config('services.openai.key');
+            $model = $model ?: 'gpt-4o-mini';
+
+            if (empty($apiKey)) {
+                throw new \RuntimeException('OpenAI API key is not configured.');
+            }
+
+            $this->streamOpenAiCompatible(
+                'https://api.openai.com/v1/chat/completions',
+                $apiKey,
+                $model,
+                $prompt,
+                $onChunk,
+                $onComplete,
+                []
+            );
+
+            return;
+        }
 
         if ($provider === 'openrouter') {
-            $openRouterKey = config('services.openrouter.key');
-            $openRouterModel = config('services.openrouter.model', 'google/gemini-2.5-flash');
+            $apiKey = $apiKey ?: config('services.openrouter.key');
+            $model = $model ?: 'google/gemini-2.5-flash';
 
-            if (empty($openRouterKey)) {
+            if (empty($apiKey)) {
                 throw new \RuntimeException('OpenRouter API key is not configured.');
             }
 
-            $client = new GuzzleClient([
-                'timeout' => $this->streamTimeout,
-                'connect_timeout' => 10,
-            ]);
+            $this->streamOpenAiCompatible(
+                'https://openrouter.ai/api/v1/chat/completions',
+                $apiKey,
+                $model,
+                $prompt,
+                $onChunk,
+                $onComplete,
+                [
+                    'HTTP-Referer' => config('app.url', 'http://localhost:8000'),
+                    'X-Title' => 'AI SaaS Content Generator',
+                ]
+            );
 
-            try {
-                $response = $client->post('https://openrouter.ai/api/v1/chat/completions', [
-                    'headers' => [
-                        'Authorization' => "Bearer {$openRouterKey}",
-                        'Content-Type' => 'application/json',
-                        'Accept' => 'text/event-stream',
-                        'HTTP-Referer' => config('app.url', 'http://localhost:8000'),
-                        'X-Title' => 'AI SaaS Content Generator',
-                    ],
-                    'json' => [
-                        'model' => $openRouterModel,
-                        'messages' => [
-                            ['role' => 'user', 'content' => $prompt],
-                        ],
-                        'temperature' => 0.3,
-                        'stream' => true,
-                    ],
-                    'stream' => true,
-                ]);
-
-                $body = $response->getBody();
-                $buffer = '';
-                $fullContent = '';
-
-                while (! $body->eof()) {
-                    $read = $body->read(1024);
-                    $buffer .= $read;
-
-                    while (($pos = strpos($buffer, "\n")) !== false) {
-                        $line = substr($buffer, 0, $pos);
-                        $buffer = substr($buffer, $pos + 1);
-                        $line = trim($line);
-
-                        if (empty($line)) {
-                            continue;
-                        }
-
-                        if (str_starts_with($line, 'data:')) {
-                            $dataJson = trim(substr($line, 5));
-
-                            if ($dataJson === '[DONE]' || empty($dataJson)) {
-                                continue;
-                            }
-
-                            $data = json_decode($dataJson, true);
-
-                            // Check if API returned an error structure in stream
-                            if ($data && isset($data['error'])) {
-                                $errMsg = $data['error']['message'] ?? json_encode($data['error']);
-                                throw new \RuntimeException('OpenRouter API Error: '.$errMsg);
-                            }
-
-                            if ($data && isset($data['choices'][0]['delta']['content'])) {
-                                $text = $data['choices'][0]['delta']['content'];
-                                $fullContent .= $text;
-                                $onChunk($text);
-                            }
-                        }
-                    }
-                }
-
-                $onComplete($fullContent);
-
-                return;
-            } catch (\Throwable $e) {
-                Log::error('OpenRouter SSE streaming failed: '.$e->getMessage(), [
-                    'exception' => $e,
-                ]);
-                throw new \RuntimeException('AI streaming content failed: '.$e->getMessage(), 0, $e);
-            }
+            return;
         }
 
-        if (empty($this->apiKey)) {
-            throw new \RuntimeException('Gemini API key is not configured.');
+        // Gemini Provider
+        $apiKey = $apiKey ?: $this->apiKey;
+        $model = $model ?: $this->model;
+
+        // Normalize model aliases to official Gemini API identifiers
+        $geminiAliases = [
+            'gemini-3.8-flash-lite' => 'gemini-3.5-flash-lite',
+            'gemini-flash-lite' => 'gemini-3.5-flash-lite',
+            'gemini-flash' => 'gemini-3.8-flash',
+            'gemini-pro' => 'gemini-3-pro',
+        ];
+        $model = $geminiAliases[$model] ?? $model;
+
+        if (empty($apiKey)) {
+            throw new \RuntimeException('Google Gemini API key is not configured.');
         }
 
-        $url = "https://generativelanguage.googleapis.com/v1beta/models/{$this->model}:streamGenerateContent?key={$this->apiKey}&alt=sse";
+        $url = "https://generativelanguage.googleapis.com/v1beta/models/{$model}:streamGenerateContent?key={$apiKey}&alt=sse";
 
         $client = new GuzzleClient([
             'timeout' => $this->streamTimeout,
             'connect_timeout' => 10,
         ]);
-
-        $payload = [
-            'contents' => [
-                [
-                    'parts' => [
-                        ['text' => $prompt],
-                    ],
-                ],
-            ],
-        ];
 
         try {
             $response = $client->post($url, [
@@ -142,7 +108,15 @@ class GeminiStreamService
                     'Content-Type' => 'application/json',
                     'Accept' => 'text/event-stream',
                 ],
-                'json' => $payload,
+                'json' => [
+                    'contents' => [
+                        [
+                            'parts' => [
+                                ['text' => $prompt],
+                            ],
+                        ],
+                    ],
+                ],
                 'stream' => true,
             ]);
 
@@ -151,11 +125,9 @@ class GeminiStreamService
             $fullContent = '';
 
             while (! $body->eof()) {
-                // Read a chunk of bytes
                 $read = $body->read(1024);
                 $buffer .= $read;
 
-                // Split into lines
                 while (($pos = strpos($buffer, "\n")) !== false) {
                     $line = substr($buffer, 0, $pos);
                     $buffer = substr($buffer, $pos + 1);
@@ -168,14 +140,12 @@ class GeminiStreamService
                     if (str_starts_with($line, 'data:')) {
                         $dataJson = trim(substr($line, 5));
 
-                        // Stop if we receive the done token or empty JSON
                         if ($dataJson === '[DONE]' || empty($dataJson)) {
                             continue;
                         }
 
                         $data = json_decode($dataJson, true);
 
-                        // Check if API returned an error structure in stream
                         if ($data && isset($data['error'])) {
                             $errMsg = $data['error']['message'] ?? json_encode($data['error']);
                             throw new \RuntimeException('Gemini API Error: '.$errMsg);
@@ -190,13 +160,93 @@ class GeminiStreamService
                 }
             }
 
-            // Fire completion callback
             $onComplete($fullContent);
-
         } catch (\Throwable $e) {
-            Log::error('Gemini SSE streaming failed: '.$e->getMessage(), [
-                'exception' => $e,
+            Log::error('Gemini SSE streaming failed: '.$e->getMessage());
+            throw new \RuntimeException('AI streaming content failed: '.$e->getMessage(), 0, $e);
+        }
+    }
+
+    /**
+     * Helper to stream from any OpenAI-compatible completions endpoint.
+     */
+    protected function streamOpenAiCompatible(
+        string $endpoint,
+        string $apiKey,
+        string $model,
+        string $prompt,
+        callable $onChunk,
+        callable $onComplete,
+        array $extraHeaders = []
+    ): void {
+        $client = new GuzzleClient([
+            'timeout' => $this->streamTimeout,
+            'connect_timeout' => 10,
+        ]);
+
+        $headers = array_merge([
+            'Authorization' => "Bearer {$apiKey}",
+            'Content-Type' => 'application/json',
+            'Accept' => 'text/event-stream',
+        ], $extraHeaders);
+
+        try {
+            $response = $client->post($endpoint, [
+                'headers' => $headers,
+                'json' => [
+                    'model' => $model,
+                    'messages' => [
+                        ['role' => 'user', 'content' => $prompt],
+                    ],
+                    'temperature' => 0.7,
+                    'stream' => true,
+                ],
+                'stream' => true,
             ]);
+
+            $body = $response->getBody();
+            $buffer = '';
+            $fullContent = '';
+
+            while (! $body->eof()) {
+                $read = $body->read(1024);
+                $buffer .= $read;
+
+                while (($pos = strpos($buffer, "\n")) !== false) {
+                    $line = substr($buffer, 0, $pos);
+                    $buffer = substr($buffer, $pos + 1);
+                    $line = trim($line);
+
+                    if (empty($line)) {
+                        continue;
+                    }
+
+                    if (str_starts_with($line, 'data:')) {
+                        $dataJson = trim(substr($line, 5));
+
+                        if ($dataJson === '[DONE]' || empty($dataJson)) {
+                            continue;
+                        }
+
+                        $data = json_decode($dataJson, true);
+
+                        if ($data && isset($data['error'])) {
+                            $errMsg = $data['error']['message'] ?? json_encode($data['error']);
+                            throw new \RuntimeException('API Error: '.$errMsg);
+                        }
+
+                        if ($data && isset($data['choices'][0]['delta']['content'])) {
+                            $text = $data['choices'][0]['delta']['content'];
+                            $fullContent .= $text;
+                            $onChunk($text);
+                        }
+                    }
+                }
+            }
+
+            $onComplete($fullContent);
+        } catch (\Throwable $e) {
+            Log::error('OpenAI-compatible SSE streaming failed: '.$e->getMessage());
             throw new \RuntimeException('AI streaming content failed: '.$e->getMessage(), 0, $e);
         }
     }

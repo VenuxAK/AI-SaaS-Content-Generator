@@ -1,16 +1,16 @@
-import { Head, Link, useForm } from '@inertiajs/react';
-import { ArrowLeft, Wallet, AlertCircle, Sparkles, Receipt, RefreshCw, Key } from 'lucide-react';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Head, Link } from '@inertiajs/react';
+import { ArrowLeft, Cpu, Key, ShieldCheck, Sparkles, Zap } from 'lucide-react';
+
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { toast } from 'sonner';
-import { index as adminUsersIndex, adjustCredits as adminAdjustCredits } from '@/routes/admin/users';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { index as adminUsersIndex } from '@/routes/admin/users';
 
 interface User {
     id: number;
     name: string;
     email: string;
-    credit_balance: number;
+    ai_provider?: string;
+    ai_model?: string;
     is_admin: boolean;
     created_at: string;
 }
@@ -25,302 +25,236 @@ interface Generation {
     content_type: string;
     output_language: string;
     user_prompt: string;
+    ai_provider?: string | null;
+    ai_model?: string | null;
     status: string;
     created_at: string;
     tone?: Tone | null;
-}
-
-interface Transaction {
-    id: number;
-    type: string;
-    amount: number;
-    balance_before: number;
-    balance_after: number;
-    description: string;
-    created_at: string;
 }
 
 interface UserShowProps {
     subjectUser: User;
     generations: {
         data: Generation[];
-        links: any[];
-        total: number;
-    };
-    transactions: {
-        data: Transaction[];
-        links: any[];
+        links: Array<{ url: string | null; label: string; active: boolean }>;
         total: number;
     };
 }
 
-export default function AdminUserShow({ subjectUser, generations, transactions }: UserShowProps) {
-    
-    // Credit adjustment form
-    const { data, setData, post, processing, errors, reset } = useForm({
-        amount: '',
-        reason: '',
-    });
-
-    const handleAdjust = (e: React.FormEvent) => {
-        e.preventDefault();
-        post(adminAdjustCredits.url({ user: subjectUser.id }), {
-            onSuccess: () => {
-                reset();
-                toast.success('Credits adjusted successfully!');
-            },
-            onError: (err) => {
-                if (err.credits) {
-                    toast.error(err.credits);
-                }
-            }
-        });
+export default function AdminUserShow({
+    subjectUser,
+    generations,
+}: UserShowProps) {
+    const providerNameMap: Record<string, string> = {
+        gemini: 'Google Gemini',
+        openai: 'OpenAI',
+        openrouter: 'OpenRouter',
     };
 
     return (
         <>
             <Head title={`User Profile: ${subjectUser.name}`} />
-            <div className="flex h-full flex-1 flex-col gap-6 p-6 max-w-7xl mx-auto w-full">
-                
+            <div className="mx-auto flex h-full w-full max-w-7xl flex-1 flex-col gap-6 p-6">
                 {/* Header Section */}
-                <div className="flex justify-between items-center border-b border-neutral-100 dark:border-neutral-800 pb-5">
+                <div className="flex items-center justify-between border-b border-neutral-100 pb-5 dark:border-neutral-800">
                     <div>
-                        <Link 
+                        <Link
                             href={adminUsersIndex.url()}
-                            className="text-xs font-bold text-neutral-500 hover:text-neutral-800 flex items-center gap-1 mb-2"
+                            className="mb-2 flex items-center gap-1 text-xs font-bold text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-200"
                         >
                             <ArrowLeft className="size-3" />
                             Back to Users
                         </Link>
-                        <h1 className="text-2xl font-black text-neutral-950 dark:text-neutral-50 flex items-center gap-2">
+                        <h1 className="flex items-center gap-2 text-2xl font-black text-neutral-950 dark:text-neutral-50">
                             User Profile: {subjectUser.name}
                         </h1>
-                        <p className="text-sm text-neutral-500 dark:text-neutral-400 mt-1">
-                            Review and adjust credit limits or inspect usage details for this profile.
+                        <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
+                            Review AI engine preferences and generated copywriting history for this user.
                         </p>
                     </div>
                 </div>
 
-                <div className="grid gap-6 md:grid-cols-3">
-                    
+                {/* Profile & AI Engine Details Grid */}
+                <div className="grid gap-6 md:grid-cols-2">
                     {/* User Metadata Card */}
-                    <Card className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 shadow-sm p-6 space-y-4">
-                        <h3 className="text-sm font-bold text-neutral-950 dark:text-neutral-50 border-b border-neutral-100 dark:border-neutral-800 pb-2">
-                            Profile Details
+                    <Card className="space-y-4 rounded-2xl border border-neutral-200 bg-white p-6 shadow-xs dark:border-neutral-800 dark:bg-neutral-900">
+                        <h3 className="border-b border-neutral-100 pb-2 text-sm font-bold text-neutral-950 dark:border-neutral-800 dark:text-neutral-50">
+                            Account Information
                         </h3>
-                        <div>
-                            <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">ID</span>
-                            <span className="text-xs font-medium text-neutral-850 dark:text-neutral-200">{subjectUser.id}</span>
-                        </div>
-                        <div>
-                            <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">Email Address</span>
-                            <span className="text-xs font-medium text-neutral-850 dark:text-neutral-200">{subjectUser.email}</span>
-                        </div>
-                        <div>
-                            <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">Role</span>
-                            <div className="mt-1">
-                                {subjectUser.is_admin ? (
-                                    <Badge className="bg-indigo-50 text-indigo-700 dark:bg-indigo-950/20 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-950/30 flex items-center gap-1 w-fit">
-                                        <Key className="size-3" />
-                                        Admin
-                                    </Badge>
-                                ) : (
-                                    <Badge className="bg-neutral-100 text-neutral-700 dark:bg-neutral-850 dark:text-neutral-300 border border-neutral-200 dark:border-neutral-850 w-fit">
-                                        User
-                                    </Badge>
-                                )}
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <span className="block text-[10px] font-bold uppercase tracking-wider text-neutral-400">
+                                    User ID
+                                </span>
+                                <span className="text-xs font-medium text-neutral-800 dark:text-neutral-200">
+                                    #{subjectUser.id}
+                                </span>
+                            </div>
+                            <div>
+                                <span className="block text-[10px] font-bold uppercase tracking-wider text-neutral-400">
+                                    Role
+                                </span>
+                                <div className="mt-0.5">
+                                    {subjectUser.is_admin ? (
+                                        <Badge className="flex w-fit items-center gap-1 border border-indigo-100 bg-indigo-50 text-indigo-700 dark:border-indigo-950/30 dark:bg-indigo-950/20 dark:text-indigo-400">
+                                            <Key className="size-3" />
+                                            Admin
+                                        </Badge>
+                                    ) : (
+                                        <Badge className="w-fit border border-neutral-200 bg-neutral-100 text-neutral-700 dark:border-neutral-800 dark:bg-neutral-800 dark:text-neutral-300">
+                                            User
+                                        </Badge>
+                                    )}
+                                </div>
                             </div>
                         </div>
                         <div>
-                            <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">Joined On</span>
-                            <span className="text-xs font-medium text-neutral-850 dark:text-neutral-200">
+                            <span className="block text-[10px] font-bold uppercase tracking-wider text-neutral-400">
+                                Email Address
+                            </span>
+                            <span className="text-xs font-medium text-neutral-800 dark:text-neutral-200">
+                                {subjectUser.email}
+                            </span>
+                        </div>
+                        <div>
+                            <span className="block text-[10px] font-bold uppercase tracking-wider text-neutral-400">
+                                Registration Date
+                            </span>
+                            <span className="text-xs font-medium text-neutral-800 dark:text-neutral-200">
                                 {new Date(subjectUser.created_at).toLocaleString()}
                             </span>
                         </div>
-                        <div>
-                            <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">Wallet Balance</span>
-                            <span className="text-lg font-black text-indigo-600 dark:text-indigo-400 block mt-0.5">
-                                {subjectUser.credit_balance} Credits
-                            </span>
-                        </div>
                     </Card>
 
-                    {/* Manual Adjustment Card */}
-                    <Card className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 shadow-sm p-6 md:col-span-2">
-                        <h3 className="text-sm font-bold text-neutral-950 dark:text-neutral-50 mb-4 border-b border-neutral-100 dark:border-neutral-800 pb-2 flex items-center gap-1.5">
-                            <Wallet className="size-4 text-indigo-600" />
-                            Manual Credit Adjustment
+                    {/* AI Configuration Card */}
+                    <Card className="space-y-4 rounded-2xl border border-neutral-200 bg-white p-6 shadow-xs dark:border-neutral-800 dark:bg-neutral-900">
+                        <h3 className="border-b border-neutral-100 pb-2 text-sm font-bold text-neutral-950 dark:border-neutral-800 dark:text-neutral-50 flex items-center gap-1.5">
+                            <ShieldCheck className="size-4 text-indigo-600" />
+                            AI Engine Preferences (BYOK)
                         </h3>
 
-                        <form onSubmit={handleAdjust} className="space-y-4">
-                            <div className="grid gap-4 sm:grid-cols-2">
-                                <div>
-                                    <label htmlFor="amount" className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300 mb-1.5">
-                                        Credit Adjustment Amount
-                                    </label>
-                                    <input
-                                        id="amount"
-                                        type="number"
-                                        placeholder="e.g. 50 or -10"
-                                        value={data.amount}
-                                        onChange={(e) => setData('amount', e.target.value)}
-                                        className="w-full rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 px-3.5 py-2.5 text-sm text-neutral-900 dark:text-neutral-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                                        required
-                                    />
-                                    {errors.amount && <span className="text-xs text-rose-500 mt-1 block">{errors.amount}</span>}
-                                    <span className="text-[10px] text-neutral-400 mt-1.5 block">Use positive numbers to add credits, negative to deduct.</span>
-                                </div>
-
-                                <div>
-                                    <label htmlFor="reason" className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300 mb-1.5">
-                                        Adjustment Reason Notes
-                                    </label>
-                                    <input
-                                        id="reason"
-                                        type="text"
-                                        placeholder="e.g. Special promo, system refund, override"
-                                        value={data.reason}
-                                        onChange={(e) => setData('reason', e.target.value)}
-                                        className="w-full rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 px-3.5 py-2.5 text-sm text-neutral-900 dark:text-neutral-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                                        required
-                                    />
-                                    {errors.reason && <span className="text-xs text-rose-500 mt-1 block">{errors.reason}</span>}
-                                </div>
+                        <div className="flex items-center gap-3 pt-1">
+                            <div className="rounded-xl bg-indigo-50 p-3 text-indigo-600 dark:bg-indigo-950/50 dark:text-indigo-400">
+                                {subjectUser.ai_provider === 'gemini' && (
+                                    <Sparkles className="size-6" />
+                                )}
+                                {subjectUser.ai_provider === 'openai' && (
+                                    <Cpu className="size-6" />
+                                )}
+                                {subjectUser.ai_provider === 'openrouter' && (
+                                    <Zap className="size-6" />
+                                )}
+                                {!subjectUser.ai_provider && (
+                                    <Sparkles className="size-6" />
+                                )}
                             </div>
+                            <div>
+                                <span className="block text-[10px] font-bold uppercase tracking-wider text-neutral-400">
+                                    Primary Provider
+                                </span>
+                                <h4 className="text-base font-bold text-neutral-950 dark:text-neutral-50">
+                                    {providerNameMap[subjectUser.ai_provider ?? 'gemini'] ||
+                                        subjectUser.ai_provider}
+                                </h4>
+                            </div>
+                        </div>
 
-                            <Button 
-                                type="submit" 
-                                disabled={processing}
-                                className="bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-bold cursor-pointer h-10 w-fit px-6 flex items-center justify-center gap-1.5"
-                            >
-                                <RefreshCw className="size-4" />
-                                Apply Adjustment
-                            </Button>
-                        </form>
+                        <div>
+                            <span className="block text-[10px] font-bold uppercase tracking-wider text-neutral-400">
+                                Active Model
+                            </span>
+                            <span className="font-mono text-xs font-semibold text-neutral-800 dark:text-neutral-200">
+                                {subjectUser.ai_model || 'Default provider model'}
+                            </span>
+                        </div>
+
+                        <div className="rounded-xl bg-neutral-50 p-3 text-[11px] text-neutral-500 dark:bg-neutral-950 dark:text-neutral-400">
+                            API keys are encrypted using AES-256 at rest and cannot be viewed in the admin console.
+                        </div>
                     </Card>
-
                 </div>
 
-                {/* Split History & Ledger Section */}
-                <div className="grid gap-6 lg:grid-cols-2">
-                    
-                    {/* Generations Table */}
-                    <Card className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 shadow-sm overflow-hidden flex flex-col justify-between">
-                        <CardHeader className="pb-2">
-                            <CardTitle className="text-sm font-bold text-neutral-900 dark:text-neutral-50 flex items-center gap-1.5">
-                                <Sparkles className="size-4 text-indigo-600" />
-                                Generation Logs ({generations.total})
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent className="p-0 flex-1">
-                            {generations.data.length > 0 ? (
-                                <div className="overflow-x-auto">
-                                    <table className="w-full text-left text-sm">
-                                        <tbody className="divide-y divide-neutral-100 dark:divide-neutral-800/60">
-                                            {generations.data.map((gen) => (
-                                                <tr key={gen.id} className="hover:bg-neutral-50/50 dark:hover:bg-neutral-950/10">
-                                                    <td className="p-3 text-xs whitespace-nowrap text-neutral-450">
-                                                        {new Date(gen.created_at).toLocaleDateString()}
-                                                    </td>
-                                                    <td className="p-3 text-xs font-bold text-indigo-600 capitalize">
-                                                        {gen.content_type.replace('_', ' ')}
-                                                    </td>
-                                                    <td className="p-3 text-xs text-neutral-600 dark:text-neutral-400 max-w-[200px] truncate">
-                                                        {gen.user_prompt}
-                                                    </td>
-                                                    <td className="p-3 text-xs">
-                                                        <Badge className="bg-neutral-100 text-neutral-600 capitalize">{gen.status}</Badge>
-                                                    </td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            ) : (
-                                <div className="py-8 text-center text-neutral-400 text-xs">No copy generated yet.</div>
-                            )}
-                        </CardContent>
-                        {generations.links.length > 3 && (
-                            <div className="flex justify-center gap-1 py-3 border-t border-neutral-100 dark:border-neutral-800">
-                                {generations.links.map((link, idx) => (
-                                    <Link
-                                        key={idx}
-                                        href={link.url || '#'}
-                                        className={`px-2 py-1 rounded text-[10px] font-semibold border transition ${
-                                            link.active
-                                                ? 'bg-indigo-600 border-indigo-600 text-white'
-                                                : link.url
-                                                ? 'bg-white hover:bg-neutral-50 border-neutral-200 dark:bg-neutral-900 dark:border-neutral-800 text-neutral-700 dark:text-neutral-300'
-                                                : 'text-neutral-400 border-neutral-100 dark:border-neutral-900 pointer-events-none'
-                                        }`}
-                                        dangerouslySetInnerHTML={{ __html: link.label }}
-                                    />
-                                ))}
+                {/* Generations Table Section */}
+                <Card className="flex flex-col justify-between overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-xs dark:border-neutral-800 dark:bg-neutral-900">
+                    <CardHeader className="pb-2">
+                        <CardTitle className="flex items-center gap-1.5 text-sm font-bold text-neutral-900 dark:text-neutral-50">
+                            <Sparkles className="size-4 text-indigo-600" />
+                            Generated Copy History ({generations.total} total)
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent className="flex-1 p-0">
+                        {generations.data.length > 0 ? (
+                            <div className="overflow-x-auto">
+                                <table className="w-full text-left text-sm">
+                                    <thead className="border-b border-neutral-100 bg-neutral-50 text-[10px] font-bold uppercase text-neutral-400 dark:border-neutral-800 dark:bg-neutral-950">
+                                        <tr>
+                                            <th className="p-3">Date</th>
+                                            <th className="p-3">Type</th>
+                                            <th className="p-3">Prompt</th>
+                                            <th className="p-3">Engine</th>
+                                            <th className="p-3">Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-neutral-100 dark:divide-neutral-800/60">
+                                        {generations.data.map((gen) => (
+                                            <tr
+                                                key={gen.id}
+                                                className="hover:bg-neutral-50/50 dark:hover:bg-neutral-950/10"
+                                            >
+                                                <td className="whitespace-nowrap p-3 text-xs text-neutral-400">
+                                                    {new Date(
+                                                        gen.created_at
+                                                    ).toLocaleDateString()}
+                                                </td>
+                                                <td className="p-3 text-xs font-bold capitalize text-indigo-600">
+                                                    {gen.content_type.replace(
+                                                        '_',
+                                                        ' '
+                                                    )}
+                                                </td>
+                                                <td className="max-w-[320px] truncate p-3 text-xs text-neutral-600 dark:text-neutral-400">
+                                                    {gen.user_prompt}
+                                                </td>
+                                                <td className="p-3 text-xs capitalize text-neutral-600 dark:text-neutral-300">
+                                                    {gen.ai_provider || 'gemini'}
+                                                </td>
+                                                <td className="p-3 text-xs">
+                                                    <Badge className="bg-neutral-100 text-neutral-600 capitalize">
+                                                        {gen.status}
+                                                    </Badge>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        ) : (
+                            <div className="py-8 text-center text-xs text-neutral-400">
+                                No copy generated yet by this user.
                             </div>
                         )}
-                    </Card>
-
-                    {/* Ledger Transactions */}
-                    <Card className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 shadow-sm overflow-hidden flex flex-col justify-between">
-                        <CardHeader className="pb-2">
-                            <CardTitle className="text-sm font-bold text-neutral-900 dark:text-neutral-50 flex items-center gap-1.5">
-                                <Receipt className="size-4 text-indigo-600" />
-                                Balance Ledger Logs ({transactions.total})
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent className="p-0 flex-1">
-                            {transactions.data.length > 0 ? (
-                                <div className="overflow-x-auto">
-                                    <table className="w-full text-left text-sm">
-                                        <tbody className="divide-y divide-neutral-100 dark:divide-neutral-800/60">
-                                            {transactions.data.map((tx) => {
-                                                const isPositive = tx.amount > 0;
-                                                return (
-                                                    <tr key={tx.id} className="hover:bg-neutral-50/50 dark:hover:bg-neutral-950/10">
-                                                        <td className="p-3 text-[10px] text-neutral-450 whitespace-nowrap">
-                                                            {new Date(tx.created_at).toLocaleDateString()}
-                                                        </td>
-                                                        <td className="p-3 text-xs capitalize font-semibold text-neutral-500">
-                                                            {tx.type}
-                                                        </td>
-                                                        <td className={`p-3 text-xs font-bold ${isPositive ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
-                                                            {isPositive ? `+${tx.amount}` : tx.amount}
-                                                        </td>
-                                                        <td className="p-3 text-xs text-neutral-500 max-w-[160px] truncate" title={tx.description}>
-                                                            {tx.description}
-                                                        </td>
-                                                    </tr>
-                                                );
-                                            })}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            ) : (
-                                <div className="py-8 text-center text-neutral-400 text-xs">No transactions recorded.</div>
-                            )}
-                        </CardContent>
-                        {transactions.links.length > 3 && (
-                            <div className="flex justify-center gap-1 py-3 border-t border-neutral-100 dark:border-neutral-800">
-                                {transactions.links.map((link, idx) => (
-                                    <Link
-                                        key={idx}
-                                        href={link.url || '#'}
-                                        className={`px-2 py-1 rounded text-[10px] font-semibold border transition ${
-                                            link.active
-                                                ? 'bg-indigo-600 border-indigo-600 text-white'
-                                                : link.url
-                                                ? 'bg-white hover:bg-neutral-50 border-neutral-200 dark:bg-neutral-900 dark:border-neutral-800 text-neutral-700 dark:text-neutral-300'
-                                                : 'text-neutral-400 border-neutral-100 dark:border-neutral-900 pointer-events-none'
-                                        }`}
-                                        dangerouslySetInnerHTML={{ __html: link.label }}
-                                    />
-                                ))}
-                            </div>
-                        )}
-                    </Card>
-
-                </div>
-
+                    </CardContent>
+                    {generations.links.length > 3 && (
+                        <div className="flex justify-center gap-1 border-t border-neutral-100 py-3 dark:border-neutral-800">
+                            {generations.links.map((link, idx) => (
+                                <Link
+                                    key={idx}
+                                    href={link.url || '#'}
+                                    className={`rounded px-2 py-1 text-[10px] font-semibold border transition ${
+                                        link.active
+                                            ? 'border-indigo-600 bg-indigo-600 text-white'
+                                            : link.url
+                                            ? 'border-neutral-200 bg-white text-neutral-700 hover:bg-neutral-50 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-300'
+                                            : 'pointer-events-none border-neutral-100 text-neutral-400 dark:border-neutral-900'
+                                    }`}
+                                    dangerouslySetInnerHTML={{
+                                        __html: link.label,
+                                    }}
+                                />
+                            ))}
+                        </div>
+                    )}
+                </Card>
             </div>
         </>
     );

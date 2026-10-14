@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Middleware\AdminOnly;
-use App\Http\Middleware\EnsureUserHasCredits;
+use App\Http\Middleware\EnsureUserHasApiKey;
 use App\Http\Middleware\HandleAppearance;
 use App\Http\Middleware\HandleInertiaRequests;
 use Illuminate\Foundation\Application;
@@ -18,7 +18,6 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->encryptCookies(except: ['appearance', 'sidebar_state']);
-        $middleware->validateCsrfTokens(except: ['webhooks/stripe']);
 
         $middleware->web(append: [
             HandleAppearance::class,
@@ -27,7 +26,7 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         $middleware->alias([
-            'credits' => EnsureUserHasCredits::class,
+            'api_key' => EnsureUserHasApiKey::class,
             'admin' => AdminOnly::class,
         ]);
     })

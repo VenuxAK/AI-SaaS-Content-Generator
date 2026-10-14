@@ -8,7 +8,8 @@ interface User {
     id: number;
     name: string;
     email: string;
-    credit_balance: number;
+    ai_provider?: string;
+    ai_model?: string;
     is_admin: boolean;
     created_at: string;
 }
@@ -37,7 +38,7 @@ export default function AdminUsers({ users }: UsersProps) {
                             Admin Console: Users
                         </h1>
                         <p className="text-sm text-neutral-500 dark:text-neutral-400 mt-1">
-                            Monitor registered user profiles, balance allocations, and transactional histories.
+                            Monitor registered user profiles and AI engine configurations.
                         </p>
                     </div>
                 </div>
@@ -56,7 +57,7 @@ export default function AdminUsers({ users }: UsersProps) {
                                             <th className="p-4 font-bold text-xs">Name</th>
                                             <th className="p-4 font-bold text-xs">Email</th>
                                             <th className="p-4 font-bold text-xs">Role</th>
-                                            <th className="p-4 font-bold text-xs">Credit Balance</th>
+                                            <th className="p-4 font-bold text-xs">AI Provider</th>
                                             <th className="p-4 font-bold text-xs">Joined Date</th>
                                             <th className="p-4 font-bold text-xs">Actions</th>
                                         </tr>
@@ -83,8 +84,8 @@ export default function AdminUsers({ users }: UsersProps) {
                                                             </Badge>
                                                         )}
                                                     </td>
-                                                    <td className="p-4 text-xs font-bold text-neutral-900 dark:text-neutral-100">
-                                                        {user.credit_balance} credits
+                                                    <td className="p-4 text-xs font-semibold capitalize text-neutral-900 dark:text-neutral-100">
+                                                        {user.ai_provider || 'gemini'}
                                                     </td>
                                                     <td className="p-4 text-xs text-neutral-500 dark:text-neutral-450">
                                                         {new Date(user.created_at).toLocaleDateString()}

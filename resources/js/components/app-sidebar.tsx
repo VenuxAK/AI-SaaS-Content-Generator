@@ -1,5 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
-import { LayoutGrid, History, Sparkles, CreditCard, Users, Settings, PenTool } from 'lucide-react';
+import { LayoutGrid, History, Sparkles, Key, Users, PenTool } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
@@ -15,9 +15,7 @@ import {
 import { dashboard } from '@/routes';
 import { index as tonesIndex } from '@/routes/tones';
 import { index as historyIndex } from '@/routes/history';
-import { index as billingIndex } from '@/routes/billing';
 import { index as adminUsersIndex } from '@/routes/admin/users';
-import { index as adminTransactionsIndex } from '@/routes/admin/transactions';
 import { create as generateCreate } from '@/routes/generate';
 import type { NavItem } from '@/types';
 
@@ -47,9 +45,9 @@ export function AppSidebar() {
             icon: Sparkles,
         },
         {
-            title: 'Billing & Packages',
-            href: billingIndex.url(),
-            icon: CreditCard,
+            title: 'AI & API Keys',
+            href: '/settings/api-keys',
+            icon: Key,
         },
     ];
 
@@ -58,11 +56,6 @@ export function AppSidebar() {
             title: 'Admin Users',
             href: adminUsersIndex.url(),
             icon: Users,
-        });
-        navItems.push({
-            title: 'Admin Ledger',
-            href: adminTransactionsIndex.url(),
-            icon: Settings,
         });
     }
 

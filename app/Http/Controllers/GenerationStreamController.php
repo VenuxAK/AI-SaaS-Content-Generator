@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Actions\Credit\AddCreditAction;
 use App\Models\Generation;
 use App\Services\GeminiStreamService;
 use Illuminate\Support\Facades\DB;
@@ -13,12 +12,11 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 class GenerationStreamController extends Controller
 {
     public function __construct(
-        protected GeminiStreamService $streamService,
-        protected AddCreditAction $addCreditAction
+        protected GeminiStreamService $streamService
     ) {}
 
     /**
-     * Open an SSE connection and stream Gemini tokens to the browser.
+     * Open an SSE connection and stream tokens to the browser.
      */
     public function stream(Generation $generation): StreamedResponse
     {
@@ -62,23 +60,17 @@ class GenerationStreamController extends Controller
                                 'status' => 'completed',
                             ]);
                         });
-                    }
+                    },
+                    $generation->user
                 );
             } catch (\Throwable $e) {
                 Log::error("Streaming error for generation {$generation->id}: ".$e->getMessage());
 
                 DB::transaction(function () use ($generation) {
                     $generation->update(['status' => 'failed']);
-
-                    // Refund 1 credit atomically
-                    $this->addCreditAction->execute(
-                        $generation->user,
-                        1,
-                        "Refund for failed generation #{$generation->id}"
-                    );
                 });
 
-                echo 'data: '.json_encode(['error' => 'Generation failed. Credit refunded.'])."\n\n";
+                echo 'data: '.json_encode(['error' => 'Generation failed: '.$e->getMessage()])."\n\n";
                 flush();
 
                 return;

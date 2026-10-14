@@ -2,24 +2,21 @@
 
 namespace App\Actions\Content;
 
-use App\Actions\Credit\DeductCreditAction;
 use App\Enums\ContentType;
 use App\Enums\OutputLanguage;
 use App\Models\Generation;
 use App\Models\User;
 use App\Models\UserTone;
 use App\Services\PromptBuilderService;
-use Illuminate\Support\Facades\DB;
 
 class GenerateContentAction
 {
     public function __construct(
-        protected PromptBuilderService $promptBuilder,
-        protected DeductCreditAction $deductCredit
+        protected PromptBuilderService $promptBuilder
     ) {}
 
     /**
-     * Orchestrates content validation, credit deduction, and generation database logging.
+     * Orchestrates content validation and generation database logging.
      */
     public function execute(User $user, array $data): Generation
     {
@@ -39,27 +36,19 @@ class GenerateContentAction
 
         $fullPrompt = $this->promptBuilder->build($contentType, $userPrompt, $toneDescription, $language);
 
-        return DB::transaction(function () use ($user, $toneId, $contentType, $language, $userPrompt, $toneSnapshot, $fullPrompt) {
-            // Deduct 1 credit
-            $description = "Generation cost for {$contentType->label()}.";
+        $generation = new Generation;
+        $generation->user_id = $user->id;
+        $generation->tone_id = $toneId;
+        $generation->content_type = $contentType;
+        $generation->output_language = $language;
+        $generation->ai_provider = $user->ai_provider ?? 'gemini';
+        $generation->ai_model = $user->getActiveModel();
+        $generation->user_prompt = $userPrompt;
+        $generation->tone_snapshot = $toneSnapshot;
+        $generation->full_prompt = $fullPrompt;
+        $generation->status = 'pending';
+        $generation->save();
 
-            // Create generation first in pending status so we have it for transaction log
-            $generation = new Generation;
-            $generation->user_id = $user->id;
-            $generation->tone_id = $toneId;
-            $generation->content_type = $contentType;
-            $generation->output_language = $language;
-            $generation->user_prompt = $userPrompt;
-            $generation->tone_snapshot = $toneSnapshot;
-            $generation->full_prompt = $fullPrompt;
-            $generation->credits_used = 1;
-            $generation->status = 'pending';
-            $generation->save();
-
-            // Deduct from wallet and link to generation
-            $this->deductCredit->execute($user, $description, $generation, 1);
-
-            return $generation;
-        });
+        return $generation;
     }
 }

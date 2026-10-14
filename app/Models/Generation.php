@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Carbon;
 
 /**
@@ -32,12 +31,13 @@ use Illuminate\Support\Carbon;
     'tone_id',
     'content_type',
     'output_language',
+    'ai_provider',
+    'ai_model',
     'user_prompt',
     'tone_snapshot',
     'full_prompt',
     'ai_content',
     'edited_content',
-    'credits_used',
     'status',
 ])]
 class Generation extends Model
@@ -54,7 +54,6 @@ class Generation extends Model
         return [
             'content_type' => ContentType::class,
             'output_language' => OutputLanguage::class,
-            'credits_used' => 'integer',
         ];
     }
 
@@ -72,13 +71,5 @@ class Generation extends Model
     public function tone(): BelongsTo
     {
         return $this->belongsTo(UserTone::class);
-    }
-
-    /**
-     * @return HasOne<CreditTransaction, $this>
-     */
-    public function creditTransaction(): HasOne
-    {
-        return $this->hasOne(CreditTransaction::class);
     }
 }

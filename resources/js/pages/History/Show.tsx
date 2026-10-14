@@ -24,7 +24,8 @@ interface Generation {
     edited_content: string | null;
     status: 'pending' | 'streaming' | 'completed' | 'failed';
     created_at: string;
-    credits_used: number;
+    ai_provider?: string | null;
+    ai_model?: string | null;
     tone?: Tone | null;
 }
 
@@ -198,7 +199,7 @@ export default function HistoryShow({ generation, autostream }: ShowProps) {
         pending: <Badge className="bg-yellow-50 text-yellow-700 dark:bg-yellow-950/20 dark:text-yellow-400 border border-yellow-100 dark:border-yellow-950/30 animate-pulse">Pending</Badge>,
         streaming: <Badge className="bg-indigo-50 text-indigo-700 dark:bg-indigo-950/20 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-950/30 animate-pulse flex items-center gap-1.5"><RefreshCw className="size-3 animate-spin" /> Writing Copy...</Badge>,
         completed: <Badge className="bg-emerald-50 text-emerald-700 dark:bg-emerald-950/20 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-950/30">Completed</Badge>,
-        failed: <Badge className="bg-rose-50 text-rose-700 dark:bg-rose-950/20 dark:text-rose-400 border border-rose-100 dark:border-rose-950/30">Refunded / Failed</Badge>,
+        failed: <Badge className="bg-rose-50 text-rose-700 dark:bg-rose-950/20 dark:text-rose-400 border border-rose-100 dark:border-rose-950/30">Failed</Badge>,
     }[status] || <Badge>{status}</Badge>;
 
     return (
@@ -280,9 +281,9 @@ export default function HistoryShow({ generation, autostream }: ShowProps) {
                         </div>
                     </div>
                     <div className="p-4 rounded-xl border border-neutral-100 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-900/40">
-                        <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">Credits Spent</span>
-                        <div className="mt-1.5 text-xs font-black text-neutral-900 dark:text-neutral-100">
-                            {generation.credits_used} Credit
+                        <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">AI Engine</span>
+                        <div className="mt-1.5 text-xs font-bold capitalize text-neutral-900 dark:text-neutral-100 truncate">
+                            {generation.ai_provider || 'Gemini'} {generation.ai_model ? `(${generation.ai_model})` : ''}
                         </div>
                     </div>
                 </div>
@@ -298,7 +299,7 @@ export default function HistoryShow({ generation, autostream }: ShowProps) {
                                     <div>
                                         <h3 className="text-sm font-bold text-rose-950 dark:text-rose-400">Generation Stream Failed</h3>
                                         <p className="text-xs text-rose-800 dark:text-rose-400/80 mt-1">
-                                            {error || 'The connection to the AI generation provider was lost. Your credit has been automatically refunded to your balance.'}
+                                            {error || 'The connection to the AI generation provider failed. Please verify that your API key is valid and has access to the requested model.'}
                                         </p>
                                     </div>
                                 </div>

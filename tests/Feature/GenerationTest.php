@@ -2,7 +2,6 @@
 
 use App\Enums\ContentType;
 use App\Enums\OutputLanguage;
-use App\Enums\TransactionType;
 use App\Models\Generation;
 use App\Models\User;
 use App\Models\UserTone;
@@ -28,11 +27,17 @@ test('authenticated users can view generation form with tones and types', functi
         ->has('outputLanguages')
         ->has('tones', 1)
         ->has('recentGenerations')
+        ->has('hasApiKey')
+        ->has('aiProvider')
+        ->has('aiModel')
     );
 });
 
-test('users can initiate content generation and credits are deducted', function () {
-    $user = User::factory()->credits(10)->create();
+test('users can initiate content generation with active api key', function () {
+    $user = User::factory()->withApiKey('gemini')->create([
+        'ai_provider' => 'gemini',
+        'ai_model' => 'gemini-2.5-flash',
+    ]);
     $tone = UserTone::factory()->create([
         'user_id' => $user->id,
         'name' => 'Witty',
@@ -53,26 +58,15 @@ test('users can initiate content generation and credits are deducted', function 
         ->and($generation->output_language)->toBe(OutputLanguage::English)
         ->and($generation->user_prompt)->toBe('Top 5 AI tools in 2026')
         ->and($generation->tone_id)->toBe($tone->id)
-        ->and($generation->credits_used)->toBe(1);
+        ->and($generation->ai_provider)->toBe('gemini')
+        ->and($generation->ai_model)->toBe('gemini-2.5-flash');
 
     $response->assertRedirect(route('history.show', $generation->id));
     $response->assertSessionHas('autostream', true);
-
-    $user->refresh();
-    expect($user->credit_balance)->toBe(9);
-
-    $this->assertDatabaseHas('credit_transactions', [
-        'user_id' => $user->id,
-        'generation_id' => $generation->id,
-        'type' => TransactionType::Consumption->value,
-        'amount' => -1,
-        'balance_before' => 10,
-        'balance_after' => 9,
-    ]);
 });
 
 test('generation request validates required fields and enum values', function () {
-    $user = User::factory()->credits(5)->create();
+    $user = User::factory()->withApiKey('gemini')->create();
 
     $response = $this->actingAs($user)->post(route('generate.store'), [
         'content_type' => 'invalid_type',
@@ -84,7 +78,7 @@ test('generation request validates required fields and enum values', function ()
 });
 
 test('users cannot use tone belonging to another user', function () {
-    $user = User::factory()->credits(5)->create();
+    $user = User::factory()->withApiKey('gemini')->create();
     $otherUser = User::factory()->create();
     $otherTone = UserTone::factory()->create(['user_id' => $otherUser->id]);
 
@@ -99,16 +93,18 @@ test('users cannot use tone belonging to another user', function () {
 });
 
 test('users can stream content for their pending generation', function () {
-    $user = User::factory()->credits(5)->create();
+    $user = User::factory()->withApiKey('gemini')->create();
     $generation = Generation::factory()->pending()->create([
         'user_id' => $user->id,
         'full_prompt' => 'Generate a test post',
+        'ai_provider' => 'gemini',
+        'ai_model' => 'gemini-2.5-flash',
     ]);
 
     $mockStream = Mockery::mock(GeminiStreamService::class);
     $mockStream->shouldReceive('stream')
         ->once()
-        ->andReturnUsing(function ($prompt, $onChunk, $onComplete) {
+        ->andReturnUsing(function ($prompt, $onChunk, $onComplete, $user = null) {
             $onChunk('First chunk. ');
             $onChunk('Second chunk.');
             $onComplete('First chunk. Second chunk.');
@@ -129,11 +125,13 @@ test('users can stream content for their pending generation', function () {
         ->and($generation->ai_content)->toBe('First chunk. Second chunk.');
 });
 
-test('failed stream refunds credit and marks generation as failed', function () {
-    $user = User::factory()->credits(5)->create();
+test('failed stream marks generation as failed', function () {
+    $user = User::factory()->withApiKey('gemini')->create();
     $generation = Generation::factory()->pending()->create([
         'user_id' => $user->id,
         'full_prompt' => 'Generate a post that will fail',
+        'ai_provider' => 'gemini',
+        'ai_model' => 'gemini-2.5-flash',
     ]);
 
     $mockStream = Mockery::mock(GeminiStreamService::class);
@@ -152,19 +150,10 @@ test('failed stream refunds credit and marks generation as failed', function () 
 
     $generation->refresh();
     expect($generation->status)->toBe('failed');
-
-    $user->refresh();
-    expect($user->credit_balance)->toBe(6); // 5 + 1 refund
-
-    $this->assertDatabaseHas('credit_transactions', [
-        'user_id' => $user->id,
-        'type' => TransactionType::Refund->value,
-        'amount' => 1,
-    ]);
 });
 
 test('users cannot stream non-pending generation', function () {
-    $user = User::factory()->create();
+    $user = User::factory()->withApiKey('gemini')->create();
     $generation = Generation::factory()->completed()->create([
         'user_id' => $user->id,
     ]);
@@ -175,7 +164,7 @@ test('users cannot stream non-pending generation', function () {
 });
 
 test('users cannot stream another users generation', function () {
-    $user = User::factory()->create();
+    $user = User::factory()->withApiKey('gemini')->create();
     $otherUser = User::factory()->create();
     $generation = Generation::factory()->pending()->create([
         'user_id' => $otherUser->id,

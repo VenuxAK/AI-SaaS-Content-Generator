@@ -2,11 +2,8 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Actions\Credit\AdjustCreditAction;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Admin\AdjustCreditRequest;
 use App\Models\User;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -36,35 +33,9 @@ class UserController extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate(10, ['*'], 'generations_page');
 
-        $transactions = $user->creditTransactions()
-            ->orderBy('created_at', 'desc')
-            ->paginate(10, ['*'], 'transactions_page');
-
         return Inertia::render('Admin/UserShow', [
             'subjectUser' => $user,
             'generations' => $generations,
-            'transactions' => $transactions,
         ]);
-    }
-
-    /**
-     * Adjust credits manually for a user.
-     */
-    public function adjustCredits(AdjustCreditRequest $request, User $user, AdjustCreditAction $action): RedirectResponse
-    {
-        $validated = $request->validated();
-
-        try {
-            $action->execute($user, $validated['amount'], $validated['reason']);
-
-            Inertia::flash('toast', [
-                'type' => 'success',
-                'message' => "User credits adjusted by {$validated['amount']}.",
-            ]);
-        } catch (\Throwable $e) {
-            return back()->withErrors(['credits' => $e->getMessage()]);
-        }
-
-        return back();
     }
 }

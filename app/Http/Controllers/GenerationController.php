@@ -49,6 +49,9 @@ class GenerationController extends Controller
             'contentTypes' => $contentTypes,
             'outputLanguages' => $outputLanguages,
             'recentGenerations' => $recentGenerations,
+            'aiProvider' => $user->ai_provider ?? 'gemini',
+            'aiModel' => $user->getActiveModel(),
+            'hasApiKey' => $user->hasActiveApiKey(),
         ]);
     }
 

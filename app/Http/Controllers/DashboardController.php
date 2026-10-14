@@ -36,7 +36,9 @@ class DashboardController extends Controller
             ->get();
 
         return Inertia::render('dashboard', [
-            'creditBalance' => $user->credit_balance,
+            'aiProvider' => $user->ai_provider ?? 'gemini',
+            'aiModel' => $user->getActiveModel(),
+            'hasApiKey' => $user->hasActiveApiKey(),
             'tones' => $user->tones()->select('id', 'name')->get(),
             'contentTypes' => $contentTypes,
             'outputLanguages' => $outputLanguages,

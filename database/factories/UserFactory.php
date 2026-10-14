@@ -33,7 +33,9 @@ class UserFactory extends Factory
             'two_factor_secret' => null,
             'two_factor_recovery_codes' => null,
             'two_factor_confirmed_at' => null,
-            'credit_balance' => 10,
+            'gemini_api_key' => 'fake-gemini-key-12345',
+            'ai_provider' => 'gemini',
+            'ai_model' => 'gemini-2.5-flash',
             'is_admin' => false,
         ];
     }
@@ -49,22 +51,25 @@ class UserFactory extends Factory
     }
 
     /**
-     * Indicate that the user has zero credits.
+     * Indicate that the user has no API keys configured.
      */
-    public function noCredits(): static
+    public function withoutApiKey(): static
     {
         return $this->state(fn (array $attributes) => [
-            'credit_balance' => 0,
+            'gemini_api_key' => null,
+            'openai_api_key' => null,
+            'openrouter_api_key' => null,
         ]);
     }
 
     /**
-     * Set a specific credit balance for the user.
+     * Set a specific API key for a provider.
      */
-    public function credits(int $amount): static
+    public function withApiKey(string $provider = 'gemini', string $key = 'test-key-12345678'): static
     {
         return $this->state(fn (array $attributes) => [
-            'credit_balance' => $amount,
+            "{$provider}_api_key" => $key,
+            'ai_provider' => $provider,
         ]);
     }
 

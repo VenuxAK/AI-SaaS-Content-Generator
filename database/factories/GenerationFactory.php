@@ -33,7 +33,8 @@ class GenerationFactory extends Factory
             'full_prompt' => "Generate content: {$prompt}",
             'ai_content' => fake()->paragraphs(3, true),
             'edited_content' => null,
-            'credits_used' => 1,
+            'ai_provider' => 'gemini',
+            'ai_model' => 'gemini-2.5-flash',
             'status' => 'completed',
         ];
     }
