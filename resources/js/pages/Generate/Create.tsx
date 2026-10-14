@@ -1,11 +1,22 @@
+import { useState } from 'react';
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
+import { motion } from 'framer-motion';
 import {
     AlertTriangle,
+    ArrowRight,
+    CheckCircle2,
     Cpu,
+    FileText,
     History,
     Key,
+    Layers,
+    Linkedin,
+    Megaphone,
+    Mail,
     PenTool,
+    Share2,
     Sparkles,
+    Twitter,
     Zap,
 } from 'lucide-react';
 
@@ -53,6 +64,30 @@ interface CreateProps {
     hasApiKey?: boolean;
 }
 
+const PLATFORM_ICONS: Record<string, typeof Linkedin> = {
+    linkedin_post: Linkedin,
+    twitter_thread: Twitter,
+    facebook_post: Share2,
+    blog_post: FileText,
+    ad_copy: Megaphone,
+    cold_email: Mail,
+};
+
+const PROMPT_SUGGESTIONS = [
+    {
+        title: 'Launch Announcement',
+        prompt: 'Announce the launch of our new product feature. Emphasize speed, simplicity, and a 30-day money-back guarantee with a bold call to action.',
+    },
+    {
+        title: 'Thought Leadership',
+        prompt: 'Share a contrarian take on why conventional industry wisdom is broken, supported by 3 practical lessons learned from scaling to 10k users.',
+    },
+    {
+        title: 'Direct Response Pitch',
+        prompt: 'Write an irresistible hook addressing the #1 frustration of solo founders, followed by our solution and social proof.',
+    },
+];
+
 export default function Create({
     tones,
     contentTypes,
@@ -82,109 +117,189 @@ export default function Create({
         post(generateStore.url());
     };
 
+    const handleApplySuggestion = (promptText: string) => {
+        setData('user_prompt', promptText);
+    };
+
     return (
         <>
-            <Head title="Generate AI Copy" />
-            <div className="mx-auto flex h-full w-full max-w-7xl flex-1 flex-col gap-6 p-6">
-                {/* Header Title */}
-                <div className="flex flex-col gap-1">
-                    <h1 className="flex items-center gap-2 text-2xl font-black tracking-tight text-neutral-950 dark:text-neutral-50">
-                        <PenTool className="size-6 text-indigo-600 dark:text-indigo-400" />
-                        Generate AI Copy
-                    </h1>
-                    <p className="text-sm text-neutral-500 dark:text-neutral-400">
-                        Create high-converting copy, posts, and scripts streamed directly from your active AI model.
-                    </p>
+            <Head title="AI Studio - Generate Copy" />
+            <div className="mx-auto flex h-full w-full max-w-7xl flex-1 flex-col gap-6 p-4 sm:p-6 lg:p-8">
+                {/* Studio Header */}
+                <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between border-b border-slate-200/80 pb-5 dark:border-slate-800/80">
+                    <div className="flex flex-col gap-1">
+                        <div className="flex items-center gap-2.5">
+                            <div className="flex size-9 items-center justify-center rounded-xl bg-indigo-600/10 text-indigo-600 dark:bg-indigo-500/20 dark:text-indigo-400">
+                                <PenTool className="size-5" />
+                            </div>
+                            <h1 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">
+                                AI Copy Studio
+                            </h1>
+                            <span className="rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-xs font-bold text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                                BYOK Active
+                            </span>
+                        </div>
+                        <p className="text-sm text-slate-500 dark:text-slate-400">
+                            Craft high-impact copy, multi-platform threads, and blogs streamed directly through your calibrated AI keys.
+                        </p>
+                    </div>
+
+                    {/* Active Model Quick Badge */}
+                    <div className="flex items-center gap-2">
+                        <Link
+                            href="/settings/api-keys"
+                            className="flex items-center gap-2 rounded-xl border border-slate-200/80 bg-white px-3.5 py-2 text-xs font-semibold text-slate-700 shadow-xs transition hover:border-indigo-400 hover:text-indigo-600 dark:border-slate-800 dark:bg-[#0c0e1a] dark:text-slate-300 dark:hover:border-indigo-500/50 dark:hover:text-white"
+                        >
+                            <span className="flex size-2 rounded-full bg-emerald-500 animate-pulse" />
+                            <span className="font-mono">{providerNames[aiProvider] || 'AI'}: {aiModel}</span>
+                            <span className="text-slate-400 text-[10px]">Change →</span>
+                        </Link>
+                    </div>
                 </div>
 
                 {/* API Key Missing Alert */}
                 {(!hasApiKey || pageErrors?.api_key) && (
-                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-5 text-amber-900 dark:text-amber-200">
+                    <motion.div
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-5 text-amber-900 dark:text-amber-200 backdrop-blur-md"
+                    >
                         <div className="flex items-center gap-3">
-                            <div className="rounded-xl bg-amber-500/20 p-2 text-amber-600 dark:text-amber-400">
+                            <div className="rounded-xl bg-amber-500/20 p-2.5 text-amber-600 dark:text-amber-400">
                                 <AlertTriangle className="size-5" />
                             </div>
                             <div>
-                                <h4 className="text-sm font-bold">API Key Required</h4>
+                                <h4 className="text-sm font-bold">BYOK API Key Required</h4>
                                 <p className="text-xs text-amber-800/80 dark:text-amber-300/80 mt-0.5">
                                     {pageErrors?.api_key ||
-                                        `Please configure your ${providerNames[aiProvider] || 'AI'} API key in settings before generating content.`}
+                                        `Connect your ${providerNames[aiProvider] || 'AI'} API key to unlock zero-markup streaming generation.`}
                                 </p>
                             </div>
                         </div>
                         <Link
                             href="/settings/api-keys"
-                            className="inline-flex items-center gap-1.5 rounded-lg bg-amber-600 hover:bg-amber-500 px-4 py-2 text-xs font-semibold text-white transition shrink-0"
+                            className="inline-flex items-center gap-2 rounded-xl bg-amber-600 hover:bg-amber-500 px-5 py-2.5 text-xs font-bold text-white shadow-md transition shrink-0 active:scale-95"
                         >
-                            <Key className="size-3.5" />
+                            <Key className="size-4" />
                             Configure Key
                         </Link>
-                    </div>
+                    </motion.div>
                 )}
 
-                {/* Main Content Layout */}
-                <div className="grid gap-6 lg:grid-cols-3">
-                    {/* Left Form Column */}
-                    <div className="space-y-6 lg:col-span-2">
-                        <Card className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-xs dark:border-neutral-800 dark:bg-neutral-900">
+                {/* Split-Pane Studio Layout */}
+                <div className="grid gap-8 lg:grid-cols-12">
+                    {/* Left Studio Input Pane */}
+                    <div className="lg:col-span-8 space-y-6">
+                        <Card className="rounded-3xl border border-slate-200/90 bg-white/90 p-6 sm:p-8 shadow-xl backdrop-blur-xl dark:border-slate-800/90 dark:bg-[#0c0e1a]/90 glow-indigo">
                             <form onSubmit={submit} className="space-y-6">
-                                <div className="grid gap-4 sm:grid-cols-2">
+                                {/* 1. Target Platform Selection Pills */}
+                                <div>
+                                    <label className="mb-2.5 block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                                        1. Select Target Format
+                                    </label>
+                                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+                                        {contentTypes.map((type) => {
+                                            const IconComponent = PLATFORM_ICONS[type.value] || FileText;
+                                            const isSelected = data.content_type === type.value;
+                                            return (
+                                                <button
+                                                    key={type.value}
+                                                    type="button"
+                                                    onClick={() => setData('content_type', type.value)}
+                                                    className={`flex cursor-pointer items-center gap-2.5 rounded-2xl border p-3 text-left transition-all ${
+                                                        isSelected
+                                                            ? 'border-indigo-600 bg-indigo-50/70 text-indigo-900 shadow-sm dark:border-indigo-500 dark:bg-indigo-950/40 dark:text-indigo-200 font-bold'
+                                                            : 'border-slate-200 bg-slate-50/50 text-slate-700 hover:border-slate-300 hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-900/40 dark:text-slate-300 dark:hover:border-slate-700'
+                                                    }`}
+                                                >
+                                                    <div
+                                                        className={`flex size-8 shrink-0 items-center justify-center rounded-xl ${
+                                                            isSelected
+                                                                ? 'bg-indigo-600 text-white dark:bg-indigo-500'
+                                                                : 'bg-slate-200/60 text-slate-600 dark:bg-slate-800 dark:text-slate-400'
+                                                        }`}
+                                                    >
+                                                        <IconComponent className="size-4" />
+                                                    </div>
+                                                    <span className="text-xs truncate font-semibold">
+                                                        {type.label}
+                                                    </span>
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+                                    {errors.content_type && (
+                                        <span className="mt-1.5 block text-xs text-rose-500">
+                                            {errors.content_type}
+                                        </span>
+                                    )}
+                                </div>
+
+                                {/* 2. Tone and Language */}
+                                <div className="grid gap-5 sm:grid-cols-2">
+                                    {/* Tone Selector */}
                                     <div>
-                                        <label
-                                            htmlFor="content_type"
-                                            className="mb-2 block text-sm font-semibold text-neutral-700 dark:text-neutral-300"
-                                        >
-                                            Content Type
-                                        </label>
+                                        <div className="mb-2 flex items-center justify-between">
+                                            <label
+                                                htmlFor="tone_id"
+                                                className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400"
+                                            >
+                                                2. Voice Tone
+                                            </label>
+                                            <Link
+                                                href={tonesIndex.url()}
+                                                className="text-xs font-semibold text-indigo-600 hover:underline dark:text-indigo-400 inline-flex items-center gap-1"
+                                            >
+                                                <Sparkles className="size-3" />
+                                                Manage Tones
+                                            </Link>
+                                        </div>
+
                                         <Select
-                                            value={data.content_type}
+                                            value={data.tone_id ? String(data.tone_id) : 'none'}
                                             onValueChange={(val) =>
-                                                setData('content_type', val)
+                                                setData('tone_id', val === 'none' ? '' : val)
                                             }
                                         >
-                                            <SelectTrigger className="h-11 w-full cursor-pointer rounded-xl border border-neutral-200 bg-white px-4 py-3 text-neutral-900 shadow-xs hover:border-neutral-300 focus:ring-2 focus:ring-indigo-500 dark:border-neutral-800 dark:bg-neutral-950 dark:text-neutral-100 dark:hover:border-neutral-700">
-                                                <SelectValue placeholder="Select content type" />
+                                            <SelectTrigger className="h-11 w-full cursor-pointer rounded-2xl border border-slate-200 bg-white px-4 text-xs font-semibold text-slate-900 shadow-xs hover:border-slate-300 focus:ring-2 focus:ring-indigo-500 dark:border-slate-800 dark:bg-[#07080e] dark:text-slate-100">
+                                                <SelectValue placeholder="Select writing tone" />
                                             </SelectTrigger>
-                                            <SelectContent className="border border-neutral-200 bg-white dark:border-neutral-800 dark:bg-neutral-950">
-                                                {contentTypes.map((type) => (
-                                                    <SelectItem
-                                                        key={type.value}
-                                                        value={type.value}
-                                                    >
-                                                        {type.label}
+                                            <SelectContent className="border border-slate-200 bg-white dark:border-slate-800 dark:bg-[#07080e]">
+                                                <SelectItem value="none">
+                                                    Neutral & Natural (Standard Default)
+                                                </SelectItem>
+                                                {tones.map((t) => (
+                                                    <SelectItem key={t.id} value={String(t.id)}>
+                                                        ✨ {t.name}
                                                     </SelectItem>
                                                 ))}
                                             </SelectContent>
                                         </Select>
-                                        {errors.content_type && (
+                                        {errors.tone_id && (
                                             <span className="mt-1 block text-xs text-rose-500">
-                                                {errors.content_type}
+                                                {errors.tone_id}
                                             </span>
                                         )}
                                     </div>
 
+                                    {/* Output Language */}
                                     <div>
                                         <label
                                             htmlFor="output_language"
-                                            className="mb-2 block text-sm font-semibold text-neutral-700 dark:text-neutral-300"
+                                            className="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400"
                                         >
-                                            Language
+                                            3. Output Language
                                         </label>
                                         <Select
                                             value={data.output_language}
-                                            onValueChange={(val) =>
-                                                setData('output_language', val)
-                                            }
+                                            onValueChange={(val) => setData('output_language', val)}
                                         >
-                                            <SelectTrigger className="h-11 w-full cursor-pointer rounded-xl border border-neutral-200 bg-white px-4 py-3 text-neutral-900 shadow-xs hover:border-neutral-300 focus:ring-2 focus:ring-indigo-500 dark:border-neutral-800 dark:bg-neutral-950 dark:text-neutral-100 dark:hover:border-neutral-700">
+                                            <SelectTrigger className="h-11 w-full cursor-pointer rounded-2xl border border-slate-200 bg-white px-4 text-xs font-semibold text-slate-900 shadow-xs hover:border-slate-300 focus:ring-2 focus:ring-indigo-500 dark:border-slate-800 dark:bg-[#07080e] dark:text-slate-100">
                                                 <SelectValue placeholder="Select language" />
                                             </SelectTrigger>
-                                            <SelectContent className="border border-neutral-200 bg-white dark:border-neutral-800 dark:bg-neutral-950">
+                                            <SelectContent className="border border-slate-200 bg-white dark:border-slate-800 dark:bg-[#07080e]">
                                                 {outputLanguages.map((lang) => (
-                                                    <SelectItem
-                                                        key={lang.value}
-                                                        value={lang.value}
-                                                    >
+                                                    <SelectItem key={lang.value} value={lang.value}>
                                                         {lang.label}
                                                     </SelectItem>
                                                 ))}
@@ -198,93 +313,27 @@ export default function Create({
                                     </div>
                                 </div>
 
-                                <div>
-                                    <div className="mb-2 flex items-center justify-between">
-                                        <label
-                                            htmlFor="tone_id"
-                                            className="block text-sm font-semibold text-neutral-700 dark:text-neutral-300"
-                                        >
-                                            Writing Tone
-                                        </label>
-                                        <Link
-                                            href={tonesIndex.url()}
-                                            className="text-xs font-semibold text-indigo-600 hover:underline dark:text-indigo-400"
-                                        >
-                                            Manage Tones →
-                                        </Link>
-                                    </div>
-                                    {tones.length > 0 ? (
-                                        <Select
-                                            value={
-                                                data.tone_id
-                                                    ? String(data.tone_id)
-                                                    : 'none'
-                                            }
-                                            onValueChange={(val) =>
-                                                setData(
-                                                    'tone_id',
-                                                    val === 'none' ? '' : val
-                                                )
-                                            }
-                                        >
-                                            <SelectTrigger className="h-11 w-full cursor-pointer rounded-xl border border-neutral-200 bg-white px-4 py-3 text-neutral-900 shadow-xs hover:border-neutral-300 focus:ring-2 focus:ring-indigo-500 dark:border-neutral-800 dark:bg-neutral-950 dark:text-neutral-100 dark:hover:border-neutral-700">
-                                                <SelectValue placeholder="Select tone" />
-                                            </SelectTrigger>
-                                            <SelectContent className="border border-neutral-200 bg-white dark:border-neutral-800 dark:bg-neutral-950">
-                                                <SelectItem value="none">
-                                                    None (Standard Default)
-                                                </SelectItem>
-                                                {tones.map((t) => (
-                                                    <SelectItem
-                                                        key={t.id}
-                                                        value={String(t.id)}
-                                                    >
-                                                        {t.name}
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-                                    ) : (
-                                        <div className="flex items-center justify-between rounded-xl border border-neutral-100 bg-neutral-50 p-3 text-xs text-neutral-500 dark:border-neutral-900 dark:bg-neutral-950 dark:text-neutral-400">
-                                            <span>
-                                                No custom tones defined. Standard tone will be used.
-                                            </span>
-                                            <Link
-                                                href={tonesIndex.url()}
-                                                className="font-bold text-indigo-600 underline dark:text-indigo-400"
-                                            >
-                                                Create Tone
-                                            </Link>
-                                        </div>
-                                    )}
-                                    {errors.tone_id && (
-                                        <span className="mt-1 block text-xs text-rose-500">
-                                            {errors.tone_id}
-                                        </span>
-                                    )}
-                                </div>
-
+                                {/* 3. Prompt Input Box */}
                                 <div>
                                     <div className="mb-2 flex items-center justify-between">
                                         <label
                                             htmlFor="user_prompt"
-                                            className="block text-sm font-semibold text-neutral-700 dark:text-neutral-300"
+                                            className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400"
                                         >
-                                            What should we write about?
+                                            4. Topic & Campaign Instructions
                                         </label>
-                                        <span className="text-xs text-neutral-400">
+                                        <span className="font-mono text-xs text-slate-400">
                                             {data.user_prompt.length} / 2000
                                         </span>
                                     </div>
+
                                     <textarea
                                         id="user_prompt"
                                         rows={6}
-                                        placeholder="Describe your product, offer, target audience, or topic in detail. The more context you provide, the better the copy!"
+                                        placeholder="Describe your product, core hook, target persona, and desired takeaway. The more context you provide, the sharper the generated copy will be..."
                                         value={data.user_prompt}
-                                        onChange={(e) =>
-                                            setData('user_prompt', e.target.value)
-                                        }
-                                        className="w-full resize-none rounded-xl border border-neutral-200 bg-white px-4 py-3 font-sans text-sm leading-relaxed text-neutral-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-neutral-800 dark:bg-neutral-950 dark:text-neutral-100"
+                                        onChange={(e) => setData('user_prompt', e.target.value)}
+                                        className="w-full resize-none rounded-2xl border border-slate-200 bg-white p-4 font-sans text-sm leading-relaxed text-slate-900 shadow-xs focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 dark:border-slate-800 dark:bg-[#07080e] dark:text-slate-100"
                                         maxLength={2000}
                                         required
                                     />
@@ -293,124 +342,138 @@ export default function Create({
                                             {errors.user_prompt}
                                         </span>
                                     )}
+
+                                    {/* Quick Prompt Ideas */}
+                                    <div className="mt-3 flex flex-wrap items-center gap-2">
+                                        <span className="text-[11px] font-semibold text-slate-400">
+                                            Quick Templates:
+                                        </span>
+                                        {PROMPT_SUGGESTIONS.map((sugg, i) => (
+                                            <button
+                                                key={i}
+                                                type="button"
+                                                onClick={() => handleApplySuggestion(sugg.prompt)}
+                                                className="cursor-pointer rounded-lg border border-slate-200/80 bg-slate-50 px-2.5 py-1 text-[11px] font-medium text-slate-600 transition hover:border-indigo-300 hover:bg-indigo-50/50 hover:text-indigo-700 dark:border-slate-800 dark:bg-slate-900/60 dark:text-slate-300 dark:hover:border-indigo-500/40 dark:hover:text-indigo-300"
+                                            >
+                                                + {sugg.title}
+                                            </button>
+                                        ))}
+                                    </div>
                                 </div>
 
+                                {/* Submit Studio Button */}
                                 <Button
                                     type="submit"
                                     disabled={processing || !hasApiKey}
-                                    className="flex h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-indigo-600 text-sm font-bold text-white shadow-xs shadow-indigo-600/10 hover:bg-indigo-500 disabled:opacity-50"
+                                    className="flex h-13 w-full cursor-pointer items-center justify-center gap-2.5 rounded-2xl bg-indigo-600 text-base font-bold text-white shadow-xl shadow-indigo-600/25 transition hover:bg-indigo-500 hover:shadow-indigo-600/35 active:scale-95 disabled:opacity-50"
                                 >
-                                    <Sparkles className="size-4" />
+                                    <Sparkles className="size-5" />
                                     {processing
-                                        ? 'Initializing Stream...'
+                                        ? 'Initializing Neural Stream...'
                                         : hasApiKey
-                                        ? 'Generate Copy'
-                                        : 'Configure API Key to Generate'}
+                                        ? 'Launch Generation Stream'
+                                        : 'Connect API Key to Generate'}
                                 </Button>
                             </form>
                         </Card>
                     </div>
 
-                    {/* Right Side AI Engine Info & Recent History */}
-                    <div className="space-y-6">
-                        {/* Engine Details Card */}
-                        <Card className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-xs dark:border-neutral-800 dark:bg-neutral-900">
-                            <div className="flex items-center justify-between">
-                                <p className="text-xs font-semibold uppercase tracking-wider text-neutral-400">
-                                    Generation Engine
-                                </p>
+                    {/* Right Telemetry & Archive Sidebar */}
+                    <div className="lg:col-span-4 space-y-6">
+                        {/* BYOK Status Card */}
+                        <Card className="rounded-3xl border border-slate-200/80 bg-white/80 p-6 shadow-md backdrop-blur-xl dark:border-slate-800/80 dark:bg-[#0c0e1a]/80">
+                            <div className="flex items-center justify-between border-b border-slate-100 pb-3 dark:border-slate-800/60">
+                                <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                                    Direct AI Engine
+                                </span>
                                 <span
-                                    className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold ${
+                                    className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-bold ${
                                         hasApiKey
                                             ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
                                             : 'bg-amber-500/10 text-amber-600 dark:text-amber-400'
                                     }`}
                                 >
                                     <span
-                                        className={`size-1.5 rounded-full ${
-                                            hasApiKey
-                                                ? 'bg-emerald-500'
-                                                : 'bg-amber-500'
+                                        className={`size-2 rounded-full ${
+                                            hasApiKey ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'
                                         }`}
                                     />
-                                    {hasApiKey ? 'Ready' : 'Key Needed'}
+                                    {hasApiKey ? 'Connected' : 'Missing Key'}
                                 </span>
                             </div>
 
-                            <div className="mt-3 flex items-center gap-3">
-                                <div className="rounded-xl bg-indigo-50 p-2.5 text-indigo-600 dark:bg-indigo-950/50 dark:text-indigo-400">
-                                    {aiProvider === 'gemini' && (
-                                        <Sparkles className="size-5" />
-                                    )}
-                                    {aiProvider === 'openai' && (
-                                        <Cpu className="size-5" />
-                                    )}
-                                    {aiProvider === 'openrouter' && (
-                                        <Zap className="size-5" />
-                                    )}
+                            <div className="mt-4 flex items-center gap-3.5">
+                                <div className="flex size-11 items-center justify-center rounded-2xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400">
+                                    {aiProvider === 'gemini' && <Zap className="size-6" />}
+                                    {aiProvider === 'openai' && <Cpu className="size-6" />}
+                                    {aiProvider === 'openrouter' && <Layers className="size-6" />}
                                 </div>
-                                <div>
-                                    <h4 className="font-bold text-sm text-neutral-950 dark:text-neutral-50">
+                                <div className="flex flex-col">
+                                    <h4 className="font-extrabold text-sm text-slate-900 dark:text-white">
                                         {providerNames[aiProvider] || aiProvider}
                                     </h4>
-                                    <p className="font-mono text-xs text-neutral-500 dark:text-neutral-400">
+                                    <span className="font-mono text-xs text-indigo-600 dark:text-indigo-400 font-semibold truncate max-w-[180px]">
                                         {aiModel}
-                                    </p>
+                                    </span>
                                 </div>
+                            </div>
+
+                            <div className="mt-5 pt-4 border-t border-slate-100 dark:border-slate-800/60 flex items-center justify-between text-xs">
+                                <span className="text-slate-500 dark:text-slate-400">Platform Markup:</span>
+                                <strong className="font-bold text-emerald-600 dark:text-emerald-400">0% (Pure Direct API)</strong>
                             </div>
 
                             <Link
                                 href="/settings/api-keys"
-                                className="mt-4 block text-xs font-semibold text-indigo-600 hover:underline dark:text-indigo-400"
+                                className="mt-4 flex items-center justify-center gap-1.5 rounded-xl border border-slate-200/80 bg-slate-50 py-2.5 text-xs font-bold text-slate-700 transition hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-900/60 dark:text-slate-300 dark:hover:bg-slate-800"
                             >
-                                Change provider or model →
+                                <Key className="size-3.5" />
+                                Manage Provider & Keys →
                             </Link>
                         </Card>
 
-                        {/* Recent History */}
-                        <Card className="flex flex-col rounded-2xl border border-neutral-200 bg-white p-6 shadow-xs dark:border-neutral-800 dark:bg-neutral-900">
-                            <div className="mb-4 flex items-center justify-between border-b border-neutral-100 pb-3 dark:border-neutral-800">
+                        {/* Recent Generations Feed */}
+                        <Card className="rounded-3xl border border-slate-200/80 bg-white/80 p-6 shadow-md backdrop-blur-xl dark:border-slate-800/80 dark:bg-[#0c0e1a]/80">
+                            <div className="mb-4 flex items-center justify-between border-b border-slate-100 pb-3 dark:border-slate-800/60">
                                 <div className="flex items-center gap-2">
-                                    <History className="size-4 text-indigo-600" />
-                                    <h2 className="text-sm font-bold text-neutral-900 dark:text-neutral-50">
-                                        Recent Copies
-                                    </h2>
+                                    <History className="size-4 text-indigo-600 dark:text-indigo-400" />
+                                    <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white">
+                                        Recent Generations
+                                    </h3>
                                 </div>
                                 <Link
                                     href={historyIndex.url()}
-                                    className="text-xs font-semibold text-neutral-400 hover:text-neutral-600 hover:underline"
+                                    className="text-xs font-bold text-indigo-600 hover:underline dark:text-indigo-400"
                                 >
-                                    View All
+                                    All ({recentGenerations.length})
                                 </Link>
                             </div>
 
                             {recentGenerations.length > 0 ? (
-                                <div className="max-h-[300px] space-y-3 overflow-y-auto pr-1">
+                                <div className="space-y-2.5 max-h-[320px] overflow-y-auto pr-1">
                                     {recentGenerations.map((gen) => (
                                         <Link
                                             key={gen.id}
                                             href={historyShow.url(gen.id)}
-                                            className="group block rounded-xl border border-neutral-100 p-3 transition hover:bg-neutral-50 dark:border-neutral-800/60 dark:hover:bg-neutral-950"
+                                            className="group block rounded-2xl border border-slate-100 bg-slate-50/50 p-3.5 transition hover:border-indigo-200 hover:bg-indigo-50/30 dark:border-slate-800/60 dark:bg-slate-900/40 dark:hover:border-indigo-500/30 dark:hover:bg-slate-900/70"
                                         >
                                             <div className="flex items-center justify-between">
-                                                <span className="text-xs font-bold capitalize text-neutral-900 dark:text-neutral-100">
+                                                <span className="text-xs font-bold capitalize text-slate-900 dark:text-slate-100">
                                                     {gen.content_type.replace('_', ' ')}
                                                 </span>
-                                                <span className="text-[10px] text-neutral-400">
-                                                    {new Date(
-                                                        gen.created_at
-                                                    ).toLocaleDateString()}
+                                                <span className="text-[10px] text-slate-400 font-mono">
+                                                    {new Date(gen.created_at).toLocaleDateString()}
                                                 </span>
                                             </div>
-                                            <p className="mt-1 truncate text-xs text-neutral-500 group-hover:text-neutral-800 dark:text-neutral-400 dark:group-hover:text-neutral-300">
+                                            <p className="mt-1 line-clamp-2 text-xs text-slate-500 group-hover:text-slate-800 dark:text-slate-400 dark:group-hover:text-slate-200">
                                                 {gen.user_prompt}
                                             </p>
                                         </Link>
                                     ))}
                                 </div>
                             ) : (
-                                <div className="py-8 text-center text-xs text-neutral-400 dark:text-neutral-500">
-                                    No copies generated yet.
+                                <div className="py-8 text-center text-xs text-slate-400 dark:text-slate-500">
+                                    No copies generated yet. Your past generations will appear here.
                                 </div>
                             )}
                         </Card>
@@ -424,6 +487,6 @@ export default function Create({
 Create.layout = {
     breadcrumbs: [
         { title: 'Dashboard', href: '/dashboard' },
-        { title: 'Generate Copy', href: '/generate' },
+        { title: 'AI Copy Studio', href: '/generate' },
     ],
 };

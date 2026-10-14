@@ -1,8 +1,26 @@
+import { useState } from 'react';
 import { Head, Link } from '@inertiajs/react';
-import { History, MessageSquare, Languages, Sparkles, AlertCircle, Compass } from 'lucide-react';
-import { index as historyIndex, show as historyShow } from '@/routes/history';
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
+import {
+    History,
+    Languages,
+    MessageSquare,
+    PenTool,
+    Sparkles,
+    Linkedin,
+    Twitter,
+    FileText,
+    Share2,
+    Megaphone,
+    Mail,
+    Copy,
+    Check,
+} from 'lucide-react';
+import { toast } from 'sonner';
+
 import { Badge } from '@/components/ui/badge';
+import { Card, CardHeader, CardContent, CardFooter } from '@/components/ui/card';
+import { create as generateCreate } from '@/routes/generate';
+import { show as historyShow } from '@/routes/history';
 
 interface Tone {
     id: number;
@@ -30,23 +48,53 @@ interface HistoryProps {
     };
 }
 
+const PLATFORM_ICONS: Record<string, typeof Linkedin> = {
+    linkedin_post: Linkedin,
+    twitter_thread: Twitter,
+    facebook_post: Share2,
+    blog_post: FileText,
+    ad_copy: Megaphone,
+    cold_email: Mail,
+};
+
 export default function HistoryIndex({ history }: HistoryProps) {
+    const [copiedId, setCopiedId] = useState<number | null>(null);
+
+    const handleCopyText = (id: number, text: string | null) => {
+        if (!text) return;
+        navigator.clipboard.writeText(text);
+        setCopiedId(id);
+        toast.success('AI output copied to clipboard!');
+        setTimeout(() => setCopiedId(null), 2000);
+    };
+
     return (
         <>
-            <Head title="Content Generation History" />
-            <div className="flex h-full flex-1 flex-col gap-6 p-6 max-w-7xl mx-auto w-full">
-                
+            <Head title="Content Archive - Nexus AI" />
+            <div className="mx-auto flex h-full w-full max-w-7xl flex-1 flex-col gap-6 p-4 sm:p-6 lg:p-8">
                 {/* Header Section */}
-                <div className="flex justify-between items-center border-b border-neutral-100 dark:border-neutral-800 pb-5">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200/80 pb-5 dark:border-slate-800/80">
                     <div>
-                        <h1 className="text-2xl font-black text-neutral-950 dark:text-neutral-50 flex items-center gap-2">
-                            <History className="size-6 text-indigo-600" />
-                            Content History
-                        </h1>
-                        <p className="text-sm text-neutral-500 dark:text-neutral-400 mt-1">
-                            Review, edit, copy, or delete your previous AI generations.
+                        <div className="flex items-center gap-2.5">
+                            <div className="flex size-9 items-center justify-center rounded-2xl bg-indigo-600/10 text-indigo-600 dark:bg-indigo-500/20 dark:text-indigo-400">
+                                <History className="size-5" />
+                            </div>
+                            <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">
+                                Content Archive
+                            </h1>
+                        </div>
+                        <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
+                            Review, export, copy, or manage your historical AI-generated campaigns and copy.
                         </p>
                     </div>
+
+                    <Link
+                        href={generateCreate.url()}
+                        className="inline-flex h-11 items-center gap-2 rounded-2xl bg-indigo-600 px-5 text-xs font-bold text-white shadow-xl shadow-indigo-600/20 hover:bg-indigo-500 transition self-start sm:self-auto"
+                    >
+                        <PenTool className="size-3.5" />
+                        Create New Copy
+                    </Link>
                 </div>
 
                 {/* History Grid */}
@@ -54,39 +102,86 @@ export default function HistoryIndex({ history }: HistoryProps) {
                     <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                         {history.data.map((gen) => {
                             const date = new Date(gen.created_at).toLocaleDateString();
-                            
-                            // Badges for status
+                            const IconComponent = PLATFORM_ICONS[gen.content_type] || FileText;
+
                             const statusBadge = {
-                                pending: <Badge className="bg-yellow-50 text-yellow-700 dark:bg-yellow-950/20 dark:text-yellow-400 border border-yellow-100 dark:border-yellow-950/30 animate-pulse">Pending</Badge>,
-                                streaming: <Badge className="bg-indigo-50 text-indigo-700 dark:bg-indigo-950/20 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-950/30 animate-pulse">Writing...</Badge>,
-                                completed: <Badge className="bg-emerald-50 text-emerald-700 dark:bg-emerald-950/20 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-950/30">Completed</Badge>,
-                                failed: <Badge className="bg-rose-50 text-rose-700 dark:bg-rose-950/20 dark:text-rose-400 border border-rose-100 dark:border-rose-950/30">Refunded / Failed</Badge>,
+                                pending: (
+                                    <Badge className="border border-amber-500/20 bg-amber-500/10 text-[10px] font-bold text-amber-600 dark:text-amber-400 animate-pulse">
+                                        Pending
+                                    </Badge>
+                                ),
+                                streaming: (
+                                    <Badge className="border border-indigo-500/20 bg-indigo-500/10 text-[10px] font-bold text-indigo-600 dark:text-indigo-400 animate-pulse">
+                                        Writing...
+                                    </Badge>
+                                ),
+                                completed: (
+                                    <Badge className="border border-emerald-500/20 bg-emerald-500/10 text-[10px] font-bold text-emerald-600 dark:text-emerald-400">
+                                        Completed
+                                    </Badge>
+                                ),
+                                failed: (
+                                    <Badge className="border border-rose-500/20 bg-rose-500/10 text-[10px] font-bold text-rose-600 dark:text-rose-400">
+                                        Failed
+                                    </Badge>
+                                ),
                             }[gen.status];
 
                             return (
-                                <Link 
-                                    key={gen.id} 
+                                <Link
+                                    key={gen.id}
                                     href={historyShow.url(gen.id)}
-                                    className="block transition transform hover:-translate-y-0.5"
+                                    className="group block transition transform hover:-translate-y-1"
                                 >
-                                    <Card className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 shadow-sm hover:shadow-md transition duration-200 h-48 flex flex-col justify-between overflow-hidden">
-                                        <CardHeader className="pb-2 pt-4 px-4 border-b border-neutral-50 dark:border-neutral-950/20 flex flex-row items-center justify-between">
-                                            <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400 capitalize">
-                                                {gen.content_type.replace('_', ' ')}
-                                            </span>
+                                    <Card className="rounded-3xl border border-slate-200/80 bg-white/80 shadow-md backdrop-blur-xl transition duration-200 h-56 flex flex-col justify-between overflow-hidden dark:border-slate-800/80 dark:bg-[#0c0e1a]/80 group-hover:border-indigo-400 group-hover:shadow-xl dark:group-hover:border-indigo-500/40">
+                                        <CardHeader className="pb-2 pt-4 px-5 border-b border-slate-100 dark:border-slate-800/60 flex flex-row items-center justify-between">
+                                            <div className="flex items-center gap-2">
+                                                <div className="flex size-7 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600 dark:bg-indigo-950/40 dark:text-indigo-400">
+                                                    <IconComponent className="size-3.5" />
+                                                </div>
+                                                <span className="text-xs font-bold text-slate-900 dark:text-white capitalize truncate max-w-[140px]">
+                                                    {gen.content_type.replace('_', ' ')}
+                                                </span>
+                                            </div>
                                             {statusBadge}
                                         </CardHeader>
-                                        <CardContent className="pt-3 pb-3 px-4 flex-1">
-                                            <p className="text-xs text-neutral-600 dark:text-neutral-400 line-clamp-3 leading-relaxed">
+                                        <CardContent className="pt-3 pb-3 px-5 flex-1">
+                                            <p className="text-xs text-slate-600 dark:text-slate-400 line-clamp-3 leading-relaxed">
                                                 {gen.user_prompt}
                                             </p>
                                         </CardContent>
-                                        <CardFooter className="py-2.5 px-4 bg-neutral-50/20 dark:bg-neutral-950/10 border-t border-neutral-100 dark:border-neutral-850/40 text-[10px] text-neutral-400 flex items-center justify-between">
-                                            <span className="flex items-center gap-1">
-                                                <Languages className="size-3" />
-                                                {gen.output_language.toUpperCase()}
+                                        <CardFooter className="py-3 px-5 bg-slate-50/50 dark:bg-[#080911]/60 border-t border-slate-100 dark:border-slate-800/60 text-[11px] text-slate-400 flex items-center justify-between">
+                                            <span className="flex items-center gap-1.5 font-mono uppercase font-semibold">
+                                                <Languages className="size-3 text-indigo-500" />
+                                                {gen.output_language}
                                             </span>
-                                            <span>{date}</span>
+                                            <div className="flex items-center gap-2">
+                                                <span className="font-mono text-[10px]">{date}</span>
+                                                {gen.ai_content && (
+                                                    <button
+                                                        type="button"
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            e.stopPropagation();
+                                                            handleCopyText(gen.id, gen.ai_content);
+                                                        }}
+                                                        title="Copy AI output"
+                                                        className="flex items-center gap-1 rounded-lg border border-slate-200/80 bg-white px-2 py-0.5 text-[10px] font-semibold text-slate-700 transition hover:border-indigo-400 hover:text-indigo-600 dark:border-slate-800 dark:bg-[#0c0e1a] dark:text-slate-300 dark:hover:border-indigo-500/50 dark:hover:text-white"
+                                                    >
+                                                        {copiedId === gen.id ? (
+                                                            <>
+                                                                <Check className="size-3 text-emerald-500" />
+                                                                <span className="text-emerald-500 font-bold">Copied</span>
+                                                            </>
+                                                        ) : (
+                                                            <>
+                                                                <Copy className="size-3 text-indigo-500" />
+                                                                <span>Copy</span>
+                                                            </>
+                                                        )}
+                                                    </button>
+                                                )}
+                                            </div>
                                         </CardFooter>
                                     </Card>
                                 </Link>
@@ -94,42 +189,23 @@ export default function HistoryIndex({ history }: HistoryProps) {
                         })}
                     </div>
                 ) : (
-                    <div className="border border-dashed border-neutral-200 dark:border-neutral-800 rounded-3xl p-12 text-center max-w-md mx-auto my-6 w-full bg-neutral-50/30 dark:bg-neutral-900/10">
-                        <MessageSquare className="size-10 text-neutral-300 dark:text-neutral-700 mx-auto mb-3" />
-                        <h3 className="text-sm font-bold text-neutral-900 dark:text-neutral-50">No history available</h3>
-                        <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1 mb-6">
-                            You haven't generated any AI copy yet. Head over to the dashboard to write something.
+                    <div className="border border-dashed border-slate-200 dark:border-slate-800 rounded-3xl p-16 text-center max-w-md mx-auto my-12 w-full bg-white/50 dark:bg-[#0c0e1a]/50">
+                        <MessageSquare className="size-10 text-slate-300 dark:text-slate-700 mx-auto mb-3" />
+                        <h3 className="text-base font-extrabold text-slate-900 dark:text-white">
+                            No copies generated yet
+                        </h3>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 mb-6">
+                            Start your first AI content generation session in the studio.
                         </p>
-                        <Link 
-                            href="/dashboard"
-                            className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-bold px-4 py-2.5 text-xs shadow-sm shadow-indigo-600/10 transition"
+                        <Link
+                            href={generateCreate.url()}
+                            className="inline-flex items-center gap-2 rounded-2xl bg-indigo-600 px-6 py-3 text-xs font-bold text-white shadow-md hover:bg-indigo-500 transition"
                         >
-                            <Compass className="size-4" />
-                            Go to Writer
+                            <Sparkles className="size-4" />
+                            Launch AI Studio
                         </Link>
                     </div>
                 )}
-
-                {/* Pagination */}
-                {history.last_page > 1 && (
-                    <div className="flex justify-center gap-1.5 mt-2">
-                        {history.links.map((link, idx) => (
-                            <Link
-                                key={idx}
-                                href={link.url || '#'}
-                                className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition ${
-                                    link.active
-                                        ? 'bg-indigo-600 border-indigo-600 text-white'
-                                        : link.url
-                                        ? 'bg-white hover:bg-neutral-50 border-neutral-200 dark:bg-neutral-900 dark:border-neutral-800 text-neutral-700 dark:text-neutral-300'
-                                        : 'text-neutral-400 border-neutral-100 dark:border-neutral-900 pointer-events-none'
-                                }`}
-                                dangerouslySetInnerHTML={{ __html: link.label }}
-                            />
-                        ))}
-                    </div>
-                )}
-
             </div>
         </>
     );
@@ -142,8 +218,8 @@ HistoryIndex.layout = {
             href: '/dashboard',
         },
         {
-            title: 'History',
-            href: historyIndex.url(),
+            title: 'Content Archive',
+            href: '/history',
         },
     ],
 };

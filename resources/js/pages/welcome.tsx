@@ -1,388 +1,856 @@
+import { useState, useEffect } from 'react';
 import { Head, Link, usePage } from '@inertiajs/react';
-import { dashboard, login } from '@/routes';
-import { register } from '@/routes';
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+    ArrowRight,
+    CheckCircle2,
+    Copy,
+    Check,
+    Cpu,
+    ExternalLink,
+    Flame,
+    Key,
+    Layers,
+    Lock,
+    Moon,
+    PenTool,
+    Shield,
+    Sparkles,
+    Sun,
+    TrendingUp,
+    Zap,
+    Linkedin,
+    Twitter,
+    FileText,
+    Megaphone,
+    X as CloseIcon,
+} from 'lucide-react';
+
+import { AuroraBackground } from '@/components/ui/aurora-background';
+import { useAppearance } from '@/hooks/use-appearance';
+import { dashboard, login, register } from '@/routes';
+
+interface DemoPreset {
+    id: string;
+    label: string;
+    platform: string;
+    icon: typeof Linkedin;
+    tone: string;
+    model: string;
+    prompt: string;
+    output: string;
+    stats: {
+        words: number;
+        chars: number;
+        latency: string;
+    };
+}
+
+const DEMO_PRESETS: DemoPreset[] = [
+    {
+        id: 'linkedin',
+        label: 'LinkedIn Post',
+        platform: 'LinkedIn',
+        icon: Linkedin,
+        tone: 'Visionary & Bold',
+        model: 'Gemini 3.8 Flash',
+        prompt: 'Why bringing your own API keys is replacing traditional AI SaaS subscriptions.',
+        output: `Most companies are overpaying for AI copy. Here's the uncomfortable truth:
+
+When you pay $49/mo for an "AI copywriting tool", 90% of that price isn't the AI.
+It's SaaS markup on top of raw API tokens.
+
+Here is the new playbook:
+1. Grab a direct API key from Google Gemini or OpenAI.
+2. Plug it into an open, high-performance generation studio.
+3. Pay literal fractions of a cent per 1,000 words.
+
+Zero artificial credit limits.
+Zero monthly subscription bloat.
+Full ownership of your prompts and brand voice.
+
+The future of software isn't renting tokens—it's owning your pipeline.
+
+Are you still paying credit markups? Drop your thoughts below. 👇`,
+        stats: { words: 104, chars: 628, latency: '0.24s' },
+    },
+    {
+        id: 'twitter',
+        label: 'Viral X Thread',
+        platform: 'Twitter / X',
+        icon: Twitter,
+        tone: 'Punchy & Engaging',
+        model: 'GPT-5 (OpenAI)',
+        prompt: 'A viral 4-tweet thread breaking down prompt engineering tips for marketing copy.',
+        output: `How the top 1% write AI copy that actually converts (and doesn't sound like a generic robot): 🧵👇
+
+1/ Stop asking for "good copy."
+Instead, give the AI a negative constraint:
+"Write without buzzwords, no adjectives like 'game-changer' or 'revolutionize', and maintain an 8th-grade reading level."
+
+2/ Anchor your persona:
+Instead of "Act as a marketer", specify:
+"Act as a direct-response copywriter who has written $10M in B2B SaaS landing pages."
+
+3/ One idea per line:
+White space creates momentum. If your readers' eyes feel strained, your bounce rate doubles.
+
+Plug in your keys, iterate rapidly, and let data dictate your headlines. ⚡`,
+        stats: { words: 108, chars: 642, latency: '0.31s' },
+    },
+    {
+        id: 'ads',
+        label: 'High-Converting Ad',
+        platform: 'Meta & Google Ads',
+        icon: Megaphone,
+        tone: 'High-Converting Sales',
+        model: 'Claude 3.7 Sonnet',
+        prompt: 'Ad copy for an AI productivity app focused on eliminating busywork for solo founders.',
+        output: `🚀 Headline: Stop Trading 14 Hours a Day for 2 Hours of Progress.
+
+Primary Text:
+You didn't start a company to spend 6 hours every Tuesday formatting newsletters, responding to cold inquiries, and tweaking social graphics.
+
+Nexus AI is your autonomous copy engine:
+• Plug in your Gemini or OpenAI API keys once.
+• Generate tailored multi-channel campaigns in under 3 seconds.
+• Keep 100% of your margins—no monthly token subscriptions.
+
+👉 Click below to launch your workspace with 0% markups.`,
+        stats: { words: 78, chars: 498, latency: '0.28s' },
+    },
+    {
+        id: 'blog',
+        label: 'SEO Article Hook',
+        platform: 'Blog & Articles',
+        icon: FileText,
+        tone: 'Authoritative & Inspiring',
+        model: 'Gemini 3.5 Flash-Lite',
+        prompt: 'An engaging, story-driven blog introduction about the death of software middle-men.',
+        output: `In 2023, the easiest way to build a venture-backed startup was wrapping an OpenAI API endpoint in a colorful UI and charging $60/month.
+
+Today, that entire business model is disintegrating.
+
+Developers and creators have realized something fundamental: raw LLM intelligence is cheap, ubiquitous, and compounding weekly. The real leverage isn't the wrapper—it's giving users direct, frictionless control of their own credentials.
+
+Here is what happens when you strip away the middleman.`,
+        stats: { words: 68, chars: 472, latency: '0.19s' },
+    },
+];
 
 export default function Welcome() {
-    const { auth } = usePage().props;
+    const { auth } = usePage().props as { auth?: { user?: any } };
+    const { resolvedAppearance, updateAppearance } = useAppearance();
+    const [mounted, setMounted] = useState(false);
+
+    const [activePreset, setActivePreset] = useState<DemoPreset>(DEMO_PRESETS[0]);
+    const [displayedOutput, setDisplayedOutput] = useState('');
+    const [isTyping, setIsTyping] = useState(false);
+    const [copied, setCopied] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
+    // Simulated typewriter stream on preset change
+    useEffect(() => {
+        let index = 0;
+        const text = activePreset.output;
+        setDisplayedOutput('');
+        setIsTyping(true);
+
+        const interval = setInterval(() => {
+            if (index < text.length) {
+                setDisplayedOutput(text.slice(0, index + 3));
+                index += 3;
+            } else {
+                setDisplayedOutput(text);
+                setIsTyping(false);
+                clearInterval(interval);
+            }
+        }, 16);
+
+        return () => clearInterval(interval);
+    }, [activePreset]);
+
+    const handleCopy = () => {
+        if (!displayedOutput) return;
+        navigator.clipboard.writeText(displayedOutput);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+    };
+
+    const toggleTheme = () => {
+        updateAppearance(resolvedAppearance === 'dark' ? 'light' : 'dark');
+    };
+
+    const logoTheme = mounted ? resolvedAppearance : 'dark';
 
     return (
         <>
-            <Head title="Welcome" />
-            <div className="flex min-h-screen flex-col items-center bg-[#FDFDFC] p-6 text-[#1b1b18] lg:justify-center lg:p-8 dark:bg-[#0a0a0a]">
-                <header className="mb-6 w-full max-w-[335px] text-sm not-has-[nav]:hidden lg:max-w-4xl">
-                    <nav className="flex items-center justify-end gap-4">
-                        {auth.user ? (
-                            <Link
-                                href={dashboard()}
-                                className="inline-block rounded-sm border border-[#19140035] px-5 py-1.5 text-sm leading-normal text-[#1b1b18] hover:border-[#1915014a] dark:border-[#3E3E3A] dark:text-[#EDEDEC] dark:hover:border-[#62605b]"
+            <Head title="Nexus AI - Bring Your Own Key AI Content Studio" />
+
+            <div className="min-h-screen bg-[#f8fafc] text-slate-900 transition-colors duration-300 dark:bg-[#07080e] dark:text-slate-100 selection:bg-indigo-500/20 selection:text-indigo-600 dark:selection:text-indigo-300">
+                {/* 1. Header Navigation */}
+                <header className="sticky top-0 z-50 w-full border-b border-slate-200/80 bg-white/70 backdrop-blur-xl dark:border-slate-800/80 dark:bg-[#07080e]/75">
+                    <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+                        {/* Logo */}
+                        <Link href="/" className="flex items-center gap-2.5 group">
+                            <img
+                                src={`/images/logo/icon-only-${logoTheme}.png`}
+                                alt="Nexus AI"
+                                className="size-8 object-contain transition-transform duration-300 group-hover:scale-105"
+                            />
+                            <div className="flex flex-col">
+                                <span className="text-base font-extrabold tracking-tight text-slate-900 dark:text-white">
+                                    Nexus<span className="text-indigo-600 dark:text-indigo-400">AI</span>
+                                </span>
+                                <span className="text-[10px] font-semibold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 -mt-1">
+                                    BYOK Studio
+                                </span>
+                            </div>
+                        </Link>
+
+                        {/* Navigation Links */}
+                        <nav className="hidden md:flex items-center gap-8 text-sm font-semibold text-slate-600 dark:text-slate-300">
+                            <a href="#playground" className="transition hover:text-indigo-600 dark:hover:text-white">
+                                Live Studio Demo
+                            </a>
+                            <a href="#models" className="transition hover:text-indigo-600 dark:hover:text-white">
+                                Supported Models
+                            </a>
+                            <a href="#why-byok" className="transition hover:text-indigo-600 dark:hover:text-white">
+                                Why BYOK?
+                            </a>
+                            <a href="#features" className="transition hover:text-indigo-600 dark:hover:text-white">
+                                Features
+                            </a>
+                        </nav>
+
+                        {/* Actions */}
+                        <div className="flex items-center gap-3">
+                            {/* Theme Toggle */}
+                            <button
+                                onClick={toggleTheme}
+                                aria-label="Toggle theme"
+                                className="flex size-9 cursor-pointer items-center justify-center rounded-xl border border-slate-200/80 bg-white/50 text-slate-700 transition hover:bg-slate-100 hover:text-slate-900 dark:border-slate-800/80 dark:bg-slate-900/50 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white"
                             >
-                                Dashboard
-                            </Link>
-                        ) : (
-                            <>
+                                {mounted && resolvedAppearance === 'dark' ? (
+                                    <Sun className="size-4 text-amber-400" />
+                                ) : (
+                                    <Moon className="size-4 text-indigo-500" />
+                                )}
+                            </button>
+
+                            {auth?.user ? (
                                 <Link
-                                    href={login()}
-                                    className="inline-block rounded-sm border border-transparent px-5 py-1.5 text-sm leading-normal text-[#1b1b18] hover:border-[#19140035] dark:text-[#EDEDEC] dark:hover:border-[#3E3E3A]"
+                                    href={dashboard()}
+                                    className="inline-flex h-9.5 items-center gap-2 rounded-xl bg-indigo-600 px-4 text-sm font-bold text-white shadow-md shadow-indigo-600/20 transition hover:bg-indigo-500"
                                 >
-                                    Log in
+                                    Dashboard
+                                    <ArrowRight className="size-4" />
                                 </Link>
-                                <Link
-                                    href={register()}
-                                    className="inline-block rounded-sm border border-[#19140035] px-5 py-1.5 text-sm leading-normal text-[#1b1b18] hover:border-[#1915014a] dark:border-[#3E3E3A] dark:text-[#EDEDEC] dark:hover:border-[#62605b]"
-                                >
-                                    Register
-                                </Link>
-                            </>
-                        )}
-                    </nav>
+                            ) : (
+                                <>
+                                    <Link
+                                        href={login()}
+                                        className="hidden sm:inline-flex text-sm font-semibold text-slate-700 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white px-3 py-2"
+                                    >
+                                        Log in
+                                    </Link>
+                                    <Link
+                                        href={register()}
+                                        className="inline-flex h-9.5 items-center gap-2 rounded-xl bg-indigo-600 px-4 text-sm font-bold text-white shadow-md shadow-indigo-600/25 transition hover:bg-indigo-500 active:scale-95"
+                                    >
+                                        Get Started Free
+                                        <ArrowRight className="size-4" />
+                                    </Link>
+                                </>
+                            )}
+                        </div>
+                    </div>
                 </header>
-                <div className="flex w-full items-center justify-center opacity-100 transition-opacity duration-750 lg:grow starting:opacity-0">
-                    <main className="flex w-full max-w-[335px] flex-col-reverse lg:max-w-4xl lg:flex-row">
-                        <div className="flex-1 rounded-br-lg rounded-bl-lg bg-white p-6 pb-12 text-[13px] leading-[20px] shadow-[inset_0px_0px_0px_1px_rgba(26,26,0,0.16)] lg:rounded-tl-lg lg:rounded-br-none lg:p-20 dark:bg-[#161615] dark:text-[#EDEDEC] dark:shadow-[inset_0px_0px_0px_1px_#fffaed2d]">
-                            <h1 className="mb-1 font-medium">
-                                Let's get started
-                            </h1>
-                            <p className="mb-2 text-[#706f6c] dark:text-[#A1A09A]">
-                                Laravel has an incredibly rich ecosystem.
-                                <br />
-                                We suggest starting with the following.
+
+                {/* 2. Hero Section with Aurora Background */}
+                <AuroraBackground className="pt-16 pb-24 md:pt-24 md:pb-32 px-4 sm:px-6 lg:px-8">
+                    <div className="mx-auto max-w-5xl text-center">
+                        {/* Glow Badge */}
+                        <motion.div
+                            initial={{ opacity: 0, y: 15 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.5 }}
+                            className="inline-flex items-center gap-2 rounded-full border border-indigo-500/30 bg-indigo-500/10 px-4 py-1.5 text-xs font-semibold text-indigo-700 dark:text-indigo-300 backdrop-blur-md mb-8"
+                        >
+                            <span className="flex size-2 rounded-full bg-emerald-400 animate-pulse" />
+                            <span>Zero Token Markup • BYOK Freedom • Gemini 3.8 Flash, GPT-5 & Claude 3.7</span>
+                        </motion.div>
+
+                        {/* Main Title */}
+                        <motion.h1
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.6, delay: 0.1 }}
+                            className="text-4xl font-black tracking-tight sm:text-6xl lg:text-7xl"
+                        >
+                            Supercharge Your Copy with{' '}
+                            <span className="bg-gradient-to-r from-indigo-500 via-purple-500 to-cyan-400 bg-clip-text text-transparent">
+                                Your Own AI Keys
+                            </span>
+                        </motion.h1>
+
+                        {/* Subheading */}
+                        <motion.p
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.6, delay: 0.2 }}
+                            className="mx-auto mt-6 max-w-3xl text-base sm:text-xl leading-relaxed text-slate-600 dark:text-slate-300 font-normal"
+                        >
+                            Stop renting marked-up AI tokens at $49/month. Nexus AI connects directly to your Google Gemini, OpenAI, or OpenRouter keys—delivering high-converting social copy, viral threads, and SEO blogs with calibrated voice personas.
+                        </motion.p>
+
+                        {/* CTA Buttons */}
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.6, delay: 0.3 }}
+                            className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4"
+                        >
+                            <Link
+                                href={auth?.user ? dashboard() : register()}
+                                className="flex h-13 w-full sm:w-auto items-center justify-center gap-2.5 rounded-2xl bg-indigo-600 px-8 text-base font-bold text-white shadow-xl shadow-indigo-600/30 transition hover:bg-indigo-500 hover:shadow-indigo-600/40 active:scale-95"
+                            >
+                                <Zap className="size-5" />
+                                {auth?.user ? 'Enter AI Studio' : 'Start Generating Free'}
+                            </Link>
+
+                            <a
+                                href="#playground"
+                                className="flex h-13 w-full sm:w-auto items-center justify-center gap-2 rounded-2xl border border-slate-300/80 bg-white/70 px-7 text-base font-semibold text-slate-800 backdrop-blur-md transition hover:bg-white hover:text-slate-950 dark:border-slate-800 dark:bg-slate-900/60 dark:text-slate-200 dark:hover:bg-slate-800 dark:hover:text-white"
+                            >
+                                <Sparkles className="size-5 text-indigo-500" />
+                                Live Playground
+                            </a>
+                        </motion.div>
+
+                        {/* Trust Micro-Metrics */}
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ duration: 0.6, delay: 0.4 }}
+                            className="mt-12 flex flex-wrap items-center justify-center gap-6 sm:gap-10 text-xs font-semibold text-slate-500 dark:text-slate-400"
+                        >
+                            <div className="flex items-center gap-2">
+                                <CheckCircle2 className="size-4 text-emerald-500" />
+                                <span>100% Raw API Direct Cost</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <Shield className="size-4 text-indigo-500" />
+                                <span>AES-256 Encrypted Keys</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <Cpu className="size-4 text-cyan-500" />
+                                <span>SSE Sub-Second Streaming</span>
+                            </div>
+                        </motion.div>
+                    </div>
+                </AuroraBackground>
+
+                {/* 3. Interactive Studio Demo Showcase */}
+                <section id="playground" className="relative -mt-12 z-20 mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 pb-24">
+                    <motion.div
+                        initial={{ opacity: 0, y: 30 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.7 }}
+                        className="rounded-3xl border border-slate-200/90 bg-white/90 p-4 sm:p-8 shadow-2xl backdrop-blur-2xl dark:border-slate-800/90 dark:bg-[#0c0e1a]/90 glow-indigo"
+                    >
+                        {/* Demo Top Bar */}
+                        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-slate-200/70 dark:border-slate-800/70 pb-6">
+                            <div>
+                                <div className="flex items-center gap-2">
+                                    <span className="flex size-3 rounded-full bg-emerald-500 animate-ping" />
+                                    <h3 className="text-lg font-extrabold tracking-tight text-slate-900 dark:text-white">
+                                        Interactive Studio Simulation
+                                    </h3>
+                                    <span className="rounded-md bg-indigo-500/10 px-2 py-0.5 text-xs font-bold text-indigo-600 dark:text-indigo-400">
+                                        Live Preview
+                                    </span>
+                                </div>
+                                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                                    Select a target platform preset below to simulate immediate high-velocity generation.
+                                </p>
+                            </div>
+
+                            {/* Preset Buttons */}
+                            <div className="flex flex-wrap gap-2">
+                                {DEMO_PRESETS.map((preset) => {
+                                    const IconComponent = preset.icon;
+                                    const isSelected = activePreset.id === preset.id;
+                                    return (
+                                        <button
+                                            key={preset.id}
+                                            onClick={() => setActivePreset(preset)}
+                                            className={`flex cursor-pointer items-center gap-2 rounded-xl px-3.5 py-2 text-xs font-bold transition-all ${
+                                                isSelected
+                                                    ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
+                                                    : 'border border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-900/60 dark:text-slate-300 dark:hover:bg-slate-800'
+                                            }`}
+                                        >
+                                            <IconComponent className="size-4 shrink-0" />
+                                            <span>{preset.label}</span>
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        </div>
+
+                        {/* Workspace View */}
+                        <div className="mt-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+                            {/* Left Config Card */}
+                            <div className="lg:col-span-4 flex flex-col gap-4 rounded-2xl border border-slate-200/70 bg-slate-50/70 p-5 dark:border-slate-800/70 dark:bg-slate-900/40">
+                                <div className="flex items-center justify-between text-xs">
+                                    <span className="font-semibold text-slate-500 dark:text-slate-400">Active Engine</span>
+                                    <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                                        <span className="size-1.5 rounded-full bg-emerald-500" />
+                                        {activePreset.model}
+                                    </span>
+                                </div>
+
+                                <div className="flex items-center justify-between text-xs">
+                                    <span className="font-semibold text-slate-500 dark:text-slate-400">Voice Tone</span>
+                                    <span className="rounded-lg bg-indigo-500/15 px-2.5 py-1 text-xs font-bold text-indigo-700 dark:text-indigo-300">
+                                        {activePreset.tone}
+                                    </span>
+                                </div>
+
+                                <div>
+                                    <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 block mb-1">
+                                        Topic / Prompt Given
+                                    </label>
+                                    <div className="rounded-xl border border-slate-200 bg-white p-3 text-xs leading-relaxed text-slate-800 dark:border-slate-800 dark:bg-[#07080e] dark:text-slate-200 font-medium">
+                                        "{activePreset.prompt}"
+                                    </div>
+                                </div>
+
+                                <div className="mt-auto pt-4 border-t border-slate-200/70 dark:border-slate-800/70 flex flex-col gap-2">
+                                    <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 font-mono">
+                                        <span>Latency: <strong className="text-slate-700 dark:text-slate-200">{activePreset.stats.latency}</strong></span>
+                                        <span>Words: <strong className="text-slate-700 dark:text-slate-200">{activePreset.stats.words}</strong></span>
+                                        <span>Chars: <strong className="text-slate-700 dark:text-slate-200">{activePreset.stats.chars}</strong></span>
+                                    </div>
+                                    <div className="rounded-lg bg-amber-500/10 p-2.5 text-[11px] text-amber-800 dark:text-amber-300 flex items-start gap-2">
+                                        <Lock className="size-3.5 shrink-0 mt-0.5 text-amber-600 dark:text-amber-400" />
+                                        <span>Your API key is sent directly to Google/OpenAI endpoints with 0% proxy fee.</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Right Output Window */}
+                            <div className="lg:col-span-8 flex flex-col rounded-2xl border border-slate-200/70 bg-white p-5 dark:border-slate-800/70 dark:bg-[#07080e]">
+                                <div className="flex items-center justify-between border-b border-slate-200/60 dark:border-slate-800/60 pb-3 mb-4">
+                                    <div className="flex items-center gap-2">
+                                        <div className="size-2 rounded-full bg-indigo-500" />
+                                        <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                                            Live Generation Canvas
+                                        </span>
+                                    </div>
+                                    <button
+                                        onClick={handleCopy}
+                                        className="flex cursor-pointer items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:bg-slate-100 hover:text-slate-900 dark:border-slate-800 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white"
+                                    >
+                                        {copied ? (
+                                            <>
+                                                <Check className="size-3.5 text-emerald-500" />
+                                                <span className="text-emerald-500">Copied!</span>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Copy className="size-3.5" />
+                                                <span>Copy Result</span>
+                                            </>
+                                        )}
+                                    </button>
+                                </div>
+
+                                <div className="min-h-[220px] max-h-[340px] overflow-y-auto whitespace-pre-wrap font-sans text-sm leading-relaxed text-slate-800 dark:text-slate-200 pr-2">
+                                    {displayedOutput}
+                                    {isTyping && (
+                                        <span className="inline-block size-2.5 ml-1 rounded-xs bg-indigo-500 animate-cursor" />
+                                    )}
+                                </div>
+
+                                <div className="mt-auto pt-4 border-t border-slate-100 dark:border-slate-900 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
+                                    <span className="flex items-center gap-1">
+                                        <Sparkles className="size-3.5 text-indigo-500" />
+                                        Formatted Markdown Preview
+                                    </span>
+                                    <Link
+                                        href={auth?.user ? dashboard() : register()}
+                                        className="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline inline-flex items-center gap-1"
+                                    >
+                                        Customize prompts in Studio <ArrowRight className="size-3" />
+                                    </Link>
+                                </div>
+                            </div>
+                        </div>
+                    </motion.div>
+                </section>
+
+                {/* 4. Supported Models Showcase */}
+                <section id="models" className="py-24 border-t border-slate-200/80 dark:border-slate-800/80 bg-slate-50/50 dark:bg-[#090b14]/50">
+                    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                        <div className="text-center max-w-3xl mx-auto mb-16">
+                            <h2 className="text-xs font-bold uppercase tracking-widest text-indigo-600 dark:text-indigo-400">
+                                Unrestricted Model Access
+                            </h2>
+                            <p className="mt-3 text-3xl font-black tracking-tight sm:text-4xl text-slate-900 dark:text-white">
+                                Plug In the Most Powerful AI Models on Earth
                             </p>
-                            <ul className="mb-4 flex flex-col lg:mb-6">
-                                <li className="relative flex items-center gap-4 py-2 before:absolute before:top-1/2 before:bottom-0 before:left-[0.4rem] before:border-l before:border-[#e3e3e0] dark:before:border-[#3E3E3A]">
-                                    <span className="relative bg-white py-1 dark:bg-[#161615]">
-                                        <span className="flex h-3.5 w-3.5 items-center justify-center rounded-full border border-[#e3e3e0] bg-[#FDFDFC] shadow-[0px_0px_1px_0px_rgba(0,0,0,0.03),0px_1px_2px_0px_rgba(0,0,0,0.06)] dark:border-[#3E3E3A] dark:bg-[#161615]">
-                                            <span className="h-1.5 w-1.5 rounded-full bg-[#dbdbd7] dark:bg-[#3E3E3A]" />
-                                        </span>
+                            <p className="mt-4 text-base text-slate-600 dark:text-slate-400">
+                                Switch models on the fly with a single click. No subscription tiers, no paywalled models.
+                            </p>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                            {/* Google Gemini Card */}
+                            <motion.div
+                                whileHover={{ y: -5 }}
+                                className="flex flex-col rounded-3xl border border-slate-200/80 bg-white p-7 shadow-lg transition-all dark:border-slate-800/80 dark:bg-[#0c0e1a] glow-indigo"
+                            >
+                                <div className="flex items-center justify-between mb-4">
+                                    <div className="flex items-center gap-3">
+                                        <div className="flex size-11 items-center justify-center rounded-2xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400">
+                                            <Zap className="size-6" />
+                                        </div>
+                                        <div>
+                                            <h3 className="font-extrabold text-lg text-slate-900 dark:text-white">Google Gemini</h3>
+                                            <p className="text-xs text-slate-500 dark:text-slate-400">Ultra-fast, massive context</p>
+                                        </div>
+                                    </div>
+                                    <span className="rounded-full bg-emerald-500/10 px-2.5 py-1 text-xs font-bold text-emerald-600 dark:text-emerald-400">
+                                        Recommended
                                     </span>
-                                    <span>
-                                        Read the
-                                        <a
-                                            href="https://laravel.com/docs"
-                                            target="_blank"
-                                            className="ml-1 inline-flex items-center space-x-1 font-medium text-[#f53003] underline underline-offset-4 dark:text-[#FF4433]"
-                                        >
-                                            <span>Documentation</span>
-                                            <svg
-                                                width={10}
-                                                height={11}
-                                                viewBox="0 0 10 11"
-                                                fill="none"
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                className="h-2.5 w-2.5"
-                                            >
-                                                <path
-                                                    d="M7.70833 6.95834V2.79167H3.54167M2.5 8L7.5 3.00001"
-                                                    stroke="currentColor"
-                                                    strokeLinecap="square"
-                                                />
-                                            </svg>
-                                        </a>
+                                </div>
+                                <p className="text-xs leading-relaxed text-slate-600 dark:text-slate-400 mb-6">
+                                    Includes generous free-tier limits directly from Google AI Studio. Sub-second response streaming.
+                                </p>
+                                <div className="flex flex-col gap-2 mt-auto">
+                                    <div className="flex items-center justify-between rounded-xl bg-slate-50 dark:bg-slate-900/60 p-2.5 text-xs font-mono font-semibold">
+                                        <span className="text-slate-700 dark:text-slate-300">gemini-3.8-flash</span>
+                                        <span className="text-indigo-600 dark:text-indigo-400 font-bold">Fastest</span>
+                                    </div>
+                                    <div className="flex items-center justify-between rounded-xl bg-slate-50 dark:bg-slate-900/60 p-2.5 text-xs font-mono font-semibold">
+                                        <span className="text-slate-700 dark:text-slate-300">gemini-3.5-flash-lite</span>
+                                        <span className="text-slate-500">Lowest Cost</span>
+                                    </div>
+                                    <div className="flex items-center justify-between rounded-xl bg-slate-50 dark:bg-slate-900/60 p-2.5 text-xs font-mono font-semibold">
+                                        <span className="text-slate-700 dark:text-slate-300">gemini-2.5-flash</span>
+                                        <span className="text-slate-500">Battle-Tested</span>
+                                    </div>
+                                </div>
+                            </motion.div>
+
+                            {/* OpenAI Card */}
+                            <motion.div
+                                whileHover={{ y: -5 }}
+                                className="flex flex-col rounded-3xl border border-slate-200/80 bg-white p-7 shadow-lg transition-all dark:border-slate-800/80 dark:bg-[#0c0e1a] glow-cyan"
+                            >
+                                <div className="flex items-center justify-between mb-4">
+                                    <div className="flex items-center gap-3">
+                                        <div className="flex size-11 items-center justify-center rounded-2xl bg-cyan-500/10 text-cyan-600 dark:text-cyan-400">
+                                            <Cpu className="size-6" />
+                                        </div>
+                                        <div>
+                                            <h3 className="font-extrabold text-lg text-slate-900 dark:text-white">OpenAI</h3>
+                                            <p className="text-xs text-slate-500 dark:text-slate-400">Industry standard reasoning</p>
+                                        </div>
+                                    </div>
+                                    <span className="rounded-full bg-cyan-500/10 px-2.5 py-1 text-xs font-bold text-cyan-600 dark:text-cyan-400">
+                                        Flagship
                                     </span>
+                                </div>
+                                <p className="text-xs leading-relaxed text-slate-600 dark:text-slate-400 mb-6">
+                                    Exceptional linguistic tone calibration, complex instruction following, and persuasive copywriting.
+                                </p>
+                                <div className="flex flex-col gap-2 mt-auto">
+                                    <div className="flex items-center justify-between rounded-xl bg-slate-50 dark:bg-slate-900/60 p-2.5 text-xs font-mono font-semibold">
+                                        <span className="text-slate-700 dark:text-slate-300">gpt-5 / gpt-4.5</span>
+                                        <span className="text-cyan-600 dark:text-cyan-400 font-bold">Next-Gen</span>
+                                    </div>
+                                    <div className="flex items-center justify-between rounded-xl bg-slate-50 dark:bg-slate-900/60 p-2.5 text-xs font-mono font-semibold">
+                                        <span className="text-slate-700 dark:text-slate-300">gpt-4o / gpt-4o-mini</span>
+                                        <span className="text-slate-500">High Speed</span>
+                                    </div>
+                                    <div className="flex items-center justify-between rounded-xl bg-slate-50 dark:bg-slate-900/60 p-2.5 text-xs font-mono font-semibold">
+                                        <span className="text-slate-700 dark:text-slate-300">o3-mini / o1</span>
+                                        <span className="text-slate-500">Reasoning</span>
+                                    </div>
+                                </div>
+                            </motion.div>
+
+                            {/* OpenRouter Card */}
+                            <motion.div
+                                whileHover={{ y: -5 }}
+                                className="flex flex-col rounded-3xl border border-slate-200/80 bg-white p-7 shadow-lg transition-all dark:border-slate-800/80 dark:bg-[#0c0e1a] glow-violet"
+                            >
+                                <div className="flex items-center justify-between mb-4">
+                                    <div className="flex items-center gap-3">
+                                        <div className="flex size-11 items-center justify-center rounded-2xl bg-purple-500/10 text-purple-600 dark:text-purple-400">
+                                            <Layers className="size-6" />
+                                        </div>
+                                        <div>
+                                            <h3 className="font-extrabold text-lg text-slate-900 dark:text-white">OpenRouter</h3>
+                                            <p className="text-xs text-slate-500 dark:text-slate-400">Universal model hub</p>
+                                        </div>
+                                    </div>
+                                    <span className="rounded-full bg-purple-500/10 px-2.5 py-1 text-xs font-bold text-purple-600 dark:text-purple-400">
+                                        Multi-Model
+                                    </span>
+                                </div>
+                                <p className="text-xs leading-relaxed text-slate-600 dark:text-slate-400 mb-6">
+                                    Access Anthropic Claude, DeepSeek, Meta Llama, and hundreds of models through a single API key.
+                                </p>
+                                <div className="flex flex-col gap-2 mt-auto">
+                                    <div className="flex items-center justify-between rounded-xl bg-slate-50 dark:bg-slate-900/60 p-2.5 text-xs font-mono font-semibold">
+                                        <span className="text-slate-700 dark:text-slate-300">claude-3.7-sonnet</span>
+                                        <span className="text-purple-600 dark:text-purple-400 font-bold">Top Prose</span>
+                                    </div>
+                                    <div className="flex items-center justify-between rounded-xl bg-slate-50 dark:bg-slate-900/60 p-2.5 text-xs font-mono font-semibold">
+                                        <span className="text-slate-700 dark:text-slate-300">deepseek/deepseek-r1</span>
+                                        <span className="text-slate-500">Open Weights</span>
+                                    </div>
+                                    <div className="flex items-center justify-between rounded-xl bg-slate-50 dark:bg-slate-900/60 p-2.5 text-xs font-mono font-semibold">
+                                        <span className="text-slate-700 dark:text-slate-300">meta-llama/llama-3.3-70b</span>
+                                        <span className="text-slate-500">Ultra-Value</span>
+                                    </div>
+                                </div>
+                            </motion.div>
+                        </div>
+                    </div>
+                </section>
+
+                {/* 5. Why BYOK vs Traditional AI SaaS Comparison */}
+                <section id="why-byok" className="py-24 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
+                    <div className="text-center max-w-3xl mx-auto mb-16">
+                        <h2 className="text-xs font-bold uppercase tracking-widest text-indigo-600 dark:text-indigo-400">
+                            The Math is Simple
+                        </h2>
+                        <p className="mt-3 text-3xl font-black tracking-tight sm:text-4xl text-slate-900 dark:text-white">
+                            Why You Should Stop Paying for "Credits"
+                        </p>
+                        <p className="mt-4 text-base text-slate-600 dark:text-slate-400">
+                            Compare traditional AI SaaS subscriptions to the Bring Your Own Key model.
+                        </p>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        {/* Old Way */}
+                        <div className="rounded-3xl border border-rose-500/20 bg-rose-500/5 p-8 relative overflow-hidden">
+                            <span className="inline-block rounded-lg bg-rose-500/10 px-3 py-1 text-xs font-bold text-rose-600 dark:text-rose-400 mb-4">
+                                The Old SaaS Subscription Way
+                            </span>
+                            <div className="text-2xl font-black text-slate-900 dark:text-white mb-6">
+                                $49 - $99 <span className="text-sm font-semibold text-slate-500">/ month</span>
+                            </div>
+                            <ul className="space-y-4 text-sm text-slate-600 dark:text-slate-300">
+                                <li className="flex items-start gap-3">
+                                    <CloseIcon className="size-5 shrink-0 text-rose-500 mt-0.5" />
+                                    <span>Arbitrary monthly "credit" caps that expire if unused</span>
                                 </li>
-                                <li className="relative flex items-center gap-4 py-2 before:absolute before:top-0 before:bottom-1/2 before:left-[0.4rem] before:border-l before:border-[#e3e3e0] dark:before:border-[#3E3E3A]">
-                                    <span className="relative bg-white py-1 dark:bg-[#161615]">
-                                        <span className="flex h-3.5 w-3.5 items-center justify-center rounded-full border border-[#e3e3e0] bg-[#FDFDFC] shadow-[0px_0px_1px_0px_rgba(0,0,0,0.03),0px_1px_2px_0px_rgba(0,0,0,0.06)] dark:border-[#3E3E3A] dark:bg-[#161615]">
-                                            <span className="h-1.5 w-1.5 rounded-full bg-[#dbdbd7] dark:bg-[#3E3E3A]" />
-                                        </span>
-                                    </span>
-                                    <span>
-                                        Watch video tutorials at
-                                        <a
-                                            href="https://laracasts.com"
-                                            target="_blank"
-                                            className="ml-1 inline-flex items-center space-x-1 font-medium text-[#f53003] underline underline-offset-4 dark:text-[#FF4433]"
-                                        >
-                                            <span>Laracasts</span>
-                                            <svg
-                                                width={10}
-                                                height={11}
-                                                viewBox="0 0 10 11"
-                                                fill="none"
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                className="h-2.5 w-2.5"
-                                            >
-                                                <path
-                                                    d="M7.70833 6.95834V2.79167H3.54167M2.5 8L7.5 3.00001"
-                                                    stroke="currentColor"
-                                                    strokeLinecap="square"
-                                                />
-                                            </svg>
-                                        </a>
-                                    </span>
+                                <li className="flex items-start gap-3">
+                                    <CloseIcon className="size-5 shrink-0 text-rose-500 mt-0.5" />
+                                    <span>500% to 1,000% markup on top of raw API token costs</span>
                                 </li>
-                            </ul>
-                            <ul className="flex gap-3 text-sm leading-normal">
-                                <li>
-                                    <a
-                                        href="https://cloud.laravel.com"
-                                        target="_blank"
-                                        className="inline-block rounded-sm border border-black bg-[#1b1b18] px-5 py-1.5 text-sm leading-normal text-white hover:border-black hover:bg-black dark:border-[#eeeeec] dark:bg-[#eeeeec] dark:text-[#1C1C1A] dark:hover:border-white dark:hover:bg-white"
-                                    >
-                                        Deploy now
-                                    </a>
+                                <li className="flex items-start gap-3">
+                                    <CloseIcon className="size-5 shrink-0 text-rose-500 mt-0.5" />
+                                    <span>Locked into outdated models chosen by the provider</span>
+                                </li>
+                                <li className="flex items-start gap-3">
+                                    <CloseIcon className="size-5 shrink-0 text-rose-500 mt-0.5" />
+                                    <span>Recurring monthly bill even during quiet periods</span>
                                 </li>
                             </ul>
                         </div>
-                        <div className="relative -mb-px aspect-[335/364] w-full shrink-0 overflow-hidden rounded-t-lg bg-[#fff2f2] lg:mb-0 lg:-ml-px lg:aspect-auto lg:w-[438px] lg:rounded-t-none lg:rounded-r-lg dark:bg-[#1D0002]">
-                            {/* Laravel Logo */}
-                            <svg
-                                className="w-full max-w-none translate-y-0 text-[#F53003] opacity-100 transition-all duration-750 dark:text-[#F61500] starting:opacity-0 motion-safe:starting:translate-y-6"
-                                viewBox="0 0 438 104"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                            >
-                                <path
-                                    d="M17.2036 -3H0V102.197H49.5189V86.7187H17.2036V-3Z"
-                                    fill="currentColor"
-                                />
-                                <path
-                                    d="M110.256 41.6337C108.061 38.1275 104.945 35.3731 100.905 33.3681C96.8667 31.3647 92.8016 30.3618 88.7131 30.3618C83.4247 30.3618 78.5885 31.3389 74.201 33.2923C69.8111 35.2456 66.0474 37.928 62.9059 41.3333C59.7643 44.7401 57.3198 48.6726 55.5754 53.1293C53.8287 57.589 52.9572 62.274 52.9572 67.1813C52.9572 72.1925 53.8287 76.8995 55.5754 81.3069C57.3191 85.7173 59.7636 89.6241 62.9059 93.0293C66.0474 96.4361 69.8119 99.1155 74.201 101.069C78.5885 103.022 83.4247 103.999 88.7131 103.999C92.8016 103.999 96.8667 102.997 100.905 100.994C104.945 98.9911 108.061 96.2359 110.256 92.7282V102.195H126.563V32.1642H110.256V41.6337ZM108.76 75.7472C107.762 78.4531 106.366 80.8078 104.572 82.8112C102.776 84.8161 100.606 86.4183 98.0637 87.6206C95.5202 88.823 92.7004 89.4238 89.6103 89.4238C86.5178 89.4238 83.7252 88.823 81.2324 87.6206C78.7388 86.4183 76.5949 84.8161 74.7998 82.8112C73.004 80.8078 71.6319 78.4531 70.6856 75.7472C69.7356 73.0421 69.2644 70.1868 69.2644 67.1821C69.2644 64.1758 69.7356 61.3205 70.6856 58.6154C71.6319 55.9102 73.004 53.5571 74.7998 51.5522C76.5949 49.5495 78.738 47.9451 81.2324 46.7427C83.7252 45.5404 86.5178 44.9396 89.6103 44.9396C92.7012 44.9396 95.5202 45.5404 98.0637 46.7427C100.606 47.9451 102.776 49.5487 104.572 51.5522C106.367 53.5571 107.762 55.9102 108.76 58.6154C109.756 61.3205 110.256 64.1758 110.256 67.1821C110.256 70.1868 109.756 73.0421 108.76 75.7472Z"
-                                    fill="currentColor"
-                                />
-                                <path
-                                    d="M242.805 41.6337C240.611 38.1275 237.494 35.3731 233.455 33.3681C229.416 31.3647 225.351 30.3618 221.262 30.3618C215.974 30.3618 211.138 31.3389 206.75 33.2923C202.36 35.2456 198.597 37.928 195.455 41.3333C192.314 44.7401 189.869 48.6726 188.125 53.1293C186.378 57.589 185.507 62.274 185.507 67.1813C185.507 72.1925 186.378 76.8995 188.125 81.3069C189.868 85.7173 192.313 89.6241 195.455 93.0293C198.597 96.4361 202.361 99.1155 206.75 101.069C211.138 103.022 215.974 103.999 221.262 103.999C225.351 103.999 229.416 102.997 233.455 100.994C237.494 98.9911 240.611 96.2359 242.805 92.7282V102.195H259.112V32.1642H242.805V41.6337ZM241.31 75.7472C240.312 78.4531 238.916 80.8078 237.122 82.8112C235.326 84.8161 233.156 86.4183 230.614 87.6206C228.07 88.823 225.251 89.4238 222.16 89.4238C219.068 89.4238 216.275 88.823 213.782 87.6206C211.289 86.4183 209.145 84.8161 207.35 82.8112C205.554 80.8078 204.182 78.4531 203.236 75.7472C202.286 73.0421 201.814 70.1868 201.814 67.1821C201.814 64.1758 202.286 61.3205 203.236 58.6154C204.182 55.9102 205.554 53.5571 207.35 51.5522C209.145 49.5495 211.288 47.9451 213.782 46.7427C216.275 45.5404 219.068 44.9396 222.16 44.9396C225.251 44.9396 228.07 45.5404 230.614 46.7427C233.156 47.9451 235.326 49.5487 237.122 51.5522C238.917 53.5571 240.312 55.9102 241.31 58.6154C242.306 61.3205 242.806 64.1758 242.806 67.1821C242.805 70.1868 242.305 73.0421 241.31 75.7472Z"
-                                    fill="currentColor"
-                                />
-                                <path
-                                    d="M438 -3H421.694V102.197H438V-3Z"
-                                    fill="currentColor"
-                                />
-                                <path
-                                    d="M139.43 102.197H155.735V48.2834H183.712V32.1665H139.43V102.197Z"
-                                    fill="currentColor"
-                                />
-                                <path
-                                    d="M324.49 32.1665L303.995 85.794L283.498 32.1665H266.983L293.748 102.197H314.242L341.006 32.1665H324.49Z"
-                                    fill="currentColor"
-                                />
-                                <path
-                                    d="M376.571 30.3656C356.603 30.3656 340.797 46.8497 340.797 67.1828C340.797 89.6597 356.094 104 378.661 104C391.29 104 399.354 99.1488 409.206 88.5848L398.189 80.0226C398.183 80.031 389.874 90.9895 377.468 90.9895C363.048 90.9895 356.977 79.3111 356.977 73.269H411.075C413.917 50.1328 398.775 30.3656 376.571 30.3656ZM357.02 61.0967C357.145 59.7487 359.023 43.3761 376.442 43.3761C393.861 43.3761 395.978 59.7464 396.099 61.0967H357.02Z"
-                                    fill="currentColor"
-                                />
-                            </svg>
 
-                            {/* 13 */}
-                            <svg
-                                className="relative -mt-[6.6rem] -ml-8 w-[438px] max-w-none [--stroke-color:#1B1B18] lg:ml-0 dark:[--stroke-color:#FF750F]"
-                                viewBox="0 0 440 392"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                            >
-                                <g className="text-[#1B1B18] opacity-100 mix-blend-darken transition-all delay-300 duration-750 dark:text-black dark:mix-blend-normal starting:opacity-0">
-                                    <mask
-                                        id="path-1-mask"
-                                        maskUnits="userSpaceOnUse"
-                                        x="-0.328613"
-                                        y="103"
-                                        width="338"
-                                        height="299"
-                                        fill="black"
-                                    >
-                                        <rect
-                                            fill="white"
-                                            x="-0.328613"
-                                            y="103"
-                                            width="338"
-                                            height="299"
-                                        />
-                                        <path d="M234.936 400.8C204.136 400.8 178.936 392.4 159.336 375.6C140.136 358.8 130.536 337 130.536 310.2H200.736C200.736 318.2 203.736 324.8 209.736 330C215.736 335.2 223.736 337.8 233.736 337.8C243.336 337.8 251.136 335 257.136 329.4C263.536 323.8 266.736 316.6 266.736 307.8C266.736 299.8 263.936 293.2 258.336 288C252.736 282.8 245.536 280.2 236.736 280.2H199.536V218.4H236.736C243.536 218.4 249.336 216 254.136 211.2C258.936 206.4 261.336 200.4 261.336 193.2C261.336 184.8 258.736 178.2 253.536 173.4C248.336 168.6 241.736 166.2 233.736 166.2C226.536 166.2 220.336 168.4 215.136 172.8C210.336 177.2 207.936 182.8 207.936 189.6H141.336C141.336 164.8 150.136 144.6 167.736 129C185.336 113 207.936 105 235.536 105C263.136 105 285.536 112.2 302.736 126.6C320.336 141 329.136 160 329.136 183.6C329.136 200.8 324.536 214.8 315.336 225.6C306.136 236 294.336 243.2 279.936 247.2C297.136 252 310.736 260.2 320.736 271.8C331.136 283.4 336.336 298 336.336 315.6C336.336 340.4 326.936 360.8 308.136 376.8C289.336 392.8 264.936 400.8 234.936 400.8Z" />
-                                        <path d="M26.8714 167.6H1.67139V105.2H94.6714V400.2H26.8714V167.6Z" />
-                                    </mask>
-                                    <path
-                                        d="M234.936 400.8C204.136 400.8 178.936 392.4 159.336 375.6C140.136 358.8 130.536 337 130.536 310.2H200.736C200.736 318.2 203.736 324.8 209.736 330C215.736 335.2 223.736 337.8 233.736 337.8C243.336 337.8 251.136 335 257.136 329.4C263.536 323.8 266.736 316.6 266.736 307.8C266.736 299.8 263.936 293.2 258.336 288C252.736 282.8 245.536 280.2 236.736 280.2H199.536V218.4H236.736C243.536 218.4 249.336 216 254.136 211.2C258.936 206.4 261.336 200.4 261.336 193.2C261.336 184.8 258.736 178.2 253.536 173.4C248.336 168.6 241.736 166.2 233.736 166.2C226.536 166.2 220.336 168.4 215.136 172.8C210.336 177.2 207.936 182.8 207.936 189.6H141.336C141.336 164.8 150.136 144.6 167.736 129C185.336 113 207.936 105 235.536 105C263.136 105 285.536 112.2 302.736 126.6C320.336 141 329.136 160 329.136 183.6C329.136 200.8 324.536 214.8 315.336 225.6C306.136 236 294.336 243.2 279.936 247.2C297.136 252 310.736 260.2 320.736 271.8C331.136 283.4 336.336 298 336.336 315.6C336.336 340.4 326.936 360.8 308.136 376.8C289.336 392.8 264.936 400.8 234.936 400.8Z"
-                                        fill="currentColor"
-                                    />
-                                    <path
-                                        d="M26.8714 167.6H1.67139V105.2H94.6714V400.2H26.8714V167.6Z"
-                                        fill="currentColor"
-                                    />
-                                    <path
-                                        d="M234.936 400.8C204.136 400.8 178.936 392.4 159.336 375.6C140.136 358.8 130.536 337 130.536 310.2H200.736C200.736 318.2 203.736 324.8 209.736 330C215.736 335.2 223.736 337.8 233.736 337.8C243.336 337.8 251.136 335 257.136 329.4C263.536 323.8 266.736 316.6 266.736 307.8C266.736 299.8 263.936 293.2 258.336 288C252.736 282.8 245.536 280.2 236.736 280.2H199.536V218.4H236.736C243.536 218.4 249.336 216 254.136 211.2C258.936 206.4 261.336 200.4 261.336 193.2C261.336 184.8 258.736 178.2 253.536 173.4C248.336 168.6 241.736 166.2 233.736 166.2C226.536 166.2 220.336 168.4 215.136 172.8C210.336 177.2 207.936 182.8 207.936 189.6H141.336C141.336 164.8 150.136 144.6 167.736 129C185.336 113 207.936 105 235.536 105C263.136 105 285.536 112.2 302.736 126.6C320.336 141 329.136 160 329.136 183.6C329.136 200.8 324.536 214.8 315.336 225.6C306.136 236 294.336 243.2 279.936 247.2C297.136 252 310.736 260.2 320.736 271.8C331.136 283.4 336.336 298 336.336 315.6C336.336 340.4 326.936 360.8 308.136 376.8C289.336 392.8 264.936 400.8 234.936 400.8Z"
-                                        stroke="var(--stroke-color)"
-                                        strokeWidth="2.4"
-                                        mask="url(#path-1-mask)"
-                                    />
-                                    <path
-                                        d="M26.8714 167.6H1.67139V105.2H94.6714V400.2H26.8714V167.6Z"
-                                        stroke="var(--stroke-color)"
-                                        strokeWidth="2.4"
-                                        mask="url(#path-1-mask)"
-                                    />
-                                </g>
-
-                                <g className="text-[#F3BEC7] opacity-100 transition-all delay-400 duration-750 dark:text-[#4B0600] starting:opacity-0 motion-safe:starting:-translate-x-[26px]">
-                                    <mask
-                                        id="path-2-mask"
-                                        maskUnits="userSpaceOnUse"
-                                        x="25.3357"
-                                        y="103"
-                                        width="338"
-                                        height="299"
-                                        fill="black"
-                                    >
-                                        <rect
-                                            fill="white"
-                                            x="25.3357"
-                                            y="103"
-                                            width="338"
-                                            height="299"
-                                        />
-                                        <path d="M260.6 400.8C229.8 400.8 204.6 392.4 185 375.6C165.8 358.8 156.2 337 156.2 310.2H226.4C226.4 318.2 229.4 324.8 235.4 330C241.4 335.2 249.4 337.8 259.4 337.8C269 337.8 276.8 335 282.8 329.4C289.2 323.8 292.4 316.6 292.4 307.8C292.4 299.8 289.6 293.2 284 288C278.4 282.8 271.2 280.2 262.4 280.2H225.2V218.4H262.4C269.2 218.4 275 216 279.8 211.2C284.6 206.4 287 200.4 287 193.2C287 184.8 284.4 178.2 279.2 173.4C274 168.6 267.4 166.2 259.4 166.2C252.2 166.2 246 168.4 240.8 172.8C236 177.2 233.6 182.8 233.6 189.6H167C167 164.8 175.8 144.6 193.4 129C211 113 233.6 105 261.2 105C288.8 105 311.2 112.2 328.4 126.6C346 141 354.8 160 354.8 183.6C354.8 200.8 350.2 214.8 341 225.6C331.8 236 320 243.2 305.6 247.2C322.8 252 336.4 260.2 346.4 271.8C356.8 283.4 362 298 362 315.6C362 340.4 352.6 360.8 333.8 376.8C315 392.8 290.6 400.8 260.6 400.8Z" />
-                                        <path d="M52.5357 167.6H27.3357V105.2H120.336V400.2H52.5357V167.6Z" />
-                                    </mask>
-                                    <path
-                                        d="M260.6 400.8C229.8 400.8 204.6 392.4 185 375.6C165.8 358.8 156.2 337 156.2 310.2H226.4C226.4 318.2 229.4 324.8 235.4 330C241.4 335.2 249.4 337.8 259.4 337.8C269 337.8 276.8 335 282.8 329.4C289.2 323.8 292.4 316.6 292.4 307.8C292.4 299.8 289.6 293.2 284 288C278.4 282.8 271.2 280.2 262.4 280.2H225.2V218.4H262.4C269.2 218.4 275 216 279.8 211.2C284.6 206.4 287 200.4 287 193.2C287 184.8 284.4 178.2 279.2 173.4C274 168.6 267.4 166.2 259.4 166.2C252.2 166.2 246 168.4 240.8 172.8C236 177.2 233.6 182.8 233.6 189.6H167C167 164.8 175.8 144.6 193.4 129C211 113 233.6 105 261.2 105C288.8 105 311.2 112.2 328.4 126.6C346 141 354.8 160 354.8 183.6C354.8 200.8 350.2 214.8 341 225.6C331.8 236 320 243.2 305.6 247.2C322.8 252 336.4 260.2 346.4 271.8C356.8 283.4 362 298 362 315.6C362 340.4 352.6 360.8 333.8 376.8C315 392.8 290.6 400.8 260.6 400.8Z"
-                                        fill="currentColor"
-                                    />
-                                    <path
-                                        d="M52.5357 167.6H27.3357V105.2H120.336V400.2H52.5357V167.6Z"
-                                        fill="currentColor"
-                                    />
-                                    <path
-                                        d="M260.6 400.8C229.8 400.8 204.6 392.4 185 375.6C165.8 358.8 156.2 337 156.2 310.2H226.4C226.4 318.2 229.4 324.8 235.4 330C241.4 335.2 249.4 337.8 259.4 337.8C269 337.8 276.8 335 282.8 329.4C289.2 323.8 292.4 316.6 292.4 307.8C292.4 299.8 289.6 293.2 284 288C278.4 282.8 271.2 280.2 262.4 280.2H225.2V218.4H262.4C269.2 218.4 275 216 279.8 211.2C284.6 206.4 287 200.4 287 193.2C287 184.8 284.4 178.2 279.2 173.4C274 168.6 267.4 166.2 259.4 166.2C252.2 166.2 246 168.4 240.8 172.8C236 177.2 233.6 182.8 233.6 189.6H167C167 164.8 175.8 144.6 193.4 129C211 113 233.6 105 261.2 105C288.8 105 311.2 112.2 328.4 126.6C346 141 354.8 160 354.8 183.6C354.8 200.8 350.2 214.8 341 225.6C331.8 236 320 243.2 305.6 247.2C322.8 252 336.4 260.2 346.4 271.8C356.8 283.4 362 298 362 315.6C362 340.4 352.6 360.8 333.8 376.8C315 392.8 290.6 400.8 260.6 400.8Z"
-                                        stroke="var(--stroke-color)"
-                                        strokeWidth="2.4"
-                                        mask="url(#path-2-mask)"
-                                    />
-                                    <path
-                                        d="M52.5357 167.6H27.3357V105.2H120.336V400.2H52.5357V167.6Z"
-                                        stroke="var(--stroke-color)"
-                                        strokeWidth="2.4"
-                                        mask="url(#path-2-mask)"
-                                    />
-                                </g>
-
-                                <g className="text-[#F8B803] opacity-100 mix-blend-color transition-all delay-400 duration-750 dark:text-[#391800] dark:mix-blend-hard-light starting:opacity-0 motion-safe:starting:-translate-x-[51px]">
-                                    <mask
-                                        id="path-3-mask"
-                                        maskUnits="userSpaceOnUse"
-                                        x="51"
-                                        y="103"
-                                        width="338"
-                                        height="299"
-                                        fill="black"
-                                    >
-                                        <rect
-                                            fill="white"
-                                            x="51"
-                                            y="103"
-                                            width="338"
-                                            height="299"
-                                        />
-                                        <path d="M286.264 400.8C255.464 400.8 230.264 392.4 210.664 375.6C191.464 358.8 181.864 337 181.864 310.2H252.064C252.064 318.2 255.064 324.8 261.064 330C267.064 335.2 275.064 337.8 285.064 337.8C294.664 337.8 302.464 335 308.464 329.4C314.864 323.8 318.064 316.6 318.064 307.8C318.064 299.8 315.264 293.2 309.664 288C304.064 282.8 296.864 280.2 288.064 280.2H250.864V218.4H288.064C294.864 218.4 300.664 216 305.464 211.2C310.264 206.4 312.664 200.4 312.664 193.2C312.664 184.8 310.064 178.2 304.864 173.4C299.664 168.6 293.064 166.2 285.064 166.2C277.864 166.2 271.664 168.4 266.464 172.8C261.664 177.2 259.264 182.8 259.264 189.6H192.664C192.664 164.8 201.464 144.6 219.064 129C236.664 113 259.264 105 286.864 105C314.464 105 336.864 112.2 354.064 126.6C371.664 141 380.464 160 380.464 183.6C380.464 200.8 375.864 214.8 366.664 225.6C357.464 236 345.664 243.2 331.264 247.2C348.464 252 362.064 260.2 372.064 271.8C382.464 283.4 387.664 298 387.664 315.6C387.664 340.4 378.264 360.8 359.464 376.8C340.664 392.8 316.264 400.8 286.264 400.8Z" />
-                                        <path d="M78.2 167.6H53V105.2H146V400.2H78.2V167.6Z" />
-                                    </mask>
-                                    <path
-                                        d="M286.264 400.8C255.464 400.8 230.264 392.4 210.664 375.6C191.464 358.8 181.864 337 181.864 310.2H252.064C252.064 318.2 255.064 324.8 261.064 330C267.064 335.2 275.064 337.8 285.064 337.8C294.664 337.8 302.464 335 308.464 329.4C314.864 323.8 318.064 316.6 318.064 307.8C318.064 299.8 315.264 293.2 309.664 288C304.064 282.8 296.864 280.2 288.064 280.2H250.864V218.4H288.064C294.864 218.4 300.664 216 305.464 211.2C310.264 206.4 312.664 200.4 312.664 193.2C312.664 184.8 310.064 178.2 304.864 173.4C299.664 168.6 293.064 166.2 285.064 166.2C277.864 166.2 271.664 168.4 266.464 172.8C261.664 177.2 259.264 182.8 259.264 189.6H192.664C192.664 164.8 201.464 144.6 219.064 129C236.664 113 259.264 105 286.864 105C314.464 105 336.864 112.2 354.064 126.6C371.664 141 380.464 160 380.464 183.6C380.464 200.8 375.864 214.8 366.664 225.6C357.464 236 345.664 243.2 331.264 247.2C348.464 252 362.064 260.2 372.064 271.8C382.464 283.4 387.664 298 387.664 315.6C387.664 340.4 378.264 360.8 359.464 376.8C340.664 392.8 316.264 400.8 286.264 400.8Z"
-                                        fill="currentColor"
-                                    />
-                                    <path
-                                        d="M78.2 167.6H53V105.2H146V400.2H78.2V167.6Z"
-                                        fill="currentColor"
-                                    />
-                                    <path
-                                        d="M286.264 400.8C255.464 400.8 230.264 392.4 210.664 375.6C191.464 358.8 181.864 337 181.864 310.2H252.064C252.064 318.2 255.064 324.8 261.064 330C267.064 335.2 275.064 337.8 285.064 337.8C294.664 337.8 302.464 335 308.464 329.4C314.864 323.8 318.064 316.6 318.064 307.8C318.064 299.8 315.264 293.2 309.664 288C304.064 282.8 296.864 280.2 288.064 280.2H250.864V218.4H288.064C294.864 218.4 300.664 216 305.464 211.2C310.264 206.4 312.664 200.4 312.664 193.2C312.664 184.8 310.064 178.2 304.864 173.4C299.664 168.6 293.064 166.2 285.064 166.2C277.864 166.2 271.664 168.4 266.464 172.8C261.664 177.2 259.264 182.8 259.264 189.6H192.664C192.664 164.8 201.464 144.6 219.064 129C236.664 113 259.264 105 286.864 105C314.464 105 336.864 112.2 354.064 126.6C371.664 141 380.464 160 380.464 183.6C380.464 200.8 375.864 214.8 366.664 225.6C357.464 236 345.664 243.2 331.264 247.2C348.464 252 362.064 260.2 372.064 271.8C382.464 283.4 387.664 298 387.664 315.6C387.664 340.4 378.264 360.8 359.464 376.8C340.664 392.8 316.264 400.8 286.264 400.8Z"
-                                        stroke="var(--stroke-color)"
-                                        strokeWidth="2.4"
-                                        mask="url(#path-3-mask)"
-                                    />
-                                    <path
-                                        d="M78.2 167.6H53V105.2H146V400.2H78.2V167.6Z"
-                                        stroke="var(--stroke-color)"
-                                        strokeWidth="2.4"
-                                        mask="url(#path-3-mask)"
-                                    />
-                                </g>
-
-                                <g className="text-[#F3BEC7] opacity-100 mix-blend-multiply transition-all delay-400 duration-750 dark:text-[#733000] dark:mix-blend-normal starting:opacity-0 motion-safe:starting:-translate-x-[78px]">
-                                    <mask
-                                        id="path-4-mask"
-                                        maskUnits="userSpaceOnUse"
-                                        x="76.6643"
-                                        y="103"
-                                        width="338"
-                                        height="299"
-                                        fill="black"
-                                    >
-                                        <rect
-                                            fill="white"
-                                            x="76.6643"
-                                            y="103"
-                                            width="338"
-                                            height="299"
-                                        />
-                                        <path d="M311.929 400.8C281.129 400.8 255.929 392.4 236.329 375.6C217.129 358.8 207.529 337 207.529 310.2H277.729C277.729 318.2 280.729 324.8 286.729 330C292.729 335.2 300.729 337.8 310.729 337.8C320.329 337.8 328.129 335 334.129 329.4C340.529 323.8 343.729 316.6 343.729 307.8C343.729 299.8 340.929 293.2 335.329 288C329.729 282.8 322.529 280.2 313.729 280.2H276.529V218.4H313.729C320.529 218.4 326.329 216 331.129 211.2C335.929 206.4 338.329 200.4 338.329 193.2C338.329 184.8 335.729 178.2 330.529 173.4C325.329 168.6 318.729 166.2 310.729 166.2C303.529 166.2 297.329 168.4 292.129 172.8C287.329 177.2 284.929 182.8 284.929 189.6H218.329C218.329 164.8 227.129 144.6 244.729 129C262.329 113 284.929 105 312.529 105C340.129 105 362.529 112.2 379.729 126.6C397.329 141 406.129 160 406.129 183.6C406.129 200.8 401.529 214.8 392.329 225.6C383.129 236 371.329 243.2 356.929 247.2C374.129 252 387.729 260.2 397.729 271.8C408.129 283.4 413.329 298 413.329 315.6C413.329 340.4 403.929 360.8 385.129 376.8C366.329 392.8 341.929 400.8 311.929 400.8Z" />
-                                        <path d="M103.864 167.6H78.6643V105.2H171.664V400.2H103.864V167.6Z" />
-                                    </mask>
-                                    <path
-                                        d="M311.929 400.8C281.129 400.8 255.929 392.4 236.329 375.6C217.129 358.8 207.529 337 207.529 310.2H277.729C277.729 318.2 280.729 324.8 286.729 330C292.729 335.2 300.729 337.8 310.729 337.8C320.329 337.8 328.129 335 334.129 329.4C340.529 323.8 343.729 316.6 343.729 307.8C343.729 299.8 340.929 293.2 335.329 288C329.729 282.8 322.529 280.2 313.729 280.2H276.529V218.4H313.729C320.529 218.4 326.329 216 331.129 211.2C335.929 206.4 338.329 200.4 338.329 193.2C338.329 184.8 335.729 178.2 330.529 173.4C325.329 168.6 318.729 166.2 310.729 166.2C303.529 166.2 297.329 168.4 292.129 172.8C287.329 177.2 284.929 182.8 284.929 189.6H218.329C218.329 164.8 227.129 144.6 244.729 129C262.329 113 284.929 105 312.529 105C340.129 105 362.529 112.2 379.729 126.6C397.329 141 406.129 160 406.129 183.6C406.129 200.8 401.529 214.8 392.329 225.6C383.129 236 371.329 243.2 356.929 247.2C374.129 252 387.729 260.2 397.729 271.8C408.129 283.4 413.329 298 413.329 315.6C413.329 340.4 403.929 360.8 385.129 376.8C366.329 392.8 341.929 400.8 311.929 400.8Z"
-                                        fill="currentColor"
-                                    />
-                                    <path
-                                        d="M103.864 167.6H78.6643V105.2H171.664V400.2H103.864V167.6Z"
-                                        fill="currentColor"
-                                    />
-                                    <path
-                                        d="M311.929 400.8C281.129 400.8 255.929 392.4 236.329 375.6C217.129 358.8 207.529 337 207.529 310.2H277.729C277.729 318.2 280.729 324.8 286.729 330C292.729 335.2 300.729 337.8 310.729 337.8C320.329 337.8 328.129 335 334.129 329.4C340.529 323.8 343.729 316.6 343.729 307.8C343.729 299.8 340.929 293.2 335.329 288C329.729 282.8 322.529 280.2 313.729 280.2H276.529V218.4H313.729C320.529 218.4 326.329 216 331.129 211.2C335.929 206.4 338.329 200.4 338.329 193.2C338.329 184.8 335.729 178.2 330.529 173.4C325.329 168.6 318.729 166.2 310.729 166.2C303.529 166.2 297.329 168.4 292.129 172.8C287.329 177.2 284.929 182.8 284.929 189.6H218.329C218.329 164.8 227.129 144.6 244.729 129C262.329 113 284.929 105 312.529 105C340.129 105 362.529 112.2 379.729 126.6C397.329 141 406.129 160 406.129 183.6C406.129 200.8 401.529 214.8 392.329 225.6C383.129 236 371.329 243.2 356.929 247.2C374.129 252 387.729 260.2 397.729 271.8C408.129 283.4 413.329 298 413.329 315.6C413.329 340.4 403.929 360.8 385.129 376.8C366.329 392.8 341.929 400.8 311.929 400.8Z"
-                                        stroke="var(--stroke-color)"
-                                        strokeWidth="2.4"
-                                        mask="url(#path-4-mask)"
-                                    />
-                                    <path
-                                        d="M103.864 167.6H78.6643V105.2H171.664V400.2H103.864V167.6Z"
-                                        stroke="var(--stroke-color)"
-                                        strokeWidth="2.4"
-                                        mask="url(#path-4-mask)"
-                                    />
-                                </g>
-
-                                <g className="text-[#F3BEC7] opacity-100 mix-blend-hard-light transition-all delay-400 duration-750 dark:text-[#4B0600] starting:opacity-0 motion-safe:starting:-translate-x-[102px]">
-                                    <mask
-                                        id="path-5-mask"
-                                        maskUnits="userSpaceOnUse"
-                                        x="102.329"
-                                        y="103"
-                                        width="338"
-                                        height="299"
-                                        fill="black"
-                                    >
-                                        <rect
-                                            fill="white"
-                                            x="102.329"
-                                            y="103"
-                                            width="338"
-                                            height="299"
-                                        />
-                                        <path d="M337.593 400.8C306.793 400.8 281.593 392.4 261.993 375.6C242.793 358.8 233.193 337 233.193 310.2H303.393C303.393 318.2 306.393 324.8 312.393 330C318.393 335.2 326.393 337.8 336.393 337.8C345.993 337.8 353.793 335 359.793 329.4C366.193 323.8 369.393 316.6 369.393 307.8C369.393 299.8 366.593 293.2 360.993 288C355.393 282.8 348.193 280.2 339.393 280.2H302.193V218.4H339.393C346.193 218.4 351.993 216 356.793 211.2C361.593 206.4 363.993 200.4 363.993 193.2C363.993 184.8 361.393 178.2 356.193 173.4C350.993 168.6 344.393 166.2 336.393 166.2C329.193 166.2 322.993 168.4 317.793 172.8C312.993 177.2 310.593 182.8 310.593 189.6H243.993C243.993 164.8 252.793 144.6 270.393 129C287.993 113 310.593 105 338.193 105C365.793 105 388.193 112.2 405.393 126.6C422.993 141 431.793 160 431.793 183.6C431.793 200.8 427.193 214.8 417.993 225.6C408.793 236 396.993 243.2 382.593 247.2C399.793 252 413.393 260.2 423.393 271.8C433.793 283.4 438.993 298 438.993 315.6C438.993 340.4 429.593 360.8 410.793 376.8C391.993 392.8 367.593 400.8 337.593 400.8Z" />
-                                        <path d="M129.529 167.6H104.329V105.2H197.329V400.2H129.529V167.6Z" />
-                                    </mask>
-                                    <path
-                                        d="M337.593 400.8C306.793 400.8 281.593 392.4 261.993 375.6C242.793 358.8 233.193 337 233.193 310.2H303.393C303.393 318.2 306.393 324.8 312.393 330C318.393 335.2 326.393 337.8 336.393 337.8C345.993 337.8 353.793 335 359.793 329.4C366.193 323.8 369.393 316.6 369.393 307.8C369.393 299.8 366.593 293.2 360.993 288C355.393 282.8 348.193 280.2 339.393 280.2H302.193V218.4H339.393C346.193 218.4 351.993 216 356.793 211.2C361.593 206.4 363.993 200.4 363.993 193.2C363.993 184.8 361.393 178.2 356.193 173.4C350.993 168.6 344.393 166.2 336.393 166.2C329.193 166.2 322.993 168.4 317.793 172.8C312.993 177.2 310.593 182.8 310.593 189.6H243.993C243.993 164.8 252.793 144.6 270.393 129C287.993 113 310.593 105 338.193 105C365.793 105 388.193 112.2 405.393 126.6C422.993 141 431.793 160 431.793 183.6C431.793 200.8 427.193 214.8 417.993 225.6C408.793 236 396.993 243.2 382.593 247.2C399.793 252 413.393 260.2 423.393 271.8C433.793 283.4 438.993 298 438.993 315.6C438.993 340.4 429.593 360.8 410.793 376.8C391.993 392.8 367.593 400.8 337.593 400.8Z"
-                                        fill="currentColor"
-                                    />
-                                    <path
-                                        d="M129.529 167.6H104.329V105.2H197.329V400.2H129.529V167.6Z"
-                                        fill="currentColor"
-                                    />
-                                    <path
-                                        d="M337.593 400.8C306.793 400.8 281.593 392.4 261.993 375.6C242.793 358.8 233.193 337 233.193 310.2H303.393C303.393 318.2 306.393 324.8 312.393 330C318.393 335.2 326.393 337.8 336.393 337.8C345.993 337.8 353.793 335 359.793 329.4C366.193 323.8 369.393 316.6 369.393 307.8C369.393 299.8 366.593 293.2 360.993 288C355.393 282.8 348.193 280.2 339.393 280.2H302.193V218.4H339.393C346.193 218.4 351.993 216 356.793 211.2C361.593 206.4 363.993 200.4 363.993 193.2C363.993 184.8 361.393 178.2 356.193 173.4C350.993 168.6 344.393 166.2 336.393 166.2C329.193 166.2 322.993 168.4 317.793 172.8C312.993 177.2 310.593 182.8 310.593 189.6H243.993C243.993 164.8 252.793 144.6 270.393 129C287.993 113 310.593 105 338.193 105C365.793 105 388.193 112.2 405.393 126.6C422.993 141 431.793 160 431.793 183.6C431.793 200.8 427.193 214.8 417.993 225.6C408.793 236 396.993 243.2 382.593 247.2C399.793 252 413.393 260.2 423.393 271.8C433.793 283.4 438.993 298 438.993 315.6C438.993 340.4 429.593 360.8 410.793 376.8C391.993 392.8 367.593 400.8 337.593 400.8Z"
-                                        stroke="var(--stroke-color)"
-                                        strokeWidth="2.4"
-                                        mask="url(#path-5-mask)"
-                                    />
-                                    <path
-                                        d="M129.529 167.6H104.329V105.2H197.329V400.2H129.529V167.6Z"
-                                        stroke="var(--stroke-color)"
-                                        strokeWidth="2.4"
-                                        mask="url(#path-5-mask)"
-                                    />
-                                </g>
-                            </svg>
-                            <div className="absolute inset-0 rounded-t-lg shadow-[inset_0px_0px_0px_1px_rgba(26,26,0,0.16)] lg:rounded-t-none lg:rounded-r-lg dark:shadow-[inset_0px_0px_0px_1px_#fffaed2d]"></div>
+                        {/* Nexus AI BYOK */}
+                        <div className="rounded-3xl border border-emerald-500/30 bg-emerald-500/5 p-8 relative overflow-hidden glow-indigo">
+                            <span className="inline-block rounded-lg bg-emerald-500/10 px-3 py-1 text-xs font-bold text-emerald-600 dark:text-emerald-400 mb-4">
+                                The Nexus AI BYOK Way
+                            </span>
+                            <div className="text-2xl font-black text-slate-900 dark:text-white mb-6">
+                                $0 Platform Fee <span className="text-sm font-semibold text-slate-500">/ raw token rate</span>
+                            </div>
+                            <ul className="space-y-4 text-sm text-slate-600 dark:text-slate-300">
+                                <li className="flex items-start gap-3">
+                                    <Check className="size-5 shrink-0 text-emerald-500 mt-0.5" />
+                                    <span><strong>0% Token Markup:</strong> Pay fractions of a penny directly to Google or OpenAI</span>
+                                </li>
+                                <li className="flex items-start gap-3">
+                                    <Check className="size-5 shrink-0 text-emerald-500 mt-0.5" />
+                                    <span><strong>Unlimited Generations:</strong> Generate millions of words without hitting credit walls</span>
+                                </li>
+                                <li className="flex items-start gap-3">
+                                    <Check className="size-5 shrink-0 text-emerald-500 mt-0.5" />
+                                    <span><strong>Immediate Model Access:</strong> Switch to Gemini 3.8 Flash or GPT-5 instantly</span>
+                                </li>
+                                <li className="flex items-start gap-3">
+                                    <Check className="size-5 shrink-0 text-emerald-500 mt-0.5" />
+                                    <span><strong>Data Sovereignty:</strong> Your prompts travel directly under your own API account</span>
+                                </li>
+                            </ul>
                         </div>
-                    </main>
-                </div>
-                <div className="hidden h-14.5 lg:block"></div>
+                    </div>
+                </section>
+
+                {/* 6. Feature Grid */}
+                <section id="features" className="py-24 border-t border-slate-200/80 dark:border-slate-800/80 bg-slate-50/50 dark:bg-[#090b14]/50">
+                    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                        <div className="text-center max-w-3xl mx-auto mb-16">
+                            <h2 className="text-xs font-bold uppercase tracking-widest text-indigo-600 dark:text-indigo-400">
+                                Built for Speed & Precision
+                            </h2>
+                            <p className="mt-3 text-3xl font-black tracking-tight sm:text-4xl text-slate-900 dark:text-white">
+                                Everything You Need in a Content Studio
+                            </p>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                            <div className="rounded-3xl border border-slate-200/80 bg-white p-7 dark:border-slate-800/80 dark:bg-[#0c0e1a]">
+                                <div className="flex size-12 items-center justify-center rounded-2xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 mb-5">
+                                    <Sparkles className="size-6" />
+                                </div>
+                                <h3 className="font-extrabold text-lg text-slate-900 dark:text-white mb-2">
+                                    Custom Voice Tones
+                                </h3>
+                                <p className="text-xs leading-relaxed text-slate-600 dark:text-slate-400">
+                                    Configure company voice guidelines, slang, vocabulary, and formality personas. Every generation sounds authentically yours.
+                                </p>
+                            </div>
+
+                            <div className="rounded-3xl border border-slate-200/80 bg-white p-7 dark:border-slate-800/80 dark:bg-[#0c0e1a]">
+                                <div className="flex size-12 items-center justify-center rounded-2xl bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 mb-5">
+                                    <Zap className="size-6" />
+                                </div>
+                                <h3 className="font-extrabold text-lg text-slate-900 dark:text-white mb-2">
+                                    Real-Time SSE Streaming
+                                </h3>
+                                <p className="text-xs leading-relaxed text-slate-600 dark:text-slate-400">
+                                    No spinning wheels. Tokens stream into the workspace the millisecond they are generated by the neural network.
+                                </p>
+                            </div>
+
+                            <div className="rounded-3xl border border-slate-200/80 bg-white p-7 dark:border-slate-800/80 dark:bg-[#0c0e1a]">
+                                <div className="flex size-12 items-center justify-center rounded-2xl bg-purple-500/10 text-purple-600 dark:text-purple-400 mb-5">
+                                    <TrendingUp className="size-6" />
+                                </div>
+                                <h3 className="font-extrabold text-lg text-slate-900 dark:text-white mb-2">
+                                    Multi-Platform Presets
+                                </h3>
+                                <p className="text-xs leading-relaxed text-slate-600 dark:text-slate-400">
+                                    Pre-tuned prompts for LinkedIn hooks, Twitter threads, Facebook posts, SEO blog introductions, and cold sales emails.
+                                </p>
+                            </div>
+
+                            <div className="rounded-3xl border border-slate-200/80 bg-white p-7 dark:border-slate-800/80 dark:bg-[#0c0e1a]">
+                                <div className="flex size-12 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 mb-5">
+                                    <Lock className="size-6" />
+                                </div>
+                                <h3 className="font-extrabold text-lg text-slate-900 dark:text-white mb-2">
+                                    Encrypted Key Vault
+                                </h3>
+                                <p className="text-xs leading-relaxed text-slate-600 dark:text-slate-400">
+                                    Your API credentials are protected with Laravel's AES-256-GCM encryption at rest. Never shared, never exported.
+                                </p>
+                            </div>
+
+                            <div className="rounded-3xl border border-slate-200/80 bg-white p-7 dark:border-slate-800/80 dark:bg-[#0c0e1a]">
+                                <div className="flex size-12 items-center justify-center rounded-2xl bg-amber-500/10 text-amber-600 dark:text-amber-400 mb-5">
+                                    <FileText className="size-6" />
+                                </div>
+                                <h3 className="font-extrabold text-lg text-slate-900 dark:text-white mb-2">
+                                    Telemetry & Word Counting
+                                </h3>
+                                <p className="text-xs leading-relaxed text-slate-600 dark:text-slate-400">
+                                    Instant calculation of word counts, character counts, and estimated reading times for social media character constraints.
+                                </p>
+                            </div>
+
+                            <div className="rounded-3xl border border-slate-200/80 bg-white p-7 dark:border-slate-800/80 dark:bg-[#0c0e1a]">
+                                <div className="flex size-12 items-center justify-center rounded-2xl bg-rose-500/10 text-rose-600 dark:text-rose-400 mb-5">
+                                    <PenTool className="size-6" />
+                                </div>
+                                <h3 className="font-extrabold text-lg text-slate-900 dark:text-white mb-2">
+                                    Persistent History Archive
+                                </h3>
+                                <p className="text-xs leading-relaxed text-slate-600 dark:text-slate-400">
+                                    Every generated copy snippet is safely indexed. Search, copy, or export in Markdown format whenever you need it.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                {/* 7. Bottom CTA Banner */}
+                <section className="py-24 px-4 sm:px-6 lg:px-8">
+                    <div className="mx-auto max-w-5xl rounded-3xl border border-indigo-500/30 bg-gradient-to-br from-indigo-900/40 via-purple-900/30 to-[#07080e] p-10 sm:p-16 text-center shadow-2xl relative overflow-hidden glow-indigo">
+                        <div className="relative z-10">
+                            <span className="inline-flex items-center gap-1.5 rounded-full bg-indigo-500/20 px-3.5 py-1 text-xs font-bold text-indigo-300 mb-4">
+                                <Sparkles className="size-3.5" />
+                                Setup in Under 60 Seconds
+                            </span>
+                            <h2 className="text-3xl sm:text-5xl font-black tracking-tight text-white">
+                                Ready to Take Full Control of Your AI Copy?
+                            </h2>
+                            <p className="mx-auto mt-4 max-w-2xl text-base sm:text-lg text-slate-300">
+                                Plug in your Gemini or OpenAI API keys today and experience true token freedom.
+                            </p>
+                            <div className="mt-8 flex justify-center">
+                                <Link
+                                    href={auth?.user ? dashboard() : register()}
+                                    className="inline-flex h-13 items-center gap-2 rounded-2xl bg-indigo-600 px-8 text-base font-bold text-white shadow-xl shadow-indigo-600/30 transition hover:bg-indigo-500 active:scale-95"
+                                >
+                                    {auth?.user ? 'Open Dashboard' : 'Create Free Account'}
+                                    <ArrowRight className="size-5" />
+                                </Link>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                {/* 8. Footer */}
+                <footer className="border-t border-slate-200/80 py-12 dark:border-slate-800/80 bg-white dark:bg-[#07080e]">
+                    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-6">
+                        <div className="flex items-center gap-2.5">
+                            <img
+                                src={`/images/logo/icon-only-${logoTheme}.png`}
+                                alt="Nexus AI"
+                                className="size-6 object-contain"
+                            />
+                            <span className="font-extrabold text-sm text-slate-900 dark:text-white">
+                                Nexus AI Content Studio
+                            </span>
+                        </div>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 text-center sm:text-left">
+                            Bring Your Own API Key AI SaaS. Your keys are encrypted locally with AES-256-GCM.
+                        </p>
+                        <div className="flex items-center gap-4 text-xs font-semibold text-slate-600 dark:text-slate-400">
+                            {auth?.user ? (
+                                <Link href={dashboard()} className="hover:text-indigo-600 dark:hover:text-white">
+                                    Dashboard
+                                </Link>
+                            ) : (
+                                <>
+                                    <Link href={login()} className="hover:text-indigo-600 dark:hover:text-white">
+                                        Log in
+                                    </Link>
+                                    <Link href={register()} className="hover:text-indigo-600 dark:hover:text-white">
+                                        Register
+                                    </Link>
+                                </>
+                            )}
+                        </div>
+                    </div>
+                </footer>
             </div>
         </>
     );
