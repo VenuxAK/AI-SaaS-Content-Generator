@@ -14,7 +14,7 @@ RUN npm run build
 # ==============================================================================
 # Stage 2: Production PHP Runtime with FrankenPHP & Octane
 # ==============================================================================
-FROM dunglas/frankenphp:latest-php8.4-alpine AS production
+FROM dunglas/frankenphp:php8.4-alpine AS production
 
 # Install system packages (ca-certificates for TiDB Cloud TLS verification)
 RUN apk add --no-cache ca-certificates
