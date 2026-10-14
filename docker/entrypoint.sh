@@ -38,6 +38,31 @@ if [ -n "$DB_HOST" ] || [ -n "$DB_URL" ] || [ -n "$DATABASE_URL" ]; then
     done
 fi
 
+# Ensure storage and cache directories exist with proper write permissions early
+mkdir -p storage/framework/cache/data \
+         storage/framework/sessions \
+         storage/framework/views \
+         storage/logs \
+         bootstrap/cache
+chmod -R 777 storage bootstrap/cache
+
+# Guarantee APP_KEY exists so web requests (sessions, cookies, encryption) never fail with 500
+if [ -z "$APP_KEY" ]; then
+    echo "================================================================="
+    echo "WARNING: APP_KEY is not set in Render environment!"
+    export APP_KEY=$(php artisan key:generate --show)
+    echo "Generated fallback key: $APP_KEY"
+    echo "Please set this APP_KEY in your Render dashboard under Environment."
+    echo "================================================================="
+fi
+
+# If REDIS_HOST is set to 'redis' but cannot be resolved, fall back to database
+if [ "$REDIS_HOST" = "redis" ] && ! getent hosts redis > /dev/null 2>&1; then
+    echo "Notice: Redis host 'redis' not reachable. Forcing CACHE_STORE=database and SESSION_DRIVER=database."
+    export CACHE_STORE=database
+    export SESSION_DRIVER=database
+fi
+
 # Run optimizations and migrations only for the primary app service (when starting Octane)
 case "$*" in
     *octane:start*)
@@ -51,12 +76,5 @@ case "$*" in
         php artisan event:cache
         ;;
 esac
-
-# Ensure storage directories exist with proper write permissions
-mkdir -p storage/framework/cache/data \
-         storage/framework/sessions \
-         storage/framework/views \
-         storage/logs \
-         bootstrap/cache
 
 exec "$@"
