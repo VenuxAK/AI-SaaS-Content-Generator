@@ -1,0 +1,158 @@
+services:
+  # ----------------------------------------------------------------------------
+  # 1. Primary Web Application (FrankenPHP + Octane)
+  # ----------------------------------------------------------------------------
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: content_generator_app
+    restart: unless-stopped
+    ports:
+      - "${APP_PORT:-8000}:8000"
+    env_file:
+      - .env
+    environment:
+      - APP_ENV=${APP_ENV:-production}
+      - OCTANE_SERVER=${OCTANE_SERVER:-frankenphp}
+      - DB_HOST=${DB_HOST:-mysql}
+      - DB_URL=${DB_URL:-}
+      - REDIS_HOST=${REDIS_HOST:-redis}
+    depends_on:
+      mysql:
+        condition: service_healthy
+        required: false
+      redis:
+        condition: service_healthy
+        required: false
+    volumes:
+      - storage_uploads:/app/storage/app
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:8000/up || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    networks:
+      - internal_network
+
+  # ----------------------------------------------------------------------------
+  # 2. Dedicated Background Queue Worker (AI Processing & Async Tasks)
+  # ----------------------------------------------------------------------------
+  queue:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: content_generator_queue
+    restart: unless-stopped
+    command: ["php", "artisan", "queue:work", "--tries=3", "--timeout=120", "--max-time=3600"]
+    env_file:
+      - .env
+    environment:
+      - APP_ENV=${APP_ENV:-production}
+      - DB_HOST=${DB_HOST:-mysql}
+      - DB_URL=${DB_URL:-}
+      - REDIS_HOST=${REDIS_HOST:-redis}
+    depends_on:
+      mysql:
+        condition: service_healthy
+        required: false
+      redis:
+        condition: service_healthy
+        required: false
+    volumes:
+      - storage_uploads:/app/storage/app
+    networks:
+      - internal_network
+
+  # ----------------------------------------------------------------------------
+  # 3. Task Scheduler (Laravel Cron Runner)
+  # ----------------------------------------------------------------------------
+  scheduler:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: content_generator_scheduler
+    restart: unless-stopped
+    command: ["php", "artisan", "schedule:work"]
+    env_file:
+      - .env
+    environment:
+      - APP_ENV=${APP_ENV:-production}
+      - DB_HOST=${DB_HOST:-mysql}
+      - DB_URL=${DB_URL:-}
+      - REDIS_HOST=${REDIS_HOST:-redis}
+    depends_on:
+      mysql:
+        condition: service_healthy
+        required: false
+      redis:
+        condition: service_healthy
+        required: false
+    networks:
+      - internal_network
+
+  # ----------------------------------------------------------------------------
+  # 4. MySQL 8.4 LTS Database
+  # ----------------------------------------------------------------------------
+  mysql:
+    image: mysql:8.4
+    container_name: content_generator_mysql
+    restart: unless-stopped
+    command:
+      - --default-authentication-plugin=mysql_native_password
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    environment:
+      MYSQL_DATABASE: "${DB_DATABASE:-saas_content_generator}"
+      MYSQL_USER: "${DB_USERNAME:-content_user}"
+      MYSQL_PASSWORD: "${DB_PASSWORD:-secret}"
+      MYSQL_ROOT_PASSWORD: "${DB_ROOT_PASSWORD:-root_super_secret}"
+    ports:
+      - "127.0.0.1:${FORWARD_DB_PORT:-3306}:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u root -p$${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    networks:
+      - internal_network
+
+  # ----------------------------------------------------------------------------
+  # 5. Redis 7 (In-Memory Sessions, Cache & Queue Broker)
+  # ----------------------------------------------------------------------------
+  redis:
+    image: redis:7-alpine
+    container_name: content_generator_redis
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "127.0.0.1:${FORWARD_REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+    networks:
+      - internal_network
+
+# ==============================================================================
+# Persistent Volumes & Private Network
+# ==============================================================================
+volumes:
+  mysql_data:
+    driver: local
+  redis_data:
+    driver: local
+  storage_uploads:
+    driver: local
+
+networks:
+  internal_network:
+    driver: bridge

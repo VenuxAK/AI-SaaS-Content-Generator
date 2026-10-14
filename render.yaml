@@ -1,0 +1,46 @@
+# ==============================================================================
+# Render Blueprint Specification for AI SaaS Content Generator
+# ==============================================================================
+services:
+  - type: web
+    name: ai-saas-content-generator
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /up
+    autoDeploy: true
+    envVars:
+      - key: APP_NAME
+        value: "AI SaaS Content Generator"
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: "false"
+      - key: APP_URL
+        sync: false # Set to your https://*.onrender.com URL or custom domain
+
+      # Laravel Octane with FrankenPHP
+      - key: OCTANE_SERVER
+        value: frankenphp
+      - key: OCTANE_MAX_REQUESTS
+        value: "1000"
+      - key: OCTANE_HTTPS
+        value: "true"
+
+      # TiDB Cloud Serverless MySQL Connection
+      - key: DB_CONNECTION
+        value: mysql
+      - key: DB_URL
+        sync: false # Paste your TiDB Cloud connection string here
+
+      # In-Database Sessions & Caches (Free Tier friendly, no Redis required)
+      - key: SESSION_DRIVER
+        value: database
+      - key: CACHE_STORE
+        value: database
+      - key: QUEUE_CONNECTION
+        value: sync
+
+      # Application Encryption Key
+      - key: APP_KEY
+        generateValue: true
