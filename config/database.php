@@ -17,7 +17,7 @@ return [
     |
     */
 
-    'default' => env('DB_CONNECTION', 'sqlite'),
+    'default' => env('DB_CONNECTION', env('DB_HOST') ? 'mysql' : 'sqlite'),
 
     /*
     |--------------------------------------------------------------------------
@@ -60,7 +60,18 @@ return [
             'strict' => true,
             'engine' => null,
             'options' => extension_loaded('pdo_mysql') ? array_filter([
-                Mysql::ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+                Mysql::ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA', (function () {
+                    $host = env('DB_HOST');
+                    if ($host && ! in_array($host, ['127.0.0.1', 'localhost', 'mysql'])) {
+                        foreach (['/etc/ssl/certs/ca-certificates.crt', '/etc/ssl/cert.pem', '/etc/pki/tls/certs/ca-bundle.crt'] as $ca) {
+                            if (file_exists($ca)) {
+                                return $ca;
+                            }
+                        }
+                    }
+
+                    return null;
+                })()),
             ]) : [],
         ],
 

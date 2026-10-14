@@ -22,6 +22,7 @@ RUN apk add --no-cache ca-certificates
 # Install essential production PHP extensions using FrankenPHP helper
 RUN install-php-extensions \
     pdo_mysql \
+    pdo_sqlite \
     redis \
     pcntl \
     opcache \
