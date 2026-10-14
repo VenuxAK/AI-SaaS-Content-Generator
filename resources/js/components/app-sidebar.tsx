@@ -31,8 +31,14 @@ import type { NavItem } from '@/types';
 export function AppSidebar() {
     const { auth } = usePage().props as { auth?: { user?: any } };
     const user = auth?.user;
-    const { state } = useSidebar();
+    const { state, isMobile, setOpenMobile } = useSidebar();
     const isCollapsed = state === 'collapsed';
+
+    const handleMobileDismiss = () => {
+        if (isMobile) {
+            setOpenMobile(false);
+        }
+    };
 
     const navItems: NavItem[] = [
         {
@@ -76,7 +82,7 @@ export function AppSidebar() {
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" asChild className="hover:bg-transparent">
-                            <Link href={dashboard()} prefetch>
+                            <Link href={dashboard()} prefetch onClick={handleMobileDismiss}>
                                 <AppLogo />
                             </Link>
                         </SidebarMenuButton>
@@ -102,6 +108,7 @@ export function AppSidebar() {
                         </p>
                         <Link
                             href="/settings/api-keys"
+                            onClick={handleMobileDismiss}
                             className="mt-2 block text-[10px] font-bold text-indigo-600 hover:underline dark:text-indigo-400"
                         >
                             Configure AI credentials →

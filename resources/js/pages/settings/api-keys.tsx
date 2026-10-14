@@ -345,14 +345,14 @@ export default function ApiKeysSettings({
                                                     e.target.value
                                                 )
                                             }
-                                            className="pr-20 font-mono text-sm"
+                                            className="pr-20 font-mono text-base sm:text-sm"
                                             autoComplete="off"
                                         />
                                         <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
                                             <button
                                                 type="button"
                                                 onClick={() => setShowKey(!showKey)}
-                                                className="rounded p-1 text-muted-foreground hover:text-foreground transition-colors"
+                                                className="rounded p-1.5 text-muted-foreground hover:text-foreground transition-colors min-h-[36px] min-w-[36px] flex items-center justify-center"
                                                 title={
                                                     showKey ? 'Hide key' : 'Show key'
                                                 }
@@ -374,7 +374,7 @@ export default function ApiKeysSettings({
                                         }
                                     />
 
-                                    <div className="flex items-center justify-between pt-1">
+                                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pt-1">
                                         <Button
                                             type="button"
                                             variant="outline"
@@ -387,7 +387,7 @@ export default function ApiKeysSettings({
                                                 ] &&
                                                     !keysStatus[selectedProvider]?.is_set)
                                             }
-                                            className="text-xs h-8 gap-1.5"
+                                            className="text-xs min-h-[38px] sm:h-8 gap-1.5 w-full sm:w-auto font-medium"
                                         >
                                             {testLoading ? (
                                                 <Spinner className="h-3 w-3" />
@@ -397,7 +397,7 @@ export default function ApiKeysSettings({
                                             Test Key Connection
                                         </Button>
 
-                                        <p className="text-[11px] text-muted-foreground">
+                                        <p className="text-[11px] text-muted-foreground text-center sm:text-right">
                                             Encrypted at rest with AES-256
                                         </p>
                                     </div>
@@ -430,7 +430,7 @@ export default function ApiKeysSettings({
                                         <button
                                             type="button"
                                             onClick={() => setCustomModelMode(!customModelMode)}
-                                            className="text-xs text-primary hover:underline font-medium"
+                                            className="text-xs text-primary hover:underline font-medium min-h-[32px] flex items-center"
                                         >
                                             {customModelMode
                                                 ? 'Pick from curated list'
@@ -448,7 +448,7 @@ export default function ApiKeysSettings({
                                                 onChange={(e) =>
                                                     setData('ai_model', e.target.value)
                                                 }
-                                                className="font-mono text-sm"
+                                                className="font-mono text-base sm:text-sm min-h-[44px] sm:min-h-9"
                                             />
                                             <p className="text-[11px] text-muted-foreground">
                                                 Specify any valid model ID supported by your API key.
@@ -461,7 +461,7 @@ export default function ApiKeysSettings({
                                                 setData('ai_model', val)
                                             }
                                         >
-                                            <SelectTrigger id="ai_model" className="w-full">
+                                            <SelectTrigger id="ai_model" className="w-full min-h-[44px] sm:min-h-9">
                                                 <SelectValue placeholder="Choose a model" />
                                             </SelectTrigger>
                                             <SelectContent>
@@ -481,11 +481,11 @@ export default function ApiKeysSettings({
                                     <InputError message={errors.ai_model} />
                                 </div>
 
-                                <div className="flex items-center gap-3 pt-2">
+                                <div className="flex flex-col sm:flex-row items-center gap-3 pt-2">
                                     <Button
                                         type="submit"
                                         disabled={processing}
-                                        className="gap-2"
+                                        className="gap-2 min-h-[44px] w-full sm:w-auto"
                                     >
                                         {processing && <Spinner className="h-4 w-4" />}
                                         Save AI Settings

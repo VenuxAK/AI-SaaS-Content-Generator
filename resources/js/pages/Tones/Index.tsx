@@ -111,15 +111,15 @@ export default function TonesIndex({ tones }: TonesIndexProps) {
     return (
         <>
             <Head title="Voice Personas - Nexus AI" />
-            <div className="mx-auto flex h-full w-full max-w-7xl flex-1 flex-col gap-6 p-4 sm:p-6 lg:p-8">
+            <div className="mx-auto flex h-full w-full max-w-7xl flex-1 flex-col gap-5 sm:gap-6 p-3.5 sm:p-6 lg:p-8">
                 {/* Header Section */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200/80 pb-5 dark:border-slate-800/80">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200/80 pb-4 sm:pb-5 dark:border-slate-800/80">
                     <div>
-                        <div className="flex items-center gap-2.5">
+                        <div className="flex items-center gap-2 sm:gap-2.5">
                             <div className="flex size-9 items-center justify-center rounded-2xl bg-indigo-600/10 text-indigo-600 dark:bg-indigo-500/20 dark:text-indigo-400">
                                 <Sparkles className="size-5" />
                             </div>
-                            <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">
+                            <h1 className="text-xl sm:text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">
                                 Voice Personas & Tones
                             </h1>
                         </div>
@@ -131,7 +131,7 @@ export default function TonesIndex({ tones }: TonesIndexProps) {
                     {!isCreateOpen && !editingTone && (
                         <Button
                             onClick={() => setIsCreateOpen(true)}
-                            className="bg-indigo-600 hover:bg-indigo-500 text-white rounded-2xl font-bold flex items-center gap-2 cursor-pointer shadow-xl shadow-indigo-600/20 h-11 px-5 transition active:scale-95 self-start sm:self-auto"
+                            className="bg-indigo-600 hover:bg-indigo-500 text-white rounded-2xl font-bold flex items-center justify-center gap-2 cursor-pointer shadow-xl shadow-indigo-600/20 h-11 px-5 transition active:scale-95 w-full sm:w-auto"
                         >
                             <Plus className="size-4" />
                             Create Persona
@@ -141,10 +141,10 @@ export default function TonesIndex({ tones }: TonesIndexProps) {
 
                 {/* Form: Create Tone Form Card */}
                 {isCreateOpen && (
-                    <Card className="border border-indigo-500/30 shadow-xl bg-white/90 dark:bg-[#0c0e1a]/90 backdrop-blur-2xl rounded-3xl p-6 glow-indigo">
-                        <div className="flex justify-between items-start pb-4 border-b border-slate-100 dark:border-slate-800/60 mb-5">
+                    <Card className="border border-indigo-500/30 shadow-xl bg-white/90 dark:bg-[#0c0e1a]/90 backdrop-blur-2xl rounded-3xl p-4 sm:p-6 glow-indigo">
+                        <div className="flex justify-between items-start pb-3 sm:pb-4 border-b border-slate-100 dark:border-slate-800/60 mb-4 sm:mb-5">
                             <div>
-                                <h2 className="text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                                <h2 className="text-sm sm:text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
                                     <Sparkles className="size-4 text-indigo-600 dark:text-indigo-400" />
                                     Create New Voice Persona
                                 </h2>
@@ -174,7 +174,7 @@ export default function TonesIndex({ tones }: TonesIndexProps) {
                                     placeholder="e.g. Visionary Tech Founder, High-Converting Direct Sales, Chill Gen-Z Creator"
                                     value={createForm.data.name}
                                     onChange={(e) => createForm.setData('name', e.target.value)}
-                                    className="w-full rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#07080e] px-4 py-3 text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                    className="w-full rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#07080e] px-3.5 sm:px-4 py-2.5 sm:py-3 text-base sm:text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                                     required
                                 />
                                 {createForm.errors.name && (
@@ -247,10 +247,10 @@ export default function TonesIndex({ tones }: TonesIndexProps) {
 
                 {/* Form: Edit Tone Form Card */}
                 {editingTone && (
-                    <Card className="border border-indigo-500/30 shadow-xl bg-white/90 dark:bg-[#0c0e1a]/90 backdrop-blur-2xl rounded-3xl p-6 glow-indigo">
-                        <div className="flex justify-between items-start pb-4 border-b border-slate-100 dark:border-slate-800/60 mb-5">
+                    <Card className="border border-indigo-500/30 shadow-xl bg-white/90 dark:bg-[#0c0e1a]/90 backdrop-blur-2xl rounded-3xl p-4 sm:p-6 glow-indigo">
+                        <div className="flex justify-between items-start pb-3 sm:pb-4 border-b border-slate-100 dark:border-slate-800/60 mb-4 sm:mb-5">
                             <div>
-                                <h2 className="text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                                <h2 className="text-sm sm:text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
                                     <Edit2 className="size-4 text-indigo-600 dark:text-indigo-400" />
                                     Edit Persona: {editingTone.name}
                                 </h2>
@@ -276,7 +276,7 @@ export default function TonesIndex({ tones }: TonesIndexProps) {
                                     type="text"
                                     value={editForm.data.name}
                                     onChange={(e) => editForm.setData('name', e.target.value)}
-                                    className="w-full rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#07080e] px-4 py-3 text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                    className="w-full rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#07080e] px-3.5 sm:px-4 py-2.5 sm:py-3 text-base sm:text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                                     required
                                 />
                                 {editForm.errors.name && (
@@ -298,7 +298,7 @@ export default function TonesIndex({ tones }: TonesIndexProps) {
                                     rows={4}
                                     value={editForm.data.description}
                                     onChange={(e) => editForm.setData('description', e.target.value)}
-                                    className="w-full rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#07080e] p-4 text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+                                    className="w-full rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#07080e] p-3.5 sm:p-4 text-base sm:text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
                                     required
                                 />
                                 {editForm.errors.description && (
@@ -308,7 +308,7 @@ export default function TonesIndex({ tones }: TonesIndexProps) {
                                 )}
                             </div>
 
-                            <div className="flex justify-end gap-3 pt-4 border-t border-slate-100 dark:border-slate-800/60">
+                            <div className="flex justify-end gap-3 pt-3 border-t border-slate-100 dark:border-slate-800/60">
                                 <Button
                                     type="button"
                                     variant="outline"
@@ -331,13 +331,13 @@ export default function TonesIndex({ tones }: TonesIndexProps) {
 
                 {/* Tone Cards Grid */}
                 {tones.length > 0 ? (
-                    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                    <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
                         {tones.map((tone) => (
                             <Card
                                 key={tone.id}
                                 className="group rounded-3xl border border-slate-200/80 bg-white/80 shadow-md backdrop-blur-xl transition duration-200 hover:shadow-xl hover:border-indigo-400 dark:border-slate-800/80 dark:bg-[#0c0e1a]/80 dark:hover:border-indigo-500/40 flex flex-col justify-between overflow-hidden"
                             >
-                                <CardHeader className="pb-3 pt-5 px-6 bg-slate-50/50 dark:bg-[#080911]/60 border-b border-slate-100 dark:border-slate-800/60">
+                                <CardHeader className="pb-3 pt-4 sm:pt-5 px-4 sm:px-6 bg-slate-50/50 dark:bg-[#080911]/60 border-b border-slate-100 dark:border-slate-800/60">
                                     <div className="flex justify-between items-center gap-2">
                                         <div className="flex items-center gap-2 flex-wrap">
                                             <CardTitle className="text-sm font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
@@ -360,7 +360,7 @@ export default function TonesIndex({ tones }: TonesIndexProps) {
                                                             description: tone.description,
                                                         })
                                                     }
-                                                    className="px-2.5 py-1 rounded-xl text-[11px] font-bold text-indigo-600 hover:bg-indigo-50 dark:text-indigo-400 dark:hover:bg-indigo-950/40 transition cursor-pointer flex items-center gap-1 border border-indigo-500/20 shadow-2xs"
+                                                    className="px-2.5 py-1 rounded-xl text-[11px] font-bold text-indigo-600 hover:bg-indigo-50 dark:text-indigo-400 dark:hover:bg-indigo-950/40 transition cursor-pointer flex items-center gap-1 border border-indigo-500/20 shadow-2xs min-h-[30px]"
                                                     title="Duplicate as customizable template"
                                                 >
                                                     <Plus className="size-3" /> Duplicate
@@ -369,14 +369,14 @@ export default function TonesIndex({ tones }: TonesIndexProps) {
                                                 <div className="flex items-center gap-1">
                                                     <button
                                                         onClick={() => openEdit(tone)}
-                                                        className="p-1.5 rounded-lg text-slate-400 hover:text-indigo-600 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+                                                        className="p-2 rounded-lg text-slate-400 hover:text-indigo-600 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer min-h-[36px] min-w-[36px] flex items-center justify-center"
                                                         title="Edit tone"
                                                     >
                                                         <Edit2 className="size-3.5" />
                                                     </button>
                                                     <button
                                                         onClick={() => handleDelete(tone.id)}
-                                                        className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+                                                        className="p-2 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer min-h-[36px] min-w-[36px] flex items-center justify-center"
                                                         title="Delete tone"
                                                     >
                                                         <Trash2 className="size-3.5" />
@@ -386,12 +386,12 @@ export default function TonesIndex({ tones }: TonesIndexProps) {
                                         </div>
                                     </div>
                                 </CardHeader>
-                                <CardContent className="pt-4 pb-5 px-6 flex-1">
+                                <CardContent className="pt-3.5 sm:pt-4 pb-4 sm:pb-5 px-4 sm:px-6 flex-1">
                                     <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed whitespace-pre-line">
                                         {tone.description}
                                     </p>
                                 </CardContent>
-                                <CardFooter className="py-3 px-6 bg-slate-50/30 dark:bg-[#080911]/40 border-t border-slate-100 dark:border-slate-800/60 text-[10px] text-slate-400 font-mono flex items-center justify-between">
+                                <CardFooter className="py-2.5 sm:py-3 px-4 sm:px-6 bg-slate-50/30 dark:bg-[#080911]/40 border-t border-slate-100 dark:border-slate-800/60 text-[10px] text-slate-400 font-mono flex items-center justify-between">
                                     <span>
                                         {tone.is_system
                                             ? 'Built-in system preset'

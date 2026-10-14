@@ -131,22 +131,22 @@ export default function Create({
     return (
         <>
             <Head title="AI Studio - Generate Copy" />
-            <div className="mx-auto flex h-full w-full max-w-7xl flex-1 flex-col gap-6 p-4 sm:p-6 lg:p-8">
+            <div className="mx-auto flex h-full w-full max-w-7xl flex-1 flex-col gap-5 sm:gap-6 p-3.5 sm:p-6 lg:p-8">
                 {/* Studio Header */}
-                <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between border-b border-slate-200/80 pb-5 dark:border-slate-800/80">
+                <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between border-b border-slate-200/80 pb-4 sm:pb-5 dark:border-slate-800/80">
                     <div className="flex flex-col gap-1">
-                        <div className="flex items-center gap-2.5">
+                        <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
                             <div className="flex size-9 items-center justify-center rounded-xl bg-indigo-600/10 text-indigo-600 dark:bg-indigo-500/20 dark:text-indigo-400">
                                 <PenTool className="size-5" />
                             </div>
-                            <h1 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">
+                            <h1 className="text-xl sm:text-2xl font-black tracking-tight text-slate-900 dark:text-white">
                                 AI Copy Studio
                             </h1>
                             <span className="rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-xs font-bold text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
                                 BYOK Active
                             </span>
                         </div>
-                        <p className="text-sm text-slate-500 dark:text-slate-400">
+                        <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
                             Craft high-impact copy, multi-platform threads, and blogs streamed directly through your calibrated AI keys.
                         </p>
                     </div>
@@ -155,10 +155,10 @@ export default function Create({
                     <div className="flex items-center gap-2">
                         <Link
                             href="/settings/api-keys"
-                            className="flex items-center gap-2 rounded-xl border border-slate-200/80 bg-white px-3.5 py-2 text-xs font-semibold text-slate-700 shadow-xs transition hover:border-indigo-400 hover:text-indigo-600 dark:border-slate-800 dark:bg-[#0c0e1a] dark:text-slate-300 dark:hover:border-indigo-500/50 dark:hover:text-white"
+                            className="flex items-center gap-2 rounded-xl border border-slate-200/80 bg-white px-3 py-1.5 sm:px-3.5 sm:py-2 text-xs font-semibold text-slate-700 shadow-xs transition hover:border-indigo-400 hover:text-indigo-600 dark:border-slate-800 dark:bg-[#0c0e1a] dark:text-slate-300 dark:hover:border-indigo-500/50 dark:hover:text-white"
                         >
                             <span className="flex size-2 rounded-full bg-emerald-500 animate-pulse" />
-                            <span className="font-mono">{providerNames[aiProvider] || 'AI'}: {aiModel}</span>
+                            <span className="font-mono truncate max-w-[200px] sm:max-w-none">{providerNames[aiProvider] || 'AI'}: {aiModel}</span>
                             <span className="text-slate-400 text-[10px]">Change →</span>
                         </Link>
                     </div>
@@ -169,10 +169,10 @@ export default function Create({
                     <motion.div
                         initial={{ opacity: 0, y: -10 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-5 text-amber-900 dark:text-amber-200 backdrop-blur-md"
+                        className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4 sm:p-5 text-amber-900 dark:text-amber-200 backdrop-blur-md"
                     >
                         <div className="flex items-center gap-3">
-                            <div className="rounded-xl bg-amber-500/20 p-2.5 text-amber-600 dark:text-amber-400">
+                            <div className="rounded-xl bg-amber-500/20 p-2.5 text-amber-600 dark:text-amber-400 shrink-0">
                                 <AlertTriangle className="size-5" />
                             </div>
                             <div>
@@ -185,7 +185,7 @@ export default function Create({
                         </div>
                         <Link
                             href="/settings/api-keys"
-                            className="inline-flex items-center gap-2 rounded-xl bg-amber-600 hover:bg-amber-500 px-5 py-2.5 text-xs font-bold text-white shadow-md transition shrink-0 active:scale-95"
+                            className="inline-flex w-full sm:w-auto justify-center items-center gap-2 rounded-xl bg-amber-600 hover:bg-amber-500 px-5 py-2.5 text-xs font-bold text-white shadow-md transition shrink-0 active:scale-95"
                         >
                             <Key className="size-4" />
                             Configure Key
@@ -194,17 +194,17 @@ export default function Create({
                 )}
 
                 {/* Split-Pane Studio Layout */}
-                <div className="grid gap-8 lg:grid-cols-12">
+                <div className="grid gap-6 sm:gap-8 lg:grid-cols-12">
                     {/* Left Studio Input Pane */}
                     <div className="lg:col-span-8 space-y-6">
-                        <Card className="rounded-3xl border border-slate-200/90 bg-white/90 p-6 sm:p-8 shadow-xl backdrop-blur-xl dark:border-slate-800/90 dark:bg-[#0c0e1a]/90 glow-indigo">
-                            <form onSubmit={submit} className="space-y-6">
+                        <Card className="rounded-3xl border border-slate-200/90 bg-white/90 p-4 sm:p-8 shadow-xl backdrop-blur-xl dark:border-slate-800/90 dark:bg-[#0c0e1a]/90 glow-indigo">
+                            <form onSubmit={submit} className="space-y-5 sm:space-y-6">
                                 {/* 1. Target Platform Selection Pills */}
                                 <div>
                                     <label className="mb-2.5 block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                                         1. Select Target Format
                                     </label>
-                                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+                                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-2.5">
                                         {contentTypes.map((type) => {
                                             const IconComponent = PLATFORM_ICONS[type.value] || FileText;
                                             const isSelected = data.content_type === type.value;
@@ -359,11 +359,11 @@ export default function Create({
 
                                     <textarea
                                         id="user_prompt"
-                                        rows={6}
-                                        placeholder="Describe your product, core hook, target persona, and desired takeaway. The more context you provide, the sharper the generated copy will be..."
+                                        rows={4}
+                                        placeholder="Describe your product, core hook, target persona, and desired takeaway..."
                                         value={data.user_prompt}
                                         onChange={(e) => setData('user_prompt', e.target.value)}
-                                        className="w-full resize-none rounded-2xl border border-slate-200 bg-white p-4 font-sans text-sm leading-relaxed text-slate-900 shadow-xs focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 dark:border-slate-800 dark:bg-[#07080e] dark:text-slate-100"
+                                        className="w-full resize-none rounded-2xl border border-slate-200 bg-white p-3.5 sm:p-4 font-sans text-base sm:text-sm leading-relaxed text-slate-900 shadow-xs focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 dark:border-slate-800 dark:bg-[#07080e] dark:text-slate-100"
                                         maxLength={2000}
                                         required
                                     />
@@ -374,16 +374,16 @@ export default function Create({
                                     )}
 
                                     {/* Quick Prompt Ideas */}
-                                    <div className="mt-3 flex flex-wrap items-center gap-2">
-                                        <span className="text-[11px] font-semibold text-slate-400">
-                                            Quick Templates:
+                                    <div className="mt-2.5 sm:mt-3 flex flex-wrap items-center gap-1.5 sm:gap-2">
+                                        <span className="text-[10px] sm:text-[11px] font-semibold text-slate-400">
+                                            Templates:
                                         </span>
                                         {PROMPT_SUGGESTIONS.map((sugg, i) => (
                                             <button
                                                 key={i}
                                                 type="button"
                                                 onClick={() => handleApplySuggestion(sugg.prompt)}
-                                                className="cursor-pointer rounded-lg border border-slate-200/80 bg-slate-50 px-2.5 py-1 text-[11px] font-medium text-slate-600 transition hover:border-indigo-300 hover:bg-indigo-50/50 hover:text-indigo-700 dark:border-slate-800 dark:bg-slate-900/60 dark:text-slate-300 dark:hover:border-indigo-500/40 dark:hover:text-indigo-300"
+                                                className="cursor-pointer rounded-lg border border-slate-200/80 bg-slate-50 px-2 py-1 text-[10.5px] sm:text-[11px] font-medium text-slate-600 transition hover:border-indigo-300 hover:bg-indigo-50/50 hover:text-indigo-700 dark:border-slate-800 dark:bg-slate-900/60 dark:text-slate-300 dark:hover:border-indigo-500/40 dark:hover:text-indigo-300 active:scale-95"
                                             >
                                                 + {sugg.title}
                                             </button>
@@ -395,9 +395,9 @@ export default function Create({
                                 <Button
                                     type="submit"
                                     disabled={processing || !hasApiKey}
-                                    className="flex h-13 w-full cursor-pointer items-center justify-center gap-2.5 rounded-2xl bg-indigo-600 text-base font-bold text-white shadow-xl shadow-indigo-600/25 transition hover:bg-indigo-500 hover:shadow-indigo-600/35 active:scale-95 disabled:opacity-50"
+                                    className="flex h-12 sm:h-13 w-full cursor-pointer items-center justify-center gap-2 rounded-2xl bg-indigo-600 text-sm sm:text-base font-bold text-white shadow-xl shadow-indigo-600/25 transition hover:bg-indigo-500 hover:shadow-indigo-600/35 active:scale-95 disabled:opacity-50"
                                 >
-                                    <Sparkles className="size-5" />
+                                    <Sparkles className="size-4.5 sm:size-5" />
                                     {processing
                                         ? 'Initializing Neural Stream...'
                                         : hasApiKey
@@ -409,9 +409,9 @@ export default function Create({
                     </div>
 
                     {/* Right Telemetry & Archive Sidebar */}
-                    <div className="lg:col-span-4 space-y-6">
+                    <div className="lg:col-span-4 space-y-5 sm:space-y-6">
                         {/* BYOK Status Card */}
-                        <Card className="rounded-3xl border border-slate-200/80 bg-white/80 p-6 shadow-md backdrop-blur-xl dark:border-slate-800/80 dark:bg-[#0c0e1a]/80">
+                        <Card className="rounded-3xl border border-slate-200/80 bg-white/80 p-4 sm:p-6 shadow-md backdrop-blur-xl dark:border-slate-800/80 dark:bg-[#0c0e1a]/80">
                             <div className="flex items-center justify-between border-b border-slate-100 pb-3 dark:border-slate-800/60">
                                 <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                                     Direct AI Engine

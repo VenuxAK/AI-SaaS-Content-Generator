@@ -71,15 +71,15 @@ export default function HistoryIndex({ history }: HistoryProps) {
     return (
         <>
             <Head title="Content Archive - Nexus AI" />
-            <div className="mx-auto flex h-full w-full max-w-7xl flex-1 flex-col gap-6 p-4 sm:p-6 lg:p-8">
+            <div className="mx-auto flex h-full w-full max-w-7xl flex-1 flex-col gap-5 sm:gap-6 p-3.5 sm:p-6 lg:p-8">
                 {/* Header Section */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200/80 pb-5 dark:border-slate-800/80">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200/80 pb-4 sm:pb-5 dark:border-slate-800/80">
                     <div>
-                        <div className="flex items-center gap-2.5">
+                        <div className="flex items-center gap-2 sm:gap-2.5">
                             <div className="flex size-9 items-center justify-center rounded-2xl bg-indigo-600/10 text-indigo-600 dark:bg-indigo-500/20 dark:text-indigo-400">
                                 <History className="size-5" />
                             </div>
-                            <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">
+                            <h1 className="text-xl sm:text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">
                                 Content Archive
                             </h1>
                         </div>
@@ -90,7 +90,7 @@ export default function HistoryIndex({ history }: HistoryProps) {
 
                     <Link
                         href={generateCreate.url()}
-                        className="inline-flex h-11 items-center gap-2 rounded-2xl bg-indigo-600 px-5 text-xs font-bold text-white shadow-xl shadow-indigo-600/20 hover:bg-indigo-500 transition self-start sm:self-auto"
+                        className="inline-flex h-11 w-full sm:w-auto justify-center items-center gap-2 rounded-2xl bg-indigo-600 px-5 text-xs font-bold text-white shadow-xl shadow-indigo-600/20 hover:bg-indigo-500 transition active:scale-95"
                     >
                         <PenTool className="size-3.5" />
                         Create New Copy
@@ -99,7 +99,7 @@ export default function HistoryIndex({ history }: HistoryProps) {
 
                 {/* History Grid */}
                 {history.data.length > 0 ? (
-                    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                    <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
                         {history.data.map((gen) => {
                             const date = new Date(gen.created_at).toLocaleDateString();
                             const IconComponent = PLATFORM_ICONS[gen.content_type] || FileText;
@@ -133,10 +133,10 @@ export default function HistoryIndex({ history }: HistoryProps) {
                                     href={historyShow.url(gen.id)}
                                     className="group block transition transform hover:-translate-y-1"
                                 >
-                                    <Card className="rounded-3xl border border-slate-200/80 bg-white/80 shadow-md backdrop-blur-xl transition duration-200 h-56 flex flex-col justify-between overflow-hidden dark:border-slate-800/80 dark:bg-[#0c0e1a]/80 group-hover:border-indigo-400 group-hover:shadow-xl dark:group-hover:border-indigo-500/40">
-                                        <CardHeader className="pb-2 pt-4 px-5 border-b border-slate-100 dark:border-slate-800/60 flex flex-row items-center justify-between">
+                                    <Card className="rounded-3xl border border-slate-200/80 bg-white/80 shadow-md backdrop-blur-xl transition duration-200 min-h-[13.5rem] flex flex-col justify-between overflow-hidden dark:border-slate-800/80 dark:bg-[#0c0e1a]/80 group-hover:border-indigo-400 group-hover:shadow-xl dark:group-hover:border-indigo-500/40">
+                                        <CardHeader className="pb-2 pt-4 px-4 sm:px-5 border-b border-slate-100 dark:border-slate-800/60 flex flex-row items-center justify-between">
                                             <div className="flex items-center gap-2">
-                                                <div className="flex size-7 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600 dark:bg-indigo-950/40 dark:text-indigo-400">
+                                                <div className="flex size-7 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600 dark:bg-indigo-950/40 dark:text-indigo-400 shrink-0">
                                                     <IconComponent className="size-3.5" />
                                                 </div>
                                                 <span className="text-xs font-bold text-slate-900 dark:text-white capitalize truncate max-w-[140px]">
@@ -145,12 +145,12 @@ export default function HistoryIndex({ history }: HistoryProps) {
                                             </div>
                                             {statusBadge}
                                         </CardHeader>
-                                        <CardContent className="pt-3 pb-3 px-5 flex-1">
+                                        <CardContent className="pt-3 pb-3 px-4 sm:px-5 flex-1">
                                             <p className="text-xs text-slate-600 dark:text-slate-400 line-clamp-3 leading-relaxed">
                                                 {gen.user_prompt}
                                             </p>
                                         </CardContent>
-                                        <CardFooter className="py-3 px-5 bg-slate-50/50 dark:bg-[#080911]/60 border-t border-slate-100 dark:border-slate-800/60 text-[11px] text-slate-400 flex items-center justify-between">
+                                        <CardFooter className="py-2.5 sm:py-3 px-4 sm:px-5 bg-slate-50/50 dark:bg-[#080911]/60 border-t border-slate-100 dark:border-slate-800/60 text-[11px] text-slate-400 flex items-center justify-between">
                                             <span className="flex items-center gap-1.5 font-mono uppercase font-semibold">
                                                 <Languages className="size-3 text-indigo-500" />
                                                 {gen.output_language}
@@ -161,12 +161,12 @@ export default function HistoryIndex({ history }: HistoryProps) {
                                                     <button
                                                         type="button"
                                                         onClick={(e) => {
-                                                            e.preventDefault();
-                                                            e.stopPropagation();
-                                                            handleCopyText(gen.id, gen.ai_content);
+                                                             e.preventDefault();
+                                                             e.stopPropagation();
+                                                             handleCopyText(gen.id, gen.ai_content);
                                                         }}
                                                         title="Copy AI output"
-                                                        className="flex items-center gap-1 rounded-lg border border-slate-200/80 bg-white px-2 py-0.5 text-[10px] font-semibold text-slate-700 transition hover:border-indigo-400 hover:text-indigo-600 dark:border-slate-800 dark:bg-[#0c0e1a] dark:text-slate-300 dark:hover:border-indigo-500/50 dark:hover:text-white"
+                                                        className="flex items-center gap-1 rounded-lg border border-slate-200/80 bg-white px-2 py-1 text-[10.5px] font-semibold text-slate-700 transition hover:border-indigo-400 hover:text-indigo-600 dark:border-slate-800 dark:bg-[#0c0e1a] dark:text-slate-300 dark:hover:border-indigo-500/50 dark:hover:text-white min-h-[30px]"
                                                     >
                                                         {copiedId === gen.id ? (
                                                             <>

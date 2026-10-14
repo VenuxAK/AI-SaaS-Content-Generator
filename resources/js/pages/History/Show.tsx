@@ -357,21 +357,21 @@ export default function HistoryShow({ generation, autostream }: ShowProps) {
     return (
         <>
             <Head title={`Copy - ${generation.content_type.replace('_', ' ')}`} />
-            <div className="mx-auto flex h-full w-full max-w-7xl flex-1 flex-col gap-6 p-4 sm:p-6 lg:p-8">
+            <div className="mx-auto flex h-full w-full max-w-7xl flex-1 flex-col gap-5 sm:gap-6 p-3.5 sm:p-6 lg:p-8">
                 {/* Header Section */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200/80 pb-5 dark:border-slate-800/80">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200/80 pb-4 sm:pb-5 dark:border-slate-800/80">
                     <div>
                         <Link
                             href={historyIndex.url()}
-                            className="text-xs font-bold text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-white flex items-center gap-1 mb-2 transition"
+                            className="text-xs font-bold text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-white flex items-center gap-1 mb-1.5 transition"
                         >
                             <ArrowLeft className="size-3.5" />
                             Back to History
                         </Link>
-                        <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white capitalize flex items-center gap-2.5">
+                        <h1 className="text-xl sm:text-2xl sm:text-3xl font-black text-slate-900 dark:text-white capitalize flex items-center gap-2.5">
                             {generation.content_type.replace('_', ' ')}
                         </h1>
-                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 sm:mt-1">
                             Generated on {new Date(generation.created_at).toLocaleString()}
                         </p>
                     </div>
@@ -383,19 +383,19 @@ export default function HistoryShow({ generation, autostream }: ShowProps) {
                                 <Button
                                     variant="outline"
                                     onClick={handleCopy}
-                                    className="rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-[#0c0e1a] h-10 flex items-center gap-1.5 cursor-pointer text-xs font-bold transition hover:border-indigo-400 hover:text-indigo-600 dark:hover:text-indigo-400 shadow-2xs"
+                                    className="rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-[#0c0e1a] h-10 px-3 flex items-center gap-1.5 cursor-pointer text-xs font-bold transition hover:border-indigo-400 hover:text-indigo-600 dark:hover:text-indigo-400 shadow-2xs active:scale-95"
                                 >
                                     {isCopied ? (
                                         <Check className="size-4 text-emerald-500" />
                                     ) : (
                                         <Copy className="size-4" />
                                     )}
-                                    {isCopied ? 'Copied to Clipboard' : 'Copy Output'}
+                                    <span>{isCopied ? 'Copied' : 'Copy'}</span>
                                 </Button>
                                 <Button
                                     variant="outline"
                                     onClick={() => handleDownload('md')}
-                                    className="rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-[#0c0e1a] h-10 flex items-center gap-1.5 cursor-pointer text-xs font-bold shadow-2xs"
+                                    className="rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-[#0c0e1a] h-10 px-3 flex items-center gap-1.5 cursor-pointer text-xs font-bold shadow-2xs active:scale-95"
                                 >
                                     <Download className="size-4" />
                                     .md
@@ -406,17 +406,17 @@ export default function HistoryShow({ generation, autostream }: ShowProps) {
                                         setIsEditing(!isEditing);
                                         editForm.setData('edited_content', activeText || '');
                                     }}
-                                    className="rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-[#0c0e1a] h-10 flex items-center gap-1.5 cursor-pointer text-xs font-bold shadow-2xs"
+                                    className="rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-[#0c0e1a] h-10 px-3 flex items-center gap-1.5 cursor-pointer text-xs font-bold shadow-2xs active:scale-95"
                                 >
                                     <Edit3 className="size-4" />
-                                    {isEditing ? 'View Output' : 'Edit Output'}
+                                    <span>{isEditing ? 'View' : 'Edit'}</span>
                                 </Button>
                             </>
                         )}
 
                         <Link
                             href={generateCreate.url()}
-                            className="inline-flex items-center gap-1.5 rounded-xl bg-indigo-600 px-4 h-10 text-xs font-bold text-white shadow-md shadow-indigo-600/20 hover:bg-indigo-500 transition"
+                            className="inline-flex items-center gap-1.5 rounded-xl bg-indigo-600 px-3.5 sm:px-4 h-10 text-xs font-bold text-white shadow-md shadow-indigo-600/20 hover:bg-indigo-500 transition active:scale-95"
                         >
                             <PenTool className="size-3.5" />
                             New Copy
@@ -425,7 +425,7 @@ export default function HistoryShow({ generation, autostream }: ShowProps) {
                         <Button
                             variant="outline"
                             onClick={handleDelete}
-                            className="rounded-xl border border-rose-200 bg-rose-50/50 hover:bg-rose-100 text-rose-600 dark:border-rose-900/40 dark:bg-rose-950/20 dark:hover:bg-rose-950/40 dark:text-rose-400 h-10 flex items-center gap-1.5 cursor-pointer text-xs font-bold"
+                            className="rounded-xl border border-rose-200 bg-rose-50/50 hover:bg-rose-100 text-rose-600 dark:border-rose-900/40 dark:bg-rose-950/20 dark:hover:bg-rose-950/40 dark:text-rose-400 h-10 px-3 flex items-center gap-1.5 cursor-pointer text-xs font-bold active:scale-95"
                         >
                             <Trash2 className="size-4" />
                         </Button>
@@ -433,30 +433,30 @@ export default function HistoryShow({ generation, autostream }: ShowProps) {
                 </div>
 
                 {/* Status and Configuration Metadata Cards */}
-                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                    <div className="p-4 rounded-2xl border border-slate-200/80 bg-white/80 dark:border-slate-800/80 dark:bg-[#0c0e1a]/80 shadow-xs backdrop-blur-xl">
+                <div className="grid gap-2 sm:gap-3 grid-cols-2 lg:grid-cols-4">
+                    <div className="p-3 sm:p-4 rounded-2xl border border-slate-200/80 bg-white/80 dark:border-slate-800/80 dark:bg-[#0c0e1a]/80 shadow-xs backdrop-blur-xl">
                         <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Status</span>
-                        <div className="mt-1.5">{statusBadge}</div>
+                        <div className="mt-1 sm:mt-1.5">{statusBadge}</div>
                     </div>
-                    <div className="p-4 rounded-2xl border border-slate-200/80 bg-white/80 dark:border-slate-800/80 dark:bg-[#0c0e1a]/80 shadow-xs backdrop-blur-xl">
+                    <div className="p-3 sm:p-4 rounded-2xl border border-slate-200/80 bg-white/80 dark:border-slate-800/80 dark:bg-[#0c0e1a]/80 shadow-xs backdrop-blur-xl">
                         <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Language</span>
-                        <div className="mt-1.5 flex items-center gap-1.5 text-xs font-bold text-slate-900 dark:text-slate-100 uppercase font-mono">
-                            <Languages className="size-4 text-indigo-500" />
+                        <div className="mt-1 sm:mt-1.5 flex items-center gap-1.5 text-xs font-bold text-slate-900 dark:text-slate-100 uppercase font-mono">
+                            <Languages className="size-3.5 sm:size-4 text-indigo-500" />
                             {generation.output_language}
                         </div>
                     </div>
-                    <div className="p-4 rounded-2xl border border-slate-200/80 bg-white/80 dark:border-slate-800/80 dark:bg-[#0c0e1a]/80 shadow-xs backdrop-blur-xl">
+                    <div className="p-3 sm:p-4 rounded-2xl border border-slate-200/80 bg-white/80 dark:border-slate-800/80 dark:bg-[#0c0e1a]/80 shadow-xs backdrop-blur-xl">
                         <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Voice Tone</span>
-                        <div className="mt-1.5 flex items-center gap-1.5 text-xs font-bold text-slate-900 dark:text-slate-100 truncate">
-                            <Sparkles className="size-4 text-indigo-500" />
-                            {generation.tone_snapshot ? generation.tone_snapshot.split(':')[0] : 'Standard Default'}
+                        <div className="mt-1 sm:mt-1.5 flex items-center gap-1.5 text-xs font-bold text-slate-900 dark:text-slate-100 truncate">
+                            <Sparkles className="size-3.5 sm:size-4 text-indigo-500 shrink-0" />
+                            <span className="truncate">{generation.tone_snapshot ? generation.tone_snapshot.split(':')[0] : 'Default'}</span>
                         </div>
                     </div>
-                    <div className="p-4 rounded-2xl border border-slate-200/80 bg-white/80 dark:border-slate-800/80 dark:bg-[#0c0e1a]/80 shadow-xs backdrop-blur-xl">
+                    <div className="p-3 sm:p-4 rounded-2xl border border-slate-200/80 bg-white/80 dark:border-slate-800/80 dark:bg-[#0c0e1a]/80 shadow-xs backdrop-blur-xl">
                         <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">AI Engine</span>
-                        <div className="mt-1.5 flex items-center gap-1.5 text-xs font-bold text-slate-900 dark:text-slate-100 font-mono truncate">
-                            <Zap className="size-4 text-emerald-500" />
-                            {generation.ai_provider || 'gemini'} {generation.ai_model ? `(${generation.ai_model})` : ''}
+                        <div className="mt-1 sm:mt-1.5 flex items-center gap-1.5 text-xs font-bold text-slate-900 dark:text-slate-100 font-mono truncate">
+                            <Zap className="size-3.5 sm:size-4 text-emerald-500 shrink-0" />
+                            <span className="truncate">{generation.ai_provider || 'gemini'} {generation.ai_model ? `(${generation.ai_model})` : ''}</span>
                         </div>
                     </div>
                 </div>
@@ -488,9 +488,9 @@ export default function HistoryShow({ generation, autostream }: ShowProps) {
                             )}
 
                             {/* Canvas Toolbar with Font Style & Size Controls, View Mode, and Direct Copy */}
-                            <CardHeader className="bg-slate-50/70 dark:bg-[#080911]/70 py-3.5 px-4 sm:px-6 border-b border-slate-200/60 dark:border-slate-800/60 flex flex-col xl:flex-row xl:items-center justify-between gap-3">
-                                <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-                                    <CardTitle className="text-sm font-extrabold text-slate-900 dark:text-white flex items-center gap-2 mr-1">
+                            <CardHeader className="bg-slate-50/70 dark:bg-[#080911]/70 py-3 px-3.5 sm:px-6 border-b border-slate-200/60 dark:border-slate-800/60 flex flex-col xl:flex-row xl:items-center justify-between gap-3">
+                                <div className="flex flex-wrap items-center gap-1.5 sm:gap-3">
+                                    <CardTitle className="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white flex items-center gap-2 mr-1">
                                         <div className="size-2 rounded-full bg-indigo-500" />
                                         {isEditing ? 'Editing Content' : 'AI Output'}
                                     </CardTitle>
@@ -498,11 +498,11 @@ export default function HistoryShow({ generation, autostream }: ShowProps) {
                                     {!isEditing && (
                                         <>
                                             {/* View Mode Toggle: Preview / Raw */}
-                                            <div className="flex items-center bg-slate-200/60 dark:bg-slate-900 p-0.5 rounded-xl border border-slate-300/40 dark:border-slate-800 text-[11px] font-bold">
+                                            <div className="flex items-center bg-slate-200/60 dark:bg-slate-900 p-0.5 rounded-xl border border-slate-300/40 dark:border-slate-800 text-[10.5px] sm:text-[11px] font-bold">
                                                 <button
                                                     type="button"
                                                     onClick={() => setViewMode('preview')}
-                                                    className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
+                                                    className={`px-2 sm:px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
                                                         viewMode === 'preview'
                                                             ? 'bg-white dark:bg-[#0c0e1a] text-indigo-600 dark:text-indigo-400 shadow-xs'
                                                             : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
@@ -513,7 +513,7 @@ export default function HistoryShow({ generation, autostream }: ShowProps) {
                                                 <button
                                                     type="button"
                                                     onClick={() => setViewMode('raw')}
-                                                    className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
+                                                    className={`px-2 sm:px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
                                                         viewMode === 'raw'
                                                             ? 'bg-white dark:bg-[#0c0e1a] text-indigo-600 dark:text-indigo-400 shadow-xs'
                                                             : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
@@ -524,12 +524,12 @@ export default function HistoryShow({ generation, autostream }: ShowProps) {
                                             </div>
 
                                             {/* Font Family Selector: Sans / Padauk / Serif */}
-                                            <div className="flex items-center bg-slate-200/60 dark:bg-slate-900 p-0.5 rounded-xl border border-slate-300/40 dark:border-slate-800 text-[11px] font-bold">
+                                            <div className="flex items-center bg-slate-200/60 dark:bg-slate-900 p-0.5 rounded-xl border border-slate-300/40 dark:border-slate-800 text-[10.5px] sm:text-[11px] font-bold">
                                                 <button
                                                     type="button"
                                                     title="Modern Sans (Jakarta & Noto Sans)"
                                                     onClick={() => handleFontFamilyChange('sans')}
-                                                    className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
+                                                    className={`px-2 sm:px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
                                                         fontFamily === 'sans'
                                                             ? 'bg-white dark:bg-[#0c0e1a] text-indigo-600 dark:text-indigo-400 shadow-xs'
                                                             : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
@@ -541,7 +541,7 @@ export default function HistoryShow({ generation, autostream }: ShowProps) {
                                                     type="button"
                                                     title="Padauk (Clean Myanmar Unicode)"
                                                     onClick={() => handleFontFamilyChange('padauk')}
-                                                    className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
+                                                    className={`px-2 sm:px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
                                                         fontFamily === 'padauk'
                                                             ? 'bg-white dark:bg-[#0c0e1a] text-indigo-600 dark:text-indigo-400 shadow-xs'
                                                             : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
@@ -553,7 +553,7 @@ export default function HistoryShow({ generation, autostream }: ShowProps) {
                                                     type="button"
                                                     title="Editorial Serif (Noto Serif Myanmar)"
                                                     onClick={() => handleFontFamilyChange('serif')}
-                                                    className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
+                                                    className={`px-2 sm:px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
                                                         fontFamily === 'serif'
                                                             ? 'bg-white dark:bg-[#0c0e1a] text-indigo-600 dark:text-indigo-400 shadow-xs'
                                                             : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
@@ -564,12 +564,12 @@ export default function HistoryShow({ generation, autostream }: ShowProps) {
                                             </div>
 
                                             {/* Font Size Selector: A- / A / A+ */}
-                                            <div className="flex items-center bg-slate-200/60 dark:bg-slate-900 p-0.5 rounded-xl border border-slate-300/40 dark:border-slate-800 text-[11px] font-bold">
+                                            <div className="flex items-center bg-slate-200/60 dark:bg-slate-900 p-0.5 rounded-xl border border-slate-300/40 dark:border-slate-800 text-[10.5px] sm:text-[11px] font-bold">
                                                 <button
                                                     type="button"
                                                     title="Compact size (14.5px)"
                                                     onClick={() => handleFontSizeChange('sm')}
-                                                    className={`px-2 py-1 rounded-lg transition-all cursor-pointer ${
+                                                    className={`px-1.5 sm:px-2 py-1 rounded-lg transition-all cursor-pointer ${
                                                         fontSize === 'sm'
                                                             ? 'bg-white dark:bg-[#0c0e1a] text-indigo-600 dark:text-indigo-400 shadow-xs'
                                                             : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
@@ -581,7 +581,7 @@ export default function HistoryShow({ generation, autostream }: ShowProps) {
                                                     type="button"
                                                     title="Standard comfortable size (16.5px)"
                                                     onClick={() => handleFontSizeChange('base')}
-                                                    className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
+                                                    className={`px-2 sm:px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
                                                         fontSize === 'base'
                                                             ? 'bg-white dark:bg-[#0c0e1a] text-indigo-600 dark:text-indigo-400 shadow-xs'
                                                             : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
@@ -593,7 +593,7 @@ export default function HistoryShow({ generation, autostream }: ShowProps) {
                                                     type="button"
                                                     title="Large comfortable size (18.5px)"
                                                     onClick={() => handleFontSizeChange('lg')}
-                                                    className={`px-2 py-1 rounded-lg transition-all cursor-pointer ${
+                                                    className={`px-1.5 sm:px-2 py-1 rounded-lg transition-all cursor-pointer ${
                                                         fontSize === 'lg'
                                                             ? 'bg-white dark:bg-[#0c0e1a] text-indigo-600 dark:text-indigo-400 shadow-xs'
                                                             : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
@@ -609,7 +609,7 @@ export default function HistoryShow({ generation, autostream }: ShowProps) {
                                 {/* Right Controls: Direct Copy Button + Telemetry */}
                                 <div className="flex items-center justify-between sm:justify-end gap-3 w-full xl:w-auto">
                                     {/* Live Telemetry */}
-                                    <div className="flex items-center gap-2.5 text-[11px] font-mono text-slate-500 dark:text-slate-400">
+                                    <div className="flex items-center gap-2 sm:gap-2.5 text-[10.5px] sm:text-[11px] font-mono text-slate-500 dark:text-slate-400">
                                         <span>
                                             Words: <strong className="text-slate-800 dark:text-slate-200">{wordCount}</strong>
                                         </span>
@@ -630,7 +630,7 @@ export default function HistoryShow({ generation, autostream }: ShowProps) {
                                             size="sm"
                                             onClick={handleCopy}
                                             disabled={!activeText}
-                                            className="h-8.5 px-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition cursor-pointer flex items-center gap-1.5 shadow-md shadow-indigo-600/20 active:scale-95 disabled:opacity-50 shrink-0"
+                                            className="h-8.5 px-3 sm:px-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition cursor-pointer flex items-center gap-1.5 shadow-md shadow-indigo-600/20 active:scale-95 disabled:opacity-50 shrink-0"
                                         >
                                             {isCopied ? (
                                                 <>
@@ -640,7 +640,8 @@ export default function HistoryShow({ generation, autostream }: ShowProps) {
                                             ) : (
                                                 <>
                                                     <Copy className="size-3.5" />
-                                                    <span>Copy AI Output</span>
+                                                    <span className="hidden sm:inline">Copy Output</span>
+                                                    <span className="sm:hidden">Copy</span>
                                                 </>
                                             )}
                                         </Button>
@@ -648,14 +649,14 @@ export default function HistoryShow({ generation, autostream }: ShowProps) {
                                 </div>
                             </CardHeader>
 
-                            <CardContent className="p-6 sm:p-8 flex-1">
+                            <CardContent className="p-4 sm:p-8 flex-1">
                                 {isEditing ? (
                                     <form onSubmit={handleSaveEdit} className="space-y-4 h-full flex flex-col justify-between">
                                         <textarea
                                             value={editForm.data.edited_content}
                                             onChange={(e) => editForm.setData('edited_content', e.target.value)}
                                             rows={14}
-                                            className={`w-full rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#07080e] p-5 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none shadow-xs ${fontFamilyClass} ${fontSizeClass}`}
+                                            className={`w-full rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#07080e] p-3.5 sm:p-5 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none shadow-xs text-base sm:text-sm ${fontFamilyClass} ${fontSizeClass}`}
                                             required
                                         />
                                         <div className="flex justify-end gap-3 pt-2">
