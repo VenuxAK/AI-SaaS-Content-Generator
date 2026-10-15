@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { usePage } from '@inertiajs/react';
 import { Breadcrumbs } from '@/components/breadcrumbs';
 import { SidebarTrigger } from '@/components/ui/sidebar';
@@ -23,6 +24,13 @@ export function AppSidebarHeader({
     const user = auth?.user;
     const getInitials = useInitials();
     const { resolvedAppearance, updateAppearance } = useAppearance();
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
+    const isDark = mounted && resolvedAppearance === 'dark';
 
     const toggleTheme = () => {
         updateAppearance(resolvedAppearance === 'dark' ? 'light' : 'dark');
@@ -42,9 +50,9 @@ export function AppSidebarHeader({
                     size="icon"
                     onClick={toggleTheme}
                     className="size-9 rounded-xl border border-slate-200/80 dark:border-slate-800/80 bg-white/70 dark:bg-slate-900/60 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer transition shadow-2xs"
-                    title={resolvedAppearance === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+                    title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
                 >
-                    {resolvedAppearance === 'dark' ? (
+                    {isDark ? (
                         <Sun className="size-4.5 text-amber-400" />
                     ) : (
                         <Moon className="size-4.5 text-indigo-600" />

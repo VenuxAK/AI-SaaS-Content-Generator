@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Head, Link, router } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import { motion } from 'framer-motion';
 import {
     AlertTriangle,
@@ -15,7 +15,6 @@ import {
     LayoutGrid,
     Linkedin,
     Megaphone,
-    PenTool,
     Sparkles,
     Twitter,
     Zap,
@@ -67,20 +66,12 @@ export default function Dashboard({
     tones = [],
     recentGenerations = [],
 }: DashboardProps) {
-    const [quickPrompt, setQuickPrompt] = useState('');
     const [copiedId, setCopiedId] = useState<number | null>(null);
 
     const providerNameMap: Record<string, string> = {
         gemini: 'Google Gemini',
         openai: 'OpenAI',
         openrouter: 'OpenRouter',
-    };
-
-    const handleQuickLaunch = (e: React.FormEvent) => {
-        e.preventDefault();
-        router.visit(generateCreate.url(), {
-            data: quickPrompt ? { user_prompt: quickPrompt } : {},
-        });
     };
 
     const handleCopyText = (id: number, text: string | null) => {
@@ -96,31 +87,21 @@ export default function Dashboard({
             <Head title="Executive Cockpit - Nexus AI" />
             <div className="mx-auto flex h-full w-full max-w-7xl flex-1 flex-col gap-6 sm:gap-8 p-3.5 sm:p-6 lg:p-8">
                 {/* 1. Cockpit Header Bar */}
-                <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between border-b border-slate-200/80 pb-5 sm:pb-6 dark:border-slate-800/80">
-                    <div className="flex flex-col gap-1">
-                        <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
-                            <div className="flex size-9 items-center justify-center rounded-2xl bg-indigo-600/10 text-indigo-600 dark:bg-indigo-500/20 dark:text-indigo-400">
-                                <LayoutGrid className="size-5" />
-                            </div>
-                            <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900 dark:text-white">
-                                Executive Cockpit
-                            </h1>
-                            <span className="rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-xs font-bold text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-                                BYOK 0% Markup
-                            </span>
+                <div className="flex flex-col gap-1 border-b border-slate-200/80 pb-4 sm:pb-6 dark:border-slate-800/80">
+                    <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
+                        <div className="flex size-9 items-center justify-center rounded-2xl bg-indigo-600/10 text-indigo-600 dark:bg-indigo-500/20 dark:text-indigo-400">
+                            <LayoutGrid className="size-5" />
                         </div>
-                        <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
-                            Monitor active AI credentials, quickly dispatch generation prompts, and access campaigns.
-                        </p>
+                        <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900 dark:text-white">
+                            Executive Cockpit
+                        </h1>
+                        <span className="rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-xs font-bold text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                            BYOK 0% Markup
+                        </span>
                     </div>
-
-                    <Link
-                        href={generateCreate.url()}
-                        className="inline-flex h-11 sm:h-12 w-full sm:w-auto cursor-pointer items-center justify-center gap-2 rounded-2xl bg-indigo-600 px-6 text-sm font-bold text-white shadow-xl shadow-indigo-600/25 transition hover:bg-indigo-500 active:scale-95 shrink-0"
-                    >
-                        <PenTool className="size-4" />
-                        Launch AI Studio
-                    </Link>
+                    <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+                        Monitor active AI credentials, track generation metrics, and access recent campaigns.
+                    </p>
                 </div>
 
                 {/* API Key Missing Alert */}
@@ -150,31 +131,6 @@ export default function Dashboard({
                         </Link>
                     </motion.div>
                 )}
-
-                {/* 2. 1-Click Quick Launch Prompt Bar */}
-                <form
-                    onSubmit={handleQuickLaunch}
-                    className="relative flex items-center rounded-3xl border border-slate-200/90 bg-white/90 p-1.5 sm:p-2 shadow-xl backdrop-blur-2xl dark:border-slate-800/90 dark:bg-[#0c0e1a]/90 glow-indigo"
-                >
-                    <div className="hidden xs:flex sm:flex size-9 sm:size-10 shrink-0 items-center justify-center rounded-2xl bg-indigo-50 text-indigo-600 dark:bg-indigo-950/40 dark:text-indigo-400 ml-1.5 sm:ml-2">
-                        <Sparkles className="size-4 sm:size-5" />
-                    </div>
-                    <input
-                        type="text"
-                        placeholder="Jump-start prompt (e.g. 'Viral LinkedIn hook about AI agents')..."
-                        value={quickPrompt}
-                        onChange={(e) => setQuickPrompt(e.target.value)}
-                        className="w-full bg-transparent px-3 sm:px-4 py-3 text-xs sm:text-sm text-slate-900 placeholder-slate-400 focus:outline-none dark:text-white dark:placeholder-slate-500 font-medium min-h-[44px]"
-                    />
-                    <button
-                        type="submit"
-                        className="inline-flex min-h-[44px] shrink-0 cursor-pointer items-center gap-1.5 sm:gap-2 rounded-2xl bg-indigo-600 px-4 sm:px-5 text-xs font-bold text-white shadow-md shadow-indigo-600/25 transition hover:bg-indigo-500 active:scale-95"
-                    >
-                        <span className="hidden sm:inline">Start in Studio</span>
-                        <span className="sm:hidden">Start</span>
-                        <ArrowRight className="size-3 sm:size-3.5" />
-                    </button>
-                </form>
 
                 {/* 3. Platform Quick-Start Grid / Snap Rail */}
                 <div>
@@ -523,7 +479,7 @@ export default function Dashboard({
                     ) : (
                         <div className="py-12 text-center text-sm text-slate-400 dark:text-slate-500">
                             <Clock className="mx-auto mb-2 size-8 text-slate-300 dark:text-slate-700" />
-                            <span>No generations made yet. Click &quot;Launch AI Studio&quot; to begin!</span>
+                            <span>No generations made yet. Select a platform above to start generating!</span>
                         </div>
                     )}
                 </div>
