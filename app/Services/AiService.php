@@ -65,7 +65,8 @@ class AiService
     protected function validateGeminiKey(string $apiKey): array
     {
         $response = Http::timeout(10)
-            ->get("https://generativelanguage.googleapis.com/v1beta/models?key={$apiKey}");
+            ->withHeaders(['x-goog-api-key' => $apiKey])
+            ->get('https://generativelanguage.googleapis.com/v1beta/models');
 
         if ($response->successful()) {
             return [
@@ -140,10 +141,13 @@ class AiService
         ];
         $model = $geminiAliases[$model] ?? $model;
 
-        $url = "https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent?key={$apiKey}";
+        $url = "https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent";
 
         $response = Http::timeout($this->timeout)
-            ->withHeaders(['Content-Type' => 'application/json'])
+            ->withHeaders([
+                'x-goog-api-key' => $apiKey,
+                'Content-Type' => 'application/json',
+            ])
             ->post($url, [
                 'contents' => [
                     [

@@ -36,6 +36,9 @@ class PromptBuilderService
         $prompt = str_replace('{{USER_PROMPT}}', trim($userPrompt), $prompt);
         $prompt = str_replace('{{OUTPUT_LANGUAGE_INSTRUCTION}}', $language->instruction(), $prompt);
 
+        // Clean up excessive blank lines when optional blocks like tone are omitted
+        $prompt = preg_replace("/\n{3,}/", "\n\n", $prompt);
+
         return trim($prompt);
     }
 }

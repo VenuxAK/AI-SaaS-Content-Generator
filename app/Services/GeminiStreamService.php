@@ -95,16 +95,20 @@ class GeminiStreamService
             throw new \RuntimeException('Google Gemini API key is not configured.');
         }
 
-        $url = "https://generativelanguage.googleapis.com/v1beta/models/{$model}:streamGenerateContent?key={$apiKey}&alt=sse";
+        $url = "https://generativelanguage.googleapis.com/v1beta/models/{$model}:streamGenerateContent?alt=sse";
 
         $client = new GuzzleClient([
             'timeout' => $this->streamTimeout,
             'connect_timeout' => 10,
+            'curl' => [
+                CURLOPT_BUFFERSIZE => 256,
+            ],
         ]);
 
         try {
             $response = $client->post($url, [
                 'headers' => [
+                    'x-goog-api-key' => $apiKey,
                     'Content-Type' => 'application/json',
                     'Accept' => 'text/event-stream',
                 ],
@@ -125,7 +129,7 @@ class GeminiStreamService
             $fullContent = '';
 
             while (! $body->eof()) {
-                $read = $body->read(1024);
+                $read = $body->read(256);
                 $buffer .= $read;
 
                 while (($pos = strpos($buffer, "\n")) !== false) {
@@ -182,6 +186,9 @@ class GeminiStreamService
         $client = new GuzzleClient([
             'timeout' => $this->streamTimeout,
             'connect_timeout' => 10,
+            'curl' => [
+                CURLOPT_BUFFERSIZE => 256,
+            ],
         ]);
 
         $headers = array_merge([
@@ -209,7 +216,7 @@ class GeminiStreamService
             $fullContent = '';
 
             while (! $body->eof()) {
-                $read = $body->read(1024);
+                $read = $body->read(256);
                 $buffer .= $read;
 
                 while (($pos = strpos($buffer, "\n")) !== false) {

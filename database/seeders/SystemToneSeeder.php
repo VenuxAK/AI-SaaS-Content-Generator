@@ -15,19 +15,19 @@ class SystemToneSeeder extends Seeder
         $tones = [
             [
                 'name' => 'Bold & Provocative',
-                'description' => 'Open with contrarian hooks challenging conventional industry dogmas. Use assertive, unapologetic language with strong convictions. Frame insights around counter-intuitive realizations and polarizing yet defensible perspectives.',
+                'description' => 'Adopt an unapologetic, high-conviction voice. Open with contrarian hooks challenging conventional industry dogmas. Eliminate timid hedging (avoid "it depends", "arguably", or "some might say"). Frame insights around counter-intuitive realizations and polarizing yet defensible perspectives. Use active verbs, bold declarations, and deliver fearless verdicts.',
             ],
             [
                 'name' => 'Witty & Punchy',
-                'description' => 'High energy, clever analogies, and rapid-fire rhythm. Mix short staccato punchlines with dry humor and meme-savvy observations. Keep sentences brisk and discard corporate filler words.',
+                'description' => 'High energy, clever analogies, and rapid-fire rhythm. Mix short staccato punchlines with dry wit, sharp self-awareness, and meme-savvy observations. Keep sentences brisk (5–12 words average). Discard corporate filler words and buzzwords. Deliver memorable one-liner payoffs and playful banter.',
             ],
             [
                 'name' => 'Storyteller / Relatable',
-                'description' => 'Narrative-driven arc starting in media res with emotional or situational tension. Show vulnerabilities, specific sensory details, and turning points. Connect individual struggle to a universal takeaway.',
+                'description' => 'Narrative-driven arc starting in media res with emotional or situational tension. Reveal authentic vulnerabilities, specific sensory details, and an honest turning point. Avoid melodramatic preaching or corporate speak—connect an authentic individual struggle to an empowering, universal takeaway.',
             ],
             [
                 'name' => 'Urgent Direct Sales',
-                'description' => 'High-conversion direct response copywriting. Emphasize immediate pain resolution, scarcity, social proof, and risk reversal. Drive momentum towards an unambiguous, irresistible call-to-action.',
+                'description' => 'High-conversion direct response copywriting. Emphasize immediate pain resolution, credible scarcity, social proof, and risk reversal. Agitate the cost of delay with visceral, action-oriented verbs. Eliminate passive phrasing and drive intense momentum towards an unambiguous, irresistible call-to-action.',
             ],
         ];
 

@@ -2,6 +2,7 @@
 
 use App\Enums\ContentType;
 use App\Enums\OutputLanguage;
+use App\Http\Controllers\GenerationStreamController;
 use App\Models\Generation;
 use App\Models\User;
 use App\Models\UserTone;
@@ -173,4 +174,36 @@ test('users cannot stream another users generation', function () {
     $response = $this->actingAs($user)->get(route('generate.stream', $generation->id));
 
     $response->assertForbidden();
+});
+
+test('stream error returns friendly related message without technical details in production', function () {
+    config(['app.debug' => false]);
+    app()['env'] = 'production';
+
+    $controller = new GenerationStreamController(Mockery::mock(GeminiStreamService::class));
+    $rawGuzzleError = "Server error: 'POST https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:streamGenerateContent?key=AQ.SecretKey123456789' resulted in a '503 Service Unavailable' response";
+
+    $message = $controller->formatErrorMessage(new RuntimeException($rawGuzzleError));
+
+    expect($message)->toContain('503 Service Unavailable')
+        ->toContain('temporarily experiencing high demand');
+
+    $this->assertStringNotContainsString('AQ.SecretKey123456789', $message);
+    $this->assertStringNotContainsString('POST https://generativelanguage.googleapis.com', $message);
+    $this->assertStringNotContainsString('Dev Details:', $message);
+});
+
+test('stream error masks sensitive API keys during development', function () {
+    config(['app.debug' => true]);
+    app()['env'] = 'local';
+
+    $controller = new GenerationStreamController(Mockery::mock(GeminiStreamService::class));
+    $rawGuzzleError = "Server error: 'POST https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:streamGenerateContent?key=AQ.SecretKey123456789' resulted in a '503 Service Unavailable' response";
+
+    $message = $controller->formatErrorMessage(new RuntimeException($rawGuzzleError));
+
+    expect($message)->toContain('Dev Details:')
+        ->toContain('key=AQ.Se***[MASKED]');
+
+    $this->assertStringNotContainsString('AQ.SecretKey123456789', $message);
 });

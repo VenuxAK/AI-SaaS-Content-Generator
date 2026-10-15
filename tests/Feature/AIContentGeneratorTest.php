@@ -51,8 +51,35 @@ test('prompt builder service correctly builds full prompts', function () {
 
     expect($prompt)->toContain('New SaaS product release')
         ->toContain('Excited and casual')
-        ->toContain('Write the entire content in English.');
+        ->toContain('Write the entire content in English.')
+        ->toContain('CRITICAL RULES:')
+        ->not->toContain('{{TONE_INSTRUCTIONS}}')
+        ->not->toContain('{{USER_PROMPT}}')
+        ->not->toContain('{{OUTPUT_LANGUAGE_INSTRUCTION}}');
 });
+
+test('prompt builder resolves all content type templates cleanly without placeholder leaks', function (ContentType $type) {
+    $builder = new PromptBuilderService;
+    $prompt = $builder->build(
+        $type,
+        'Sample product launch test topic',
+        null,
+        OutputLanguage::Burmese
+    );
+
+    expect($prompt)->toContain('Sample product launch test topic')
+        ->toContain('Write the entire content in Burmese')
+        ->toContain('CRITICAL RULES:')
+        ->not->toContain('{{TONE_INSTRUCTIONS}}')
+        ->not->toContain('{{USER_PROMPT}}')
+        ->not->toContain('{{OUTPUT_LANGUAGE_INSTRUCTION}}');
+})->with([
+    ContentType::FacebookPost,
+    ContentType::TikTokScript,
+    ContentType::BlogPost,
+    ContentType::Caption,
+    ContentType::MarketingCopy,
+]);
 
 test('users cannot generate content without api key', function () {
     $user = User::factory()->withoutApiKey()->create();
