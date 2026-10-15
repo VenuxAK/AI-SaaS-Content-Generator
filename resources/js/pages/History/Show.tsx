@@ -15,12 +15,22 @@ import {
     Zap,
     AlertCircle,
     Cpu,
+    MoreVertical,
+    SlidersHorizontal,
 } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { stream as generateStream, create as generateCreate } from '@/routes/generate';
 import { index as historyIndex, update as historyUpdate, destroy as historyDestroy } from '@/routes/history';
 
@@ -377,9 +387,10 @@ export default function HistoryShow({ generation, autostream }: ShowProps) {
                     </div>
 
                     {/* Action Bar */}
-                    <div className="flex flex-wrap items-center gap-2">
-                        {Boolean(activeText) && (
-                            <>
+                    <div className="flex items-center gap-2">
+                        {/* Mobile Actions (< sm) */}
+                        <div className="flex sm:hidden items-center gap-1.5">
+                            {Boolean(activeText) && (
                                 <Button
                                     variant="outline"
                                     onClick={handleCopy}
@@ -388,47 +399,117 @@ export default function HistoryShow({ generation, autostream }: ShowProps) {
                                     {isCopied ? (
                                         <Check className="size-4 text-emerald-500" />
                                     ) : (
-                                        <Copy className="size-4" />
+                                        <Copy className="size-4 text-indigo-500" />
                                     )}
                                     <span>{isCopied ? 'Copied' : 'Copy'}</span>
                                 </Button>
-                                <Button
-                                    variant="outline"
-                                    onClick={() => handleDownload('md')}
-                                    className="rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-[#0c0e1a] h-10 px-3 flex items-center gap-1.5 cursor-pointer text-xs font-bold shadow-2xs active:scale-95"
-                                >
-                                    <Download className="size-4" />
-                                    .md
-                                </Button>
-                                <Button
-                                    variant="outline"
-                                    onClick={() => {
-                                        setIsEditing(!isEditing);
-                                        editForm.setData('edited_content', activeText || '');
-                                    }}
-                                    className="rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-[#0c0e1a] h-10 px-3 flex items-center gap-1.5 cursor-pointer text-xs font-bold shadow-2xs active:scale-95"
-                                >
-                                    <Edit3 className="size-4" />
-                                    <span>{isEditing ? 'View' : 'Edit'}</span>
-                                </Button>
-                            </>
-                        )}
+                            )}
+                            <Link
+                                href={generateCreate.url()}
+                                className="inline-flex items-center gap-1.5 rounded-xl bg-indigo-600 px-3.5 h-10 text-xs font-bold text-white shadow-md shadow-indigo-600/20 hover:bg-indigo-500 transition active:scale-95"
+                            >
+                                <PenTool className="size-3.5" />
+                                New
+                            </Link>
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button
+                                        variant="outline"
+                                        size="icon"
+                                        className="size-10 rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-[#0c0e1a] shadow-2xs cursor-pointer active:scale-95"
+                                        aria-label="More actions"
+                                    >
+                                        <MoreVertical className="size-4" />
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end" className="w-48 rounded-2xl p-1.5 shadow-xl">
+                                    {Boolean(activeText) && (
+                                        <>
+                                            <DropdownMenuItem
+                                                onClick={() => handleDownload('md')}
+                                                className="cursor-pointer gap-2 rounded-xl py-2 text-xs font-semibold"
+                                            >
+                                                <Download className="size-4 text-slate-500" />
+                                                Download .md
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem
+                                                onClick={() => {
+                                                    setIsEditing(!isEditing);
+                                                    editForm.setData('edited_content', activeText || '');
+                                                }}
+                                                className="cursor-pointer gap-2 rounded-xl py-2 text-xs font-semibold"
+                                            >
+                                                <Edit3 className="size-4 text-slate-500" />
+                                                {isEditing ? 'View Mode' : 'Edit Content'}
+                                            </DropdownMenuItem>
+                                            <DropdownMenuSeparator />
+                                        </>
+                                    )}
+                                    <DropdownMenuItem
+                                        onClick={handleDelete}
+                                        className="cursor-pointer gap-2 rounded-xl py-2 text-xs font-semibold text-rose-600 dark:text-rose-400"
+                                    >
+                                        <Trash2 className="size-4 text-rose-500" />
+                                        Delete Copy
+                                    </DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                        </div>
 
-                        <Link
-                            href={generateCreate.url()}
-                            className="inline-flex items-center gap-1.5 rounded-xl bg-indigo-600 px-3.5 sm:px-4 h-10 text-xs font-bold text-white shadow-md shadow-indigo-600/20 hover:bg-indigo-500 transition active:scale-95"
-                        >
-                            <PenTool className="size-3.5" />
-                            New Copy
-                        </Link>
+                        {/* Desktop Actions (>= sm) */}
+                        <div className="hidden sm:flex items-center gap-2">
+                            {Boolean(activeText) && (
+                                <>
+                                    <Button
+                                        variant="outline"
+                                        onClick={handleCopy}
+                                        className="rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-[#0c0e1a] h-10 px-3 flex items-center gap-1.5 cursor-pointer text-xs font-bold transition hover:border-indigo-400 hover:text-indigo-600 dark:hover:text-indigo-400 shadow-2xs active:scale-95"
+                                    >
+                                        {isCopied ? (
+                                            <Check className="size-4 text-emerald-500" />
+                                        ) : (
+                                            <Copy className="size-4 text-indigo-500" />
+                                        )}
+                                        <span>{isCopied ? 'Copied' : 'Copy'}</span>
+                                    </Button>
+                                    <Button
+                                        variant="outline"
+                                        onClick={() => handleDownload('md')}
+                                        className="rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-[#0c0e1a] h-10 px-3 flex items-center gap-1.5 cursor-pointer text-xs font-bold shadow-2xs active:scale-95"
+                                    >
+                                        <Download className="size-4" />
+                                        .md
+                                    </Button>
+                                    <Button
+                                        variant="outline"
+                                        onClick={() => {
+                                            setIsEditing(!isEditing);
+                                            editForm.setData('edited_content', activeText || '');
+                                        }}
+                                        className="rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-[#0c0e1a] h-10 px-3 flex items-center gap-1.5 cursor-pointer text-xs font-bold shadow-2xs active:scale-95"
+                                    >
+                                        <Edit3 className="size-4" />
+                                        <span>{isEditing ? 'View' : 'Edit'}</span>
+                                    </Button>
+                                </>
+                            )}
 
-                        <Button
-                            variant="outline"
-                            onClick={handleDelete}
-                            className="rounded-xl border border-rose-200 bg-rose-50/50 hover:bg-rose-100 text-rose-600 dark:border-rose-900/40 dark:bg-rose-950/20 dark:hover:bg-rose-950/40 dark:text-rose-400 h-10 px-3 flex items-center gap-1.5 cursor-pointer text-xs font-bold active:scale-95"
-                        >
-                            <Trash2 className="size-4" />
-                        </Button>
+                            <Link
+                                href={generateCreate.url()}
+                                className="inline-flex items-center gap-1.5 rounded-xl bg-indigo-600 px-3.5 sm:px-4 h-10 text-xs font-bold text-white shadow-md shadow-indigo-600/20 hover:bg-indigo-500 transition active:scale-95"
+                            >
+                                <PenTool className="size-3.5" />
+                                New Copy
+                            </Link>
+
+                            <Button
+                                variant="outline"
+                                onClick={handleDelete}
+                                className="rounded-xl border border-rose-200 bg-rose-50/50 hover:bg-rose-100 text-rose-600 dark:border-rose-900/40 dark:bg-rose-950/20 dark:hover:bg-rose-950/40 dark:text-rose-400 h-10 px-3 flex items-center gap-1.5 cursor-pointer text-xs font-bold active:scale-95"
+                            >
+                                <Trash2 className="size-4" />
+                            </Button>
+                        </div>
                     </div>
                 </div>
 
@@ -488,164 +569,330 @@ export default function HistoryShow({ generation, autostream }: ShowProps) {
                             )}
 
                             {/* Canvas Toolbar with Font Style & Size Controls, View Mode, and Direct Copy */}
-                            <CardHeader className="bg-slate-50/70 dark:bg-[#080911]/70 py-3 px-3.5 sm:px-6 border-b border-slate-200/60 dark:border-slate-800/60 flex flex-col xl:flex-row xl:items-center justify-between gap-3">
-                                <div className="flex flex-wrap items-center gap-1.5 sm:gap-3">
-                                    <CardTitle className="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white flex items-center gap-2 mr-1">
-                                        <div className="size-2 rounded-full bg-indigo-500" />
-                                        {isEditing ? 'Editing Content' : 'AI Output'}
-                                    </CardTitle>
-
-                                    {!isEditing && (
-                                        <>
-                                            {/* View Mode Toggle: Preview / Raw */}
-                                            <div className="flex items-center bg-slate-200/60 dark:bg-slate-900 p-0.5 rounded-xl border border-slate-300/40 dark:border-slate-800 text-[10.5px] sm:text-[11px] font-bold">
-                                                <button
-                                                    type="button"
-                                                    onClick={() => setViewMode('preview')}
-                                                    className={`px-2 sm:px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
-                                                        viewMode === 'preview'
-                                                            ? 'bg-white dark:bg-[#0c0e1a] text-indigo-600 dark:text-indigo-400 shadow-xs'
-                                                            : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
-                                                    }`}
-                                                >
-                                                    Preview
-                                                </button>
-                                                <button
-                                                    type="button"
-                                                    onClick={() => setViewMode('raw')}
-                                                    className={`px-2 sm:px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
-                                                        viewMode === 'raw'
-                                                            ? 'bg-white dark:bg-[#0c0e1a] text-indigo-600 dark:text-indigo-400 shadow-xs'
-                                                            : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
-                                                    }`}
-                                                >
-                                                    Raw MD
-                                                </button>
-                                            </div>
-
-                                            {/* Font Family Selector: Sans / Padauk / Serif */}
-                                            <div className="flex items-center bg-slate-200/60 dark:bg-slate-900 p-0.5 rounded-xl border border-slate-300/40 dark:border-slate-800 text-[10.5px] sm:text-[11px] font-bold">
-                                                <button
-                                                    type="button"
-                                                    title="Modern Sans (Jakarta & Noto Sans)"
-                                                    onClick={() => handleFontFamilyChange('sans')}
-                                                    className={`px-2 sm:px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
-                                                        fontFamily === 'sans'
-                                                            ? 'bg-white dark:bg-[#0c0e1a] text-indigo-600 dark:text-indigo-400 shadow-xs'
-                                                            : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
-                                                    }`}
-                                                >
-                                                    Sans
-                                                </button>
-                                                <button
-                                                    type="button"
-                                                    title="Padauk (Clean Myanmar Unicode)"
-                                                    onClick={() => handleFontFamilyChange('padauk')}
-                                                    className={`px-2 sm:px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
-                                                        fontFamily === 'padauk'
-                                                            ? 'bg-white dark:bg-[#0c0e1a] text-indigo-600 dark:text-indigo-400 shadow-xs'
-                                                            : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
-                                                    }`}
-                                                >
-                                                    Padauk
-                                                </button>
-                                                <button
-                                                    type="button"
-                                                    title="Editorial Serif (Noto Serif Myanmar)"
-                                                    onClick={() => handleFontFamilyChange('serif')}
-                                                    className={`px-2 sm:px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
-                                                        fontFamily === 'serif'
-                                                            ? 'bg-white dark:bg-[#0c0e1a] text-indigo-600 dark:text-indigo-400 shadow-xs'
-                                                            : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
-                                                    }`}
-                                                >
-                                                    Serif
-                                                </button>
-                                            </div>
-
-                                            {/* Font Size Selector: A- / A / A+ */}
-                                            <div className="flex items-center bg-slate-200/60 dark:bg-slate-900 p-0.5 rounded-xl border border-slate-300/40 dark:border-slate-800 text-[10.5px] sm:text-[11px] font-bold">
-                                                <button
-                                                    type="button"
-                                                    title="Compact size (14.5px)"
-                                                    onClick={() => handleFontSizeChange('sm')}
-                                                    className={`px-1.5 sm:px-2 py-1 rounded-lg transition-all cursor-pointer ${
-                                                        fontSize === 'sm'
-                                                            ? 'bg-white dark:bg-[#0c0e1a] text-indigo-600 dark:text-indigo-400 shadow-xs'
-                                                            : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
-                                                    }`}
-                                                >
-                                                    A-
-                                                </button>
-                                                <button
-                                                    type="button"
-                                                    title="Standard comfortable size (16.5px)"
-                                                    onClick={() => handleFontSizeChange('base')}
-                                                    className={`px-2 sm:px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
-                                                        fontSize === 'base'
-                                                            ? 'bg-white dark:bg-[#0c0e1a] text-indigo-600 dark:text-indigo-400 shadow-xs'
-                                                            : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
-                                                    }`}
-                                                >
-                                                    A
-                                                </button>
-                                                <button
-                                                    type="button"
-                                                    title="Large comfortable size (18.5px)"
-                                                    onClick={() => handleFontSizeChange('lg')}
-                                                    className={`px-1.5 sm:px-2 py-1 rounded-lg transition-all cursor-pointer ${
-                                                        fontSize === 'lg'
-                                                            ? 'bg-white dark:bg-[#0c0e1a] text-indigo-600 dark:text-indigo-400 shadow-xs'
-                                                            : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
-                                                    }`}
-                                                >
-                                                    A+
-                                                </button>
-                                            </div>
-                                        </>
-                                    )}
-                                </div>
-
-                                {/* Right Controls: Direct Copy Button + Telemetry */}
-                                <div className="flex items-center justify-between sm:justify-end gap-3 w-full xl:w-auto">
-                                    {/* Live Telemetry */}
-                                    <div className="flex items-center gap-2 sm:gap-2.5 text-[10.5px] sm:text-[11px] font-mono text-slate-500 dark:text-slate-400">
-                                        <span>
-                                            Words: <strong className="text-slate-800 dark:text-slate-200">{wordCount}</strong>
-                                        </span>
-                                        <span>•</span>
-                                        <span>
-                                            Chars: <strong className="text-slate-800 dark:text-slate-200">{charCount}</strong>
-                                        </span>
-                                        <span className="hidden sm:inline">•</span>
-                                        <span className="hidden sm:inline">
-                                            Read: <strong className="text-slate-800 dark:text-slate-200">{readTimeMin}m</strong>
+                            <CardHeader className="bg-slate-50/70 dark:bg-[#080911]/70 py-2.5 sm:py-3 px-3.5 sm:px-6 border-b border-slate-200/60 dark:border-slate-800/60">
+                                {/* Mobile Clean Toolbar (< xl) */}
+                                <div className="flex xl:hidden items-center justify-between w-full gap-2">
+                                    <div className="flex items-center gap-2 min-w-0">
+                                        <div className="size-2 rounded-full bg-indigo-500 shrink-0" />
+                                        <CardTitle className="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white truncate">
+                                            {isEditing ? 'Editing' : 'AI Output'}
+                                        </CardTitle>
+                                        <span className="text-[10px] font-mono font-bold text-slate-500 bg-slate-200/60 dark:bg-slate-800 px-1.5 py-0.5 rounded-md shrink-0">
+                                            {wordCount}w
                                         </span>
                                     </div>
 
-                                    {/* 1-Click Copy Button at AI Output */}
-                                    {!isEditing && (
-                                        <Button
-                                            type="button"
-                                            size="sm"
-                                            onClick={handleCopy}
-                                            disabled={!activeText}
-                                            className="h-8.5 px-3 sm:px-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition cursor-pointer flex items-center gap-1.5 shadow-md shadow-indigo-600/20 active:scale-95 disabled:opacity-50 shrink-0"
-                                        >
-                                            {isCopied ? (
-                                                <>
-                                                    <Check className="size-3.5 text-emerald-300" />
-                                                    <span>Copied!</span>
-                                                </>
-                                            ) : (
-                                                <>
-                                                    <Copy className="size-3.5" />
-                                                    <span className="hidden sm:inline">Copy Output</span>
-                                                    <span className="sm:hidden">Copy</span>
-                                                </>
-                                            )}
-                                        </Button>
-                                    )}
+                                    <div className="flex items-center gap-1.5 shrink-0">
+                                        {!isEditing && (
+                                            <DropdownMenu>
+                                                <DropdownMenuTrigger asChild>
+                                                    <Button
+                                                        type="button"
+                                                        variant="outline"
+                                                        size="sm"
+                                                        className="h-8 px-2.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0c0e1a]"
+                                                    >
+                                                        <SlidersHorizontal className="size-3.5 text-indigo-500" />
+                                                        <span>Style</span>
+                                                    </Button>
+                                                </DropdownMenuTrigger>
+                                                <DropdownMenuContent align="end" className="w-56 p-2 rounded-2xl shadow-xl">
+                                                    <DropdownMenuLabel className="text-[11px] font-bold text-slate-400 uppercase tracking-wider py-1">
+                                                        View Format
+                                                    </DropdownMenuLabel>
+                                                    <div className="grid grid-cols-2 gap-1 mb-2">
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => setViewMode('preview')}
+                                                            className={`h-7 text-xs font-bold rounded-lg transition-all cursor-pointer ${
+                                                                viewMode === 'preview'
+                                                                    ? 'bg-indigo-600 text-white shadow-xs'
+                                                                    : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
+                                                            }`}
+                                                        >
+                                                            Preview
+                                                        </button>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => setViewMode('raw')}
+                                                            className={`h-7 text-xs font-bold rounded-lg transition-all cursor-pointer ${
+                                                                viewMode === 'raw'
+                                                                    ? 'bg-indigo-600 text-white shadow-xs'
+                                                                    : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
+                                                            }`}
+                                                        >
+                                                            Raw MD
+                                                        </button>
+                                                    </div>
+
+                                                    <DropdownMenuSeparator />
+
+                                                    <DropdownMenuLabel className="text-[11px] font-bold text-slate-400 uppercase tracking-wider py-1">
+                                                        Font Family
+                                                    </DropdownMenuLabel>
+                                                    <div className="grid grid-cols-3 gap-1 mb-2">
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => handleFontFamilyChange('sans')}
+                                                            className={`h-7 text-xs font-bold rounded-lg transition-all cursor-pointer ${
+                                                                fontFamily === 'sans'
+                                                                    ? 'bg-indigo-600 text-white shadow-xs'
+                                                                    : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
+                                                            }`}
+                                                        >
+                                                            Sans
+                                                        </button>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => handleFontFamilyChange('padauk')}
+                                                            className={`h-7 text-xs font-bold rounded-lg transition-all cursor-pointer ${
+                                                                fontFamily === 'padauk'
+                                                                    ? 'bg-indigo-600 text-white shadow-xs'
+                                                                    : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
+                                                            }`}
+                                                        >
+                                                            Padauk
+                                                        </button>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => handleFontFamilyChange('serif')}
+                                                            className={`h-7 text-xs font-bold rounded-lg transition-all cursor-pointer ${
+                                                                fontFamily === 'serif'
+                                                                    ? 'bg-indigo-600 text-white shadow-xs'
+                                                                    : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
+                                                            }`}
+                                                        >
+                                                            Serif
+                                                        </button>
+                                                    </div>
+
+                                                    <DropdownMenuSeparator />
+
+                                                    <DropdownMenuLabel className="text-[11px] font-bold text-slate-400 uppercase tracking-wider py-1">
+                                                        Text Size
+                                                    </DropdownMenuLabel>
+                                                    <div className="grid grid-cols-3 gap-1">
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => handleFontSizeChange('sm')}
+                                                            className={`h-7 text-xs font-bold rounded-lg transition-all cursor-pointer ${
+                                                                fontSize === 'sm'
+                                                                    ? 'bg-indigo-600 text-white shadow-xs'
+                                                                    : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
+                                                            }`}
+                                                        >
+                                                            Small
+                                                        </button>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => handleFontSizeChange('base')}
+                                                            className={`h-7 text-xs font-bold rounded-lg transition-all cursor-pointer ${
+                                                                fontSize === 'base'
+                                                                    ? 'bg-indigo-600 text-white shadow-xs'
+                                                                    : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
+                                                            }`}
+                                                        >
+                                                            Normal
+                                                        </button>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => handleFontSizeChange('lg')}
+                                                            className={`h-7 text-xs font-bold rounded-lg transition-all cursor-pointer ${
+                                                                fontSize === 'lg'
+                                                                    ? 'bg-indigo-600 text-white shadow-xs'
+                                                                    : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
+                                                            }`}
+                                                        >
+                                                            Large
+                                                        </button>
+                                                    </div>
+                                                </DropdownMenuContent>
+                                            </DropdownMenu>
+                                        )}
+
+                                        {!isEditing && (
+                                            <Button
+                                                type="button"
+                                                size="sm"
+                                                onClick={handleCopy}
+                                                disabled={!activeText}
+                                                className="h-8 px-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition flex items-center gap-1 shadow-xs active:scale-95 disabled:opacity-50"
+                                            >
+                                                {isCopied ? (
+                                                    <>
+                                                        <Check className="size-3.5 text-emerald-300" />
+                                                        <span>Copied</span>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <Copy className="size-3.5" />
+                                                        <span>Copy</span>
+                                                    </>
+                                                )}
+                                            </Button>
+                                        )}
+                                    </div>
+                                </div>
+
+                                {/* Desktop Inline Toolbar (xl:flex) */}
+                                <div className="hidden xl:flex items-center justify-between w-full gap-3">
+                                    <div className="flex items-center gap-3">
+                                        <CardTitle className="text-sm font-extrabold text-slate-900 dark:text-white flex items-center gap-2 mr-1">
+                                            <div className="size-2 rounded-full bg-indigo-500" />
+                                            {isEditing ? 'Editing Content' : 'AI Output'}
+                                        </CardTitle>
+
+                                        {!isEditing && (
+                                            <>
+                                                {/* View Mode Toggle: Preview / Raw */}
+                                                <div className="flex items-center bg-slate-200/60 dark:bg-slate-900 p-0.5 rounded-xl border border-slate-300/40 dark:border-slate-800 text-[11px] font-bold">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setViewMode('preview')}
+                                                        className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
+                                                            viewMode === 'preview'
+                                                                ? 'bg-white dark:bg-[#0c0e1a] text-indigo-600 dark:text-indigo-400 shadow-xs'
+                                                                : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+                                                        }`}
+                                                    >
+                                                        Preview
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setViewMode('raw')}
+                                                        className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
+                                                            viewMode === 'raw'
+                                                                ? 'bg-white dark:bg-[#0c0e1a] text-indigo-600 dark:text-indigo-400 shadow-xs'
+                                                                : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+                                                        }`}
+                                                    >
+                                                        Raw MD
+                                                    </button>
+                                                </div>
+
+                                                {/* Font Family Selector: Sans / Padauk / Serif */}
+                                                <div className="flex items-center bg-slate-200/60 dark:bg-slate-900 p-0.5 rounded-xl border border-slate-300/40 dark:border-slate-800 text-[11px] font-bold">
+                                                    <button
+                                                        type="button"
+                                                        title="Modern Sans (Jakarta & Noto Sans)"
+                                                        onClick={() => handleFontFamilyChange('sans')}
+                                                        className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
+                                                            fontFamily === 'sans'
+                                                                ? 'bg-white dark:bg-[#0c0e1a] text-indigo-600 dark:text-indigo-400 shadow-xs'
+                                                                : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+                                                        }`}
+                                                    >
+                                                        Sans
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        title="Padauk (Clean Myanmar Unicode)"
+                                                        onClick={() => handleFontFamilyChange('padauk')}
+                                                        className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
+                                                            fontFamily === 'padauk'
+                                                                ? 'bg-white dark:bg-[#0c0e1a] text-indigo-600 dark:text-indigo-400 shadow-xs'
+                                                                : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+                                                        }`}
+                                                    >
+                                                        Padauk
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        title="Editorial Serif (Noto Serif Myanmar)"
+                                                        onClick={() => handleFontFamilyChange('serif')}
+                                                        className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
+                                                            fontFamily === 'serif'
+                                                                ? 'bg-white dark:bg-[#0c0e1a] text-indigo-600 dark:text-indigo-400 shadow-xs'
+                                                                : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+                                                        }`}
+                                                    >
+                                                        Serif
+                                                    </button>
+                                                </div>
+
+                                                {/* Font Size Selector: A- / A / A+ */}
+                                                <div className="flex items-center bg-slate-200/60 dark:bg-slate-900 p-0.5 rounded-xl border border-slate-300/40 dark:border-slate-800 text-[11px] font-bold">
+                                                    <button
+                                                        type="button"
+                                                        title="Compact size (14.5px)"
+                                                        onClick={() => handleFontSizeChange('sm')}
+                                                        className={`px-2 py-1 rounded-lg transition-all cursor-pointer ${
+                                                            fontSize === 'sm'
+                                                                ? 'bg-white dark:bg-[#0c0e1a] text-indigo-600 dark:text-indigo-400 shadow-xs'
+                                                                : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+                                                        }`}
+                                                    >
+                                                        A-
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        title="Standard comfortable size (16.5px)"
+                                                        onClick={() => handleFontSizeChange('base')}
+                                                        className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
+                                                            fontSize === 'base'
+                                                                ? 'bg-white dark:bg-[#0c0e1a] text-indigo-600 dark:text-indigo-400 shadow-xs'
+                                                                : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+                                                        }`}
+                                                    >
+                                                        A
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        title="Large comfortable size (18.5px)"
+                                                        onClick={() => handleFontSizeChange('lg')}
+                                                        className={`px-2 py-1 rounded-lg transition-all cursor-pointer ${
+                                                            fontSize === 'lg'
+                                                                ? 'bg-white dark:bg-[#0c0e1a] text-indigo-600 dark:text-indigo-400 shadow-xs'
+                                                                : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+                                                        }`}
+                                                    >
+                                                        A+
+                                                    </button>
+                                                </div>
+                                            </>
+                                        )}
+                                    </div>
+
+                                    {/* Right Controls: Direct Copy Button + Telemetry */}
+                                    <div className="flex items-center justify-end gap-3">
+                                        {/* Live Telemetry */}
+                                        <div className="flex items-center gap-2.5 text-[11px] font-mono text-slate-500 dark:text-slate-400">
+                                            <span>
+                                                Words: <strong className="text-slate-800 dark:text-slate-200">{wordCount}</strong>
+                                            </span>
+                                            <span>•</span>
+                                            <span>
+                                                Chars: <strong className="text-slate-800 dark:text-slate-200">{charCount}</strong>
+                                            </span>
+                                            <span>•</span>
+                                            <span>
+                                                Read: <strong className="text-slate-800 dark:text-slate-200">{readTimeMin}m</strong>
+                                            </span>
+                                        </div>
+
+                                        {/* 1-Click Copy Button at AI Output */}
+                                        {!isEditing && (
+                                            <Button
+                                                type="button"
+                                                size="sm"
+                                                onClick={handleCopy}
+                                                disabled={!activeText}
+                                                className="h-8.5 px-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition cursor-pointer flex items-center gap-1.5 shadow-md shadow-indigo-600/20 active:scale-95 disabled:opacity-50 shrink-0"
+                                            >
+                                                {isCopied ? (
+                                                    <>
+                                                        <Check className="size-3.5 text-emerald-300" />
+                                                        <span>Copied!</span>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <Copy className="size-3.5" />
+                                                        <span>Copy Output</span>
+                                                    </>
+                                                )}
+                                            </Button>
+                                        )}
+                                    </div>
                                 </div>
                             </CardHeader>
 
@@ -737,6 +984,29 @@ export default function HistoryShow({ generation, autostream }: ShowProps) {
                         )}
                     </div>
                 </div>
+
+                {/* Floating Quick Action for Mobile Readers */}
+                {!isEditing && activeText && (
+                    <div className="fixed bottom-20 right-4 z-30 sm:hidden">
+                        <Button
+                            type="button"
+                            onClick={handleCopy}
+                            className="h-11 px-4 rounded-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-xl shadow-indigo-600/30 flex items-center gap-2 font-bold text-xs border border-white/20 active:scale-95 transition-transform cursor-pointer"
+                        >
+                            {isCopied ? (
+                                <>
+                                    <Check className="size-4 text-emerald-300" />
+                                    <span>Copied!</span>
+                                </>
+                            ) : (
+                                <>
+                                    <Copy className="size-4" />
+                                    <span>Copy Output</span>
+                                </>
+                            )}
+                        </Button>
+                    </div>
+                )}
             </div>
         </>
     );
