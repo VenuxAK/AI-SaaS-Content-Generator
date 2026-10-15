@@ -1,15 +1,27 @@
+import { usePage } from '@inertiajs/react';
 import { Breadcrumbs } from '@/components/breadcrumbs';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { useAppearance } from '@/hooks/use-appearance';
 import { Button } from '@/components/ui/button';
 import { Sun, Moon } from 'lucide-react';
-import type { BreadcrumbItem as BreadcrumbItemType } from '@/types';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { UserMenuContent } from '@/components/user-menu-content';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { useInitials } from '@/hooks/use-initials';
+import type { BreadcrumbItem as BreadcrumbItemType, User } from '@/types';
 
 export function AppSidebarHeader({
     breadcrumbs = [],
 }: {
     breadcrumbs?: BreadcrumbItemType[];
 }) {
+    const { auth } = usePage().props as { auth?: { user?: User } };
+    const user = auth?.user;
+    const getInitials = useInitials();
     const { resolvedAppearance, updateAppearance } = useAppearance();
 
     const toggleTheme = () => {
@@ -24,7 +36,7 @@ export function AppSidebarHeader({
                     <Breadcrumbs breadcrumbs={breadcrumbs} />
                 </div>
             </div>
-            <div className="flex items-center gap-2 shrink-0">
+            <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
                 <Button
                     variant="ghost"
                     size="icon"
@@ -38,6 +50,29 @@ export function AppSidebarHeader({
                         <Moon className="size-4.5 text-indigo-600" />
                     )}
                 </Button>
+
+                {user && (
+                    <div className="md:hidden">
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <button
+                                    className="flex size-9 items-center justify-center rounded-xl border border-slate-200/80 bg-white/70 dark:border-slate-800/80 dark:bg-slate-900/60 p-0.5 transition hover:ring-2 hover:ring-indigo-500/20 active:scale-95 cursor-pointer shadow-2xs"
+                                    aria-label="User Account Menu"
+                                >
+                                    <Avatar className="size-7.5 overflow-hidden rounded-lg">
+                                        <AvatarImage src={user.avatar} alt={user.name} />
+                                        <AvatarFallback className="rounded-lg bg-indigo-100 text-indigo-700 font-bold text-xs dark:bg-indigo-950 dark:text-indigo-300">
+                                            {getInitials(user.name)}
+                                        </AvatarFallback>
+                                    </Avatar>
+                                </button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent className="w-56 rounded-2xl p-1.5 shadow-xl" align="end" side="bottom">
+                                <UserMenuContent user={user} />
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    </div>
+                )}
             </div>
         </header>
     );
