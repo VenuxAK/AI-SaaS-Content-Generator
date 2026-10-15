@@ -1,7 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
 import { Head, Link, useForm, router } from '@inertiajs/react';
 import {
+    ArrowDown,
     ArrowLeft,
+    ArrowUp,
     Check,
     Copy,
     Download,
@@ -179,6 +181,34 @@ function parseMarkdown(md: string, size: 'sm' | 'base' | 'lg' = 'base') {
             return line;
         }
 
+        // Check for SEO Meta Description line and render as structured SEO card
+        const metaDescMatch = trimmed.match(
+            /^(?:<strong[^>]*>)?\s*(?:Meta Description|SEO Description|မေတ္တာရပ်ခံချက်|ဖော်ပြချက်)\s*:?\s*(?:<\/strong>)?\s*:?\s*(.+)$/i
+        );
+        if (metaDescMatch) {
+            const desc = metaDescMatch[1].replace(/^<\/strong>\s*:?\s*/, '').trim();
+            return `<div class="my-5 p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-indigo-50/80 via-slate-50/50 to-purple-50/30 dark:from-indigo-950/30 dark:via-slate-900/40 dark:to-purple-950/20 border border-indigo-200/80 dark:border-indigo-800/50 shadow-xs">
+                <div class="flex items-center gap-1.5 font-mono text-[11px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 mb-2">
+                    <span class="size-2 rounded-full bg-indigo-500 animate-pulse"></span>
+                    <span>SEO Meta Description</span>
+                </div>
+                <p class="text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed font-normal m-0">${desc}</p>
+            </div>`;
+        }
+
+        // Check for Estimated Reading Time line and render as structured pill
+        const readTimeMatch = trimmed.match(
+            /^(?:<strong[^>]*>)?\s*(?:Estimated Reading Time|Reading Time|ခန့်မှန်းဖတ်ရှုချိန်)\s*:?\s*(?:<\/strong>)?\s*:?\s*(.+)$/i
+        );
+        if (readTimeMatch) {
+            const time = readTimeMatch[1].replace(/^<\/strong>\s*:?\s*/, '').trim();
+            return `<div class="inline-flex items-center gap-1.5 px-3 py-1 mb-4 rounded-full bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/60 text-xs font-semibold text-slate-600 dark:text-slate-300 font-mono shadow-2xs">
+                <span class="text-indigo-500">⏱️</span>
+                <span class="font-bold text-slate-900 dark:text-white">Reading Time:</span>
+                <span>${time}</span>
+            </div>`;
+        }
+
         return `<p class="mb-4 text-slate-850 dark:text-slate-100 leading-[1.95] tracking-[0.01em]">${line}</p>`;
     });
 
@@ -236,12 +266,149 @@ export default function HistoryShow({ generation, autostream }: ShowProps) {
     const charCount = activeText.length;
     const readTimeMin = Math.max(1, Math.ceil(wordCount / 200));
 
-    // Smooth autoscroll during active generation
+    // Smooth Typewriter Buffer & Streaming Queue
+    const tokenBufferRef = useRef<string>('');
+    const isStreamFinishedRef = useRef<boolean>(false);
+    const animFrameRef = useRef<number | null>(null);
+
+    // Smart Auto-Scroll refs and state
+    const isProgrammaticScrollRef = useRef<boolean>(false);
+    const isAutoScrollActiveRef = useRef<boolean>(true);
+    const [showStreamingScrollDown, setShowStreamingScrollDown] = useState<boolean>(false);
+    const [showScrollTop, setShowScrollTop] = useState<boolean>(false);
+    const canvasCardRef = useRef<HTMLDivElement>(null);
+    const [canvasCenterLeft, setCanvasCenterLeft] = useState<number | null>(null);
+
+    // Keep floating action button centered precisely over the AI output card box
     useEffect(() => {
-        if (status === 'streaming') {
-            bottomRef.current?.scrollIntoView({ behavior: 'auto', block: 'nearest' });
-        }
-    }, [activeText, status]);
+        const updateCenter = () => {
+            if (canvasCardRef.current) {
+                const rect = canvasCardRef.current.getBoundingClientRect();
+                setCanvasCenterLeft(rect.left + rect.width / 2);
+            }
+        };
+
+        updateCenter();
+        window.addEventListener('resize', updateCenter, { passive: true });
+        const timer = setTimeout(updateCenter, 150);
+
+        return () => {
+            window.removeEventListener('resize', updateCenter);
+            clearTimeout(timer);
+        };
+    }, []);
+
+    // Intelligently monitor scrolling:
+    // 1. While streaming: show "New content streaming below" only when user scrolls up
+    // 2. When completed: show "Scroll to top" when user has scrolled down into content
+    useEffect(() => {
+        let scrollTimeout: ReturnType<typeof setTimeout> | null = null;
+
+        const checkScrollPosition = () => {
+            const scrollY = window.scrollY;
+            const scrollBottom = window.innerHeight + scrollY;
+            const totalHeight = document.documentElement.scrollHeight;
+            const distanceBelow = totalHeight - scrollBottom;
+
+            if (status === 'streaming') {
+                setShowScrollTop(false);
+                if (distanceBelow > 300) {
+                    isAutoScrollActiveRef.current = false;
+                    setShowStreamingScrollDown(true);
+                } else if (distanceBelow < 120) {
+                    isAutoScrollActiveRef.current = true;
+                    setShowStreamingScrollDown(false);
+                }
+            } else {
+                // When generation is completed or failed:
+                setShowStreamingScrollDown(false);
+                // Show "Scroll to top" if user has scrolled down > 280px
+                setShowScrollTop(scrollY > 280);
+            }
+        };
+
+        const handleScroll = () => {
+            // If scroll was triggered programmatically by auto-scroll, do NOT process user scroll-up logic
+            if (isProgrammaticScrollRef.current) {
+                isProgrammaticScrollRef.current = false;
+                return;
+            }
+
+            if (scrollTimeout) clearTimeout(scrollTimeout);
+            scrollTimeout = setTimeout(checkScrollPosition, 40);
+        };
+
+        const handleUserInteraction = () => {
+            isProgrammaticScrollRef.current = false;
+        };
+
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        window.addEventListener('wheel', handleUserInteraction, { passive: true });
+        window.addEventListener('touchmove', handleUserInteraction, { passive: true });
+
+        // Initial check on status change
+        checkScrollPosition();
+
+        return () => {
+            window.removeEventListener('scroll', handleScroll);
+            window.removeEventListener('wheel', handleUserInteraction);
+            window.removeEventListener('touchmove', handleUserInteraction);
+            if (scrollTimeout) clearTimeout(scrollTimeout);
+        };
+    }, [status]);
+
+    const handleScrollToBottom = () => {
+        isAutoScrollActiveRef.current = true;
+        setShowStreamingScrollDown(false);
+        isProgrammaticScrollRef.current = true;
+        bottomRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    };
+
+    const handleScrollToTop = () => {
+        setShowScrollTop(false);
+        isProgrammaticScrollRef.current = true;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    // Frame-based smooth token consumption loop
+    const startDrainLoop = () => {
+        if (animFrameRef.current) return;
+
+        const tick = () => {
+            if (tokenBufferRef.current.length > 0) {
+                const len = tokenBufferRef.current.length;
+                // Adaptive chunk consumption:
+                // Fast enough to not fall behind, smooth enough to eliminate stutter
+                let take = 1;
+                if (len > 200) take = 24;
+                else if (len > 80) take = 10;
+                else if (len > 30) take = 4;
+                else if (len > 10) take = 2;
+
+                const chunk = tokenBufferRef.current.slice(0, take);
+                tokenBufferRef.current = tokenBufferRef.current.slice(take);
+
+                setContent((prev) => prev + chunk);
+
+                // Auto-scroll ONLY if user has not scrolled up to read earlier text
+                if (isAutoScrollActiveRef.current && bottomRef.current) {
+                    isProgrammaticScrollRef.current = true;
+                    bottomRef.current.scrollIntoView({ behavior: 'auto', block: 'nearest' });
+                }
+            }
+
+            if (tokenBufferRef.current.length > 0 || !isStreamFinishedRef.current) {
+                animFrameRef.current = requestAnimationFrame(tick);
+            } else {
+                // Stream is completely drained and finished
+                animFrameRef.current = null;
+                setStatus('completed');
+                toast.success('AI generation finished!');
+            }
+        };
+
+        animFrameRef.current = requestAnimationFrame(tick);
+    };
 
     useEffect(() => {
         // SSE Streaming Hook
@@ -250,27 +417,58 @@ export default function HistoryShow({ generation, autostream }: ShowProps) {
             const source = new EventSource(streamUrl);
 
             setStatus('streaming');
+            isStreamFinishedRef.current = false;
+            tokenBufferRef.current = '';
 
             source.onmessage = (event) => {
-                const data = JSON.parse(event.data);
-                if (data.token) {
-                    setContent((prev) => prev + data.token);
-                }
-                if (data.done) {
-                    setStatus('completed');
-                    source.close();
-                    toast.success('AI generation finished!');
-                }
-                if (data.error) {
-                    setError(data.error);
-                    setStatus('failed');
-                    source.close();
-                    toast.error(data.error);
+                // Check if this is an initial comment or empty message
+                if (!event.data || event.data.startsWith(':')) return;
+
+                try {
+                    const data = JSON.parse(event.data);
+                    if (data.token) {
+                        tokenBufferRef.current += data.token;
+                        startDrainLoop();
+                    }
+                    if (data.done) {
+                        isStreamFinishedRef.current = true;
+                        source.close();
+                        // If token buffer is already empty, complete immediately
+                        if (tokenBufferRef.current.length === 0) {
+                            if (animFrameRef.current) {
+                                cancelAnimationFrame(animFrameRef.current);
+                                animFrameRef.current = null;
+                            }
+                            setStatus('completed');
+                            toast.success('AI generation finished!');
+                        }
+                    }
+                    if (data.error) {
+                        if (animFrameRef.current) {
+                            cancelAnimationFrame(animFrameRef.current);
+                            animFrameRef.current = null;
+                        }
+                        // Flush any remaining tokens before showing error
+                        if (tokenBufferRef.current) {
+                            setContent((prev) => prev + tokenBufferRef.current);
+                            tokenBufferRef.current = '';
+                        }
+                        setError(data.error);
+                        setStatus('failed');
+                        source.close();
+                        toast.error(data.error);
+                    }
+                } catch {
+                    // Ignore non-json frames
                 }
             };
 
             source.onerror = () => {
                 source.close();
+                if (animFrameRef.current) {
+                    cancelAnimationFrame(animFrameRef.current);
+                    animFrameRef.current = null;
+                }
                 setError('Connection lost. The stream was interrupted.');
                 setStatus('failed');
                 toast.error('Connection lost. Please try again.');
@@ -278,6 +476,10 @@ export default function HistoryShow({ generation, autostream }: ShowProps) {
 
             return () => {
                 source.close();
+                if (animFrameRef.current) {
+                    cancelAnimationFrame(animFrameRef.current);
+                    animFrameRef.current = null;
+                }
             };
         }
     }, [autostream, generation.id]);
@@ -563,70 +765,89 @@ export default function HistoryShow({ generation, autostream }: ShowProps) {
                             </Card>
                         )}
 
-                        <Card className="relative rounded-3xl border border-slate-200/90 bg-white/90 dark:border-slate-800/90 dark:bg-[#0c0e1a]/90 shadow-xl backdrop-blur-2xl overflow-hidden min-h-[350px] flex flex-col justify-between glow-indigo">
+                        <Card ref={canvasCardRef} className="relative rounded-3xl border border-slate-200/90 bg-white/90 dark:border-slate-800/90 dark:bg-[#0c0e1a]/90 shadow-xl backdrop-blur-2xl overflow-hidden min-h-[350px] flex flex-col justify-between glow-indigo">
                             {(status === 'streaming' || status === 'pending') && (
                                 <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-indigo-500 via-purple-500 to-cyan-400 bg-[length:200%_auto] animate-pulse" />
                             )}
 
-                            {/* Canvas Toolbar with Font Style & Size Controls, View Mode, and Direct Copy */}
+                            {/* Canvas Responsive Toolbar: Title, Telemetry, View Mode, Style Dropdown, Direct Copy */}
                             <CardHeader className="bg-slate-50/70 dark:bg-[#080911]/70 py-2.5 sm:py-3 px-3.5 sm:px-6 border-b border-slate-200/60 dark:border-slate-800/60">
-                                {/* Mobile Clean Toolbar (< xl) */}
-                                <div className="flex xl:hidden items-center justify-between w-full gap-2">
-                                    <div className="flex items-center gap-2 min-w-0">
-                                        <div className="size-2 rounded-full bg-indigo-500 shrink-0" />
+                                <div className="flex flex-wrap items-center justify-between w-full gap-2 sm:gap-3">
+                                    {/* Left: Card Title & Telemetry */}
+                                    <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
+                                        <div
+                                            className={`size-2 rounded-full shrink-0 ${
+                                                status === 'streaming'
+                                                    ? 'bg-indigo-500 animate-pulse'
+                                                    : status === 'completed'
+                                                      ? 'bg-emerald-500'
+                                                      : status === 'failed'
+                                                        ? 'bg-rose-500'
+                                                        : 'bg-slate-400'
+                                            }`}
+                                        />
                                         <CardTitle className="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white truncate">
-                                            {isEditing ? 'Editing' : 'AI Output'}
+                                            {isEditing ? 'Editing Content' : 'AI Output'}
                                         </CardTitle>
-                                        <span className="text-[10px] font-mono font-bold text-slate-500 bg-slate-200/60 dark:bg-slate-800 px-1.5 py-0.5 rounded-md shrink-0">
-                                            {wordCount}w
-                                        </span>
+
+                                        {!isEditing && activeText && (
+                                            <div className="flex items-center gap-1.5 shrink-0">
+                                                <span className="text-[10px] font-mono font-bold text-slate-600 dark:text-slate-300 bg-slate-200/60 dark:bg-slate-800 px-2 py-0.5 rounded-md">
+                                                    {wordCount}w
+                                                </span>
+                                                <span className="hidden sm:inline-block text-[10px] font-mono font-medium text-slate-500 dark:text-slate-400">
+                                                    • {readTimeMin}m read
+                                                </span>
+                                            </div>
+                                        )}
                                     </div>
 
-                                    <div className="flex items-center gap-1.5 shrink-0">
-                                        {!isEditing && (
+                                    {/* Right: Controls & Actions */}
+                                    {!isEditing && (
+                                        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+                                            {/* View Mode Toggle: Preview / Raw MD */}
+                                            <div className="flex items-center bg-slate-200/60 dark:bg-slate-900 p-0.5 rounded-xl border border-slate-300/40 dark:border-slate-800 text-[11px] font-bold">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setViewMode('preview')}
+                                                    className={`px-2 sm:px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
+                                                        viewMode === 'preview'
+                                                            ? 'bg-white dark:bg-[#0c0e1a] text-indigo-600 dark:text-indigo-400 shadow-2xs'
+                                                            : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+                                                    }`}
+                                                >
+                                                    Preview
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setViewMode('raw')}
+                                                    className={`px-2 sm:px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
+                                                        viewMode === 'raw'
+                                                            ? 'bg-white dark:bg-[#0c0e1a] text-indigo-600 dark:text-indigo-400 shadow-2xs'
+                                                            : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+                                                    }`}
+                                                >
+                                                    Raw MD
+                                                </button>
+                                            </div>
+
+                                            {/* Typography / Style Controls Dropdown */}
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
                                                     <Button
                                                         type="button"
                                                         variant="outline"
                                                         size="sm"
-                                                        className="h-8 px-2.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0c0e1a]"
+                                                        className="h-8 px-2.5 sm:px-3 rounded-xl text-xs font-semibold flex items-center gap-1.5 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0c0e1a] shadow-2xs hover:border-indigo-400 hover:text-indigo-600 dark:hover:text-indigo-400 cursor-pointer"
                                                     >
-                                                        <SlidersHorizontal className="size-3.5 text-indigo-500" />
-                                                        <span>Style</span>
+                                                        <SlidersHorizontal className="size-3.5 text-indigo-500 shrink-0" />
+                                                        <span className="hidden sm:inline">Style</span>
+                                                        <span className="text-[10px] font-mono text-slate-400 uppercase">
+                                                            ({fontFamily})
+                                                        </span>
                                                     </Button>
                                                 </DropdownMenuTrigger>
                                                 <DropdownMenuContent align="end" className="w-56 p-2 rounded-2xl shadow-xl">
-                                                    <DropdownMenuLabel className="text-[11px] font-bold text-slate-400 uppercase tracking-wider py-1">
-                                                        View Format
-                                                    </DropdownMenuLabel>
-                                                    <div className="grid grid-cols-2 gap-1 mb-2">
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => setViewMode('preview')}
-                                                            className={`h-7 text-xs font-bold rounded-lg transition-all cursor-pointer ${
-                                                                viewMode === 'preview'
-                                                                    ? 'bg-indigo-600 text-white shadow-xs'
-                                                                    : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
-                                                            }`}
-                                                        >
-                                                            Preview
-                                                        </button>
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => setViewMode('raw')}
-                                                            className={`h-7 text-xs font-bold rounded-lg transition-all cursor-pointer ${
-                                                                viewMode === 'raw'
-                                                                    ? 'bg-indigo-600 text-white shadow-xs'
-                                                                    : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
-                                                            }`}
-                                                        >
-                                                            Raw MD
-                                                        </button>
-                                                    </div>
-
-                                                    <DropdownMenuSeparator />
-
                                                     <DropdownMenuLabel className="text-[11px] font-bold text-slate-400 uppercase tracking-wider py-1">
                                                         Font Family
                                                     </DropdownMenuLabel>
@@ -681,7 +902,7 @@ export default function HistoryShow({ generation, autostream }: ShowProps) {
                                                                     : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
                                                             }`}
                                                         >
-                                                            Small
+                                                            A-
                                                         </button>
                                                         <button
                                                             type="button"
@@ -692,7 +913,7 @@ export default function HistoryShow({ generation, autostream }: ShowProps) {
                                                                     : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
                                                             }`}
                                                         >
-                                                            Normal
+                                                            A
                                                         </button>
                                                         <button
                                                             type="button"
@@ -703,25 +924,24 @@ export default function HistoryShow({ generation, autostream }: ShowProps) {
                                                                     : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
                                                             }`}
                                                         >
-                                                            Large
+                                                            A+
                                                         </button>
                                                     </div>
                                                 </DropdownMenuContent>
                                             </DropdownMenu>
-                                        )}
 
-                                        {!isEditing && (
+                                            {/* 1-Click Direct Copy Output Button */}
                                             <Button
                                                 type="button"
                                                 size="sm"
                                                 onClick={handleCopy}
                                                 disabled={!activeText}
-                                                className="h-8 px-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition flex items-center gap-1 shadow-xs active:scale-95 disabled:opacity-50"
+                                                className="h-8 px-2.5 sm:px-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition cursor-pointer flex items-center gap-1.5 shadow-xs shadow-indigo-600/20 active:scale-95 disabled:opacity-50"
                                             >
                                                 {isCopied ? (
                                                     <>
                                                         <Check className="size-3.5 text-emerald-300" />
-                                                        <span>Copied</span>
+                                                        <span className="hidden sm:inline">Copied</span>
                                                     </>
                                                 ) : (
                                                     <>
@@ -730,169 +950,8 @@ export default function HistoryShow({ generation, autostream }: ShowProps) {
                                                     </>
                                                 )}
                                             </Button>
-                                        )}
-                                    </div>
-                                </div>
-
-                                {/* Desktop Inline Toolbar (xl:flex) */}
-                                <div className="hidden xl:flex items-center justify-between w-full gap-3">
-                                    <div className="flex items-center gap-3">
-                                        <CardTitle className="text-sm font-extrabold text-slate-900 dark:text-white flex items-center gap-2 mr-1">
-                                            <div className="size-2 rounded-full bg-indigo-500" />
-                                            {isEditing ? 'Editing Content' : 'AI Output'}
-                                        </CardTitle>
-
-                                        {!isEditing && (
-                                            <>
-                                                {/* View Mode Toggle: Preview / Raw */}
-                                                <div className="flex items-center bg-slate-200/60 dark:bg-slate-900 p-0.5 rounded-xl border border-slate-300/40 dark:border-slate-800 text-[11px] font-bold">
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => setViewMode('preview')}
-                                                        className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
-                                                            viewMode === 'preview'
-                                                                ? 'bg-white dark:bg-[#0c0e1a] text-indigo-600 dark:text-indigo-400 shadow-xs'
-                                                                : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
-                                                        }`}
-                                                    >
-                                                        Preview
-                                                    </button>
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => setViewMode('raw')}
-                                                        className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
-                                                            viewMode === 'raw'
-                                                                ? 'bg-white dark:bg-[#0c0e1a] text-indigo-600 dark:text-indigo-400 shadow-xs'
-                                                                : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
-                                                        }`}
-                                                    >
-                                                        Raw MD
-                                                    </button>
-                                                </div>
-
-                                                {/* Font Family Selector: Sans / Padauk / Serif */}
-                                                <div className="flex items-center bg-slate-200/60 dark:bg-slate-900 p-0.5 rounded-xl border border-slate-300/40 dark:border-slate-800 text-[11px] font-bold">
-                                                    <button
-                                                        type="button"
-                                                        title="Modern Sans (Jakarta & Noto Sans)"
-                                                        onClick={() => handleFontFamilyChange('sans')}
-                                                        className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
-                                                            fontFamily === 'sans'
-                                                                ? 'bg-white dark:bg-[#0c0e1a] text-indigo-600 dark:text-indigo-400 shadow-xs'
-                                                                : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
-                                                        }`}
-                                                    >
-                                                        Sans
-                                                    </button>
-                                                    <button
-                                                        type="button"
-                                                        title="Padauk (Clean Myanmar Unicode)"
-                                                        onClick={() => handleFontFamilyChange('padauk')}
-                                                        className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
-                                                            fontFamily === 'padauk'
-                                                                ? 'bg-white dark:bg-[#0c0e1a] text-indigo-600 dark:text-indigo-400 shadow-xs'
-                                                                : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
-                                                        }`}
-                                                    >
-                                                        Padauk
-                                                    </button>
-                                                    <button
-                                                        type="button"
-                                                        title="Editorial Serif (Noto Serif Myanmar)"
-                                                        onClick={() => handleFontFamilyChange('serif')}
-                                                        className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
-                                                            fontFamily === 'serif'
-                                                                ? 'bg-white dark:bg-[#0c0e1a] text-indigo-600 dark:text-indigo-400 shadow-xs'
-                                                                : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
-                                                        }`}
-                                                    >
-                                                        Serif
-                                                    </button>
-                                                </div>
-
-                                                {/* Font Size Selector: A- / A / A+ */}
-                                                <div className="flex items-center bg-slate-200/60 dark:bg-slate-900 p-0.5 rounded-xl border border-slate-300/40 dark:border-slate-800 text-[11px] font-bold">
-                                                    <button
-                                                        type="button"
-                                                        title="Compact size (14.5px)"
-                                                        onClick={() => handleFontSizeChange('sm')}
-                                                        className={`px-2 py-1 rounded-lg transition-all cursor-pointer ${
-                                                            fontSize === 'sm'
-                                                                ? 'bg-white dark:bg-[#0c0e1a] text-indigo-600 dark:text-indigo-400 shadow-xs'
-                                                                : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
-                                                        }`}
-                                                    >
-                                                        A-
-                                                    </button>
-                                                    <button
-                                                        type="button"
-                                                        title="Standard comfortable size (16.5px)"
-                                                        onClick={() => handleFontSizeChange('base')}
-                                                        className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
-                                                            fontSize === 'base'
-                                                                ? 'bg-white dark:bg-[#0c0e1a] text-indigo-600 dark:text-indigo-400 shadow-xs'
-                                                                : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
-                                                        }`}
-                                                    >
-                                                        A
-                                                    </button>
-                                                    <button
-                                                        type="button"
-                                                        title="Large comfortable size (18.5px)"
-                                                        onClick={() => handleFontSizeChange('lg')}
-                                                        className={`px-2 py-1 rounded-lg transition-all cursor-pointer ${
-                                                            fontSize === 'lg'
-                                                                ? 'bg-white dark:bg-[#0c0e1a] text-indigo-600 dark:text-indigo-400 shadow-xs'
-                                                                : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
-                                                        }`}
-                                                    >
-                                                        A+
-                                                    </button>
-                                                </div>
-                                            </>
-                                        )}
-                                    </div>
-
-                                    {/* Right Controls: Direct Copy Button + Telemetry */}
-                                    <div className="flex items-center justify-end gap-3">
-                                        {/* Live Telemetry */}
-                                        <div className="flex items-center gap-2.5 text-[11px] font-mono text-slate-500 dark:text-slate-400">
-                                            <span>
-                                                Words: <strong className="text-slate-800 dark:text-slate-200">{wordCount}</strong>
-                                            </span>
-                                            <span>•</span>
-                                            <span>
-                                                Chars: <strong className="text-slate-800 dark:text-slate-200">{charCount}</strong>
-                                            </span>
-                                            <span>•</span>
-                                            <span>
-                                                Read: <strong className="text-slate-800 dark:text-slate-200">{readTimeMin}m</strong>
-                                            </span>
                                         </div>
-
-                                        {/* 1-Click Copy Button at AI Output */}
-                                        {!isEditing && (
-                                            <Button
-                                                type="button"
-                                                size="sm"
-                                                onClick={handleCopy}
-                                                disabled={!activeText}
-                                                className="h-8.5 px-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition cursor-pointer flex items-center gap-1.5 shadow-md shadow-indigo-600/20 active:scale-95 disabled:opacity-50 shrink-0"
-                                            >
-                                                {isCopied ? (
-                                                    <>
-                                                        <Check className="size-3.5 text-emerald-300" />
-                                                        <span>Copied!</span>
-                                                    </>
-                                                ) : (
-                                                    <>
-                                                        <Copy className="size-3.5" />
-                                                        <span>Copy Output</span>
-                                                    </>
-                                                )}
-                                            </Button>
-                                        )}
-                                    </div>
+                                    )}
                                 </div>
                             </CardHeader>
 
@@ -1005,6 +1064,41 @@ export default function HistoryShow({ generation, autostream }: ShowProps) {
                                 </>
                             )}
                         </Button>
+                    </div>
+                )}
+
+                {/* Floating action button: centered on the AI Output layout box */}
+                {Boolean(activeText) && (
+                    <div
+                        style={{
+                            left: canvasCenterLeft ? `${canvasCenterLeft}px` : '50%',
+                        }}
+                        className={`fixed bottom-6 -translate-x-1/2 z-40 transition-all duration-300 ease-out ${
+                            (status === 'streaming' ? showStreamingScrollDown : showScrollTop)
+                                ? 'opacity-100 translate-y-0 pointer-events-auto'
+                                : 'opacity-0 translate-y-4 pointer-events-none'
+                        }`}
+                    >
+                        {status === 'streaming' ? (
+                            <button
+                                type="button"
+                                onClick={handleScrollToBottom}
+                                className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-slate-900/95 dark:bg-white/95 text-white dark:text-slate-900 font-bold text-xs shadow-2xl shadow-indigo-500/25 border border-slate-700/50 dark:border-slate-200/50 hover:scale-105 active:scale-95 transition-all cursor-pointer backdrop-blur-md"
+                            >
+                                <span className="size-2 rounded-full bg-indigo-400 animate-ping" />
+                                <span>New content streaming below</span>
+                                <ArrowDown className="size-3.5 animate-bounce text-indigo-400 dark:text-indigo-600" />
+                            </button>
+                        ) : (
+                            <button
+                                type="button"
+                                onClick={handleScrollToTop}
+                                className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-slate-900/95 dark:bg-white/95 text-white dark:text-slate-900 font-bold text-xs shadow-2xl shadow-indigo-500/25 border border-slate-700/50 dark:border-slate-200/50 hover:scale-105 active:scale-95 transition-all cursor-pointer backdrop-blur-md"
+                            >
+                                <ArrowUp className="size-3.5 text-indigo-400 dark:text-indigo-600" />
+                                <span>Scroll to top</span>
+                            </button>
+                        )}
                     </div>
                 )}
             </div>

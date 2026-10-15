@@ -32,10 +32,64 @@ interface Generation {
     content_type: string;
     output_language: string;
     user_prompt: string;
+    title?: string;
     ai_content: string | null;
+    edited_content?: string | null;
     status: 'pending' | 'streaming' | 'completed' | 'failed';
     created_at: string;
     tone?: Tone | null;
+}
+
+export function getGenerationTitle(gen: Generation): string {
+    if (gen.title && gen.title.trim()) {
+        return gen.title.trim();
+    }
+
+    const content = gen.edited_content || gen.ai_content;
+    if (content) {
+        // 1. Look for markdown H1 or H2 header: '# Title' or '## Title'
+        const hMatch = content.match(/^#{1,3}\s+(.+)$/m);
+        if (hMatch && hMatch[1]) {
+            const clean = hMatch[1].replace(/[*_`#]/g, '').trim();
+            if (clean) return clean;
+        }
+
+        // 2. Look for bold title at start: '**Title**'
+        const boldMatch = content.match(/^\*\*([^*]+)\*\*/m);
+        if (boldMatch && boldMatch[1]) {
+            const clean = boldMatch[1].trim();
+            if (!/^(Meta Description|Estimated Reading Time|Reading Time|ခန့်မှန်းဖတ်ရှုချိန်)/i.test(clean) && clean) {
+                return clean.replace(/:$/, '');
+            }
+        }
+
+        // 3. Fallback to first non-empty line of content
+        const lines = content.split('\n');
+        for (const line of lines) {
+            const trimmed = line.trim();
+            if (!trimmed || trimmed.startsWith('---') || trimmed.startsWith('>') || /^(Meta Description|Estimated Reading Time)/i.test(trimmed)) {
+                continue;
+            }
+            const clean = trimmed.replace(/[*_`#]/g, '').trim();
+            if (clean.length >= 5) {
+                return clean.slice(0, 120);
+            }
+        }
+    }
+
+    // 4. Fallback: extract title from user_prompt
+    const titledMatch = gen.user_prompt.match(/(?:titled|title|about)\s*["']([^"']+)["']/i);
+    if (titledMatch && titledMatch[1]) {
+        return titledMatch[1].trim();
+    }
+
+    const quoteMatch = gen.user_prompt.match(/"([^"]{5,80})"/);
+    if (quoteMatch && quoteMatch[1]) {
+        return quoteMatch[1].trim();
+    }
+
+    const promptClean = gen.user_prompt.replace(/^(?:Write|Create|Draft|Generate)\s+(?:a|an)\s+[^.]+?(?:about|on|for|titled)\s+/i, '');
+    return promptClean.slice(0, 100).trim();
 }
 
 interface HistoryProps {
@@ -103,6 +157,7 @@ export default function HistoryIndex({ history }: HistoryProps) {
                         {history.data.map((gen) => {
                             const date = new Date(gen.created_at).toLocaleDateString();
                             const IconComponent = PLATFORM_ICONS[gen.content_type] || FileText;
+                            const contentTitle = getGenerationTitle(gen);
 
                             const statusBadge = {
                                 pending: (
@@ -145,10 +200,10 @@ export default function HistoryIndex({ history }: HistoryProps) {
                                             </div>
                                             {statusBadge}
                                         </CardHeader>
-                                        <CardContent className="pt-3 pb-3 px-4 sm:px-5 flex-1">
-                                            <p className="text-xs text-slate-600 dark:text-slate-400 line-clamp-3 leading-relaxed">
-                                                {gen.user_prompt}
-                                            </p>
+                                        <CardContent className="pt-3.5 pb-3.5 px-4 sm:px-5 flex-1 flex flex-col justify-center">
+                                            <h3 className="text-sm font-bold text-slate-900 dark:text-white line-clamp-3 leading-snug group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                                                {contentTitle}
+                                            </h3>
                                         </CardContent>
                                         <CardFooter className="py-2.5 sm:py-3 px-4 sm:px-5 bg-slate-50/50 dark:bg-[#080911]/60 border-t border-slate-100 dark:border-slate-800/60 text-[11px] text-slate-400 flex items-center justify-between">
                                             <span className="flex items-center gap-1.5 font-mono uppercase font-semibold">

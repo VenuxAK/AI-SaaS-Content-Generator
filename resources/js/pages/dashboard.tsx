@@ -41,6 +41,7 @@ interface Generation {
     content_type: string;
     output_language: string;
     user_prompt: string;
+    title?: string;
     ai_content: string | null;
     status: string;
     created_at: string;
@@ -351,8 +352,8 @@ export default function Dashboard({
                                             </span>
                                         </div>
 
-                                        <p className="text-xs text-slate-600 dark:text-slate-400 line-clamp-2 leading-relaxed">
-                                            {gen.user_prompt}
+                                        <p className="text-xs font-semibold text-slate-800 dark:text-slate-200 line-clamp-2 leading-relaxed">
+                                            {gen.title || gen.user_prompt}
                                         </p>
 
                                         <div className="flex items-center justify-between text-[11px] text-slate-400 pt-1 border-t border-slate-100 dark:border-slate-800/60 font-mono">
@@ -414,8 +415,8 @@ export default function Dashboard({
                                                 <td className="px-4 py-3.5 font-bold capitalize text-slate-900 dark:text-white">
                                                     {gen.content_type.replace('_', ' ')}
                                                 </td>
-                                                <td className="max-w-[260px] truncate px-4 py-3.5 text-xs text-slate-500 dark:text-slate-400">
-                                                    {gen.user_prompt}
+                                                <td className="max-w-[260px] truncate px-4 py-3.5 text-xs text-slate-700 dark:text-slate-300 font-medium" title={gen.title || gen.user_prompt}>
+                                                    {gen.title || gen.user_prompt}
                                                 </td>
                                                 <td className="px-4 py-3.5 text-xs font-mono font-semibold text-slate-700 dark:text-slate-300">
                                                     <span className="capitalize">{gen.ai_provider || 'Gemini'}</span>

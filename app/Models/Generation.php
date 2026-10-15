@@ -45,6 +45,13 @@ class Generation extends Model
     use HasFactory;
 
     /**
+     * The accessors to append to the model's array form.
+     *
+     * @var list<string>
+     */
+    protected $appends = ['title'];
+
+    /**
      * Get the attributes that should be cast.
      *
      * @return array<string, string>
@@ -55,6 +62,59 @@ class Generation extends Model
             'content_type' => ContentType::class,
             'output_language' => OutputLanguage::class,
         ];
+    }
+
+    /**
+     * Get the derived content title.
+     */
+    public function getTitleAttribute(): string
+    {
+        $content = $this->edited_content ?: $this->ai_content;
+
+        if ($content) {
+            // 1. Look for markdown H1 or H2 header: '# Title' or '## Title'
+            if (preg_match('/^#{1,3}\s+(.+)$/m', $content, $matches)) {
+                $clean = trim($matches[1]);
+                $clean = (string) preg_replace('/[*_`#]/', '', $clean);
+                if (! empty($clean)) {
+                    return $clean;
+                }
+            }
+
+            // 2. Look for bold title at start: '**Title**'
+            if (preg_match('/^\*\*([^*]+)\*\*/m', $content, $matches)) {
+                $clean = trim($matches[1]);
+                if (! preg_match('/^(Meta Description|Estimated Reading Time|Reading Time|ခန့်မှန်းဖတ်ရှုချိန်)/i', $clean) && ! empty($clean)) {
+                    return rtrim($clean, ':');
+                }
+            }
+
+            // 3. Fallback to first non-empty line of content that isn't a divider or metadata
+            $lines = explode("\n", $content);
+            foreach ($lines as $line) {
+                $trimmed = trim($line);
+                if (empty($trimmed) || str_starts_with($trimmed, '---') || str_starts_with($trimmed, '>') || preg_match('/^(Meta Description|Estimated Reading Time)/i', $trimmed)) {
+                    continue;
+                }
+                $clean = trim((string) preg_replace('/[*_`#]/', '', $trimmed));
+                if (! empty($clean) && mb_strlen($clean) >= 5) {
+                    return mb_substr($clean, 0, 120);
+                }
+            }
+        }
+
+        // 4. Fallback: extract title from user_prompt
+        if (preg_match('/(?:titled|title|about)\s*["\']([^"\']+)["\']/i', $this->user_prompt, $matches)) {
+            return trim($matches[1]);
+        }
+
+        if (preg_match('/"([^"]{5,80})"/', $this->user_prompt, $matches)) {
+            return trim($matches[1]);
+        }
+
+        $promptClean = (string) preg_replace('/^(?:Write|Create|Draft|Generate)\s+(?:a|an)\s+[^.]+?(?:about|on|for|titled)\s+/i', '', $this->user_prompt);
+
+        return mb_substr(trim($promptClean), 0, 100);
     }
 
     /**

@@ -54,6 +54,7 @@ interface Generation {
     content_type: string;
     output_language: string;
     user_prompt: string;
+    title?: string;
     ai_content: string | null;
     status: string;
     created_at: string;
@@ -560,8 +561,8 @@ export default function Create({
                                                         {new Date(gen.created_at).toLocaleDateString()}
                                                     </span>
                                                 </div>
-                                                <p className="mt-1 line-clamp-2 text-xs text-slate-500 group-hover:text-slate-800 dark:text-slate-400 dark:group-hover:text-slate-200">
-                                                    {gen.user_prompt}
+                                                <p className="mt-1 line-clamp-2 text-xs font-medium text-slate-700 group-hover:text-slate-900 dark:text-slate-300 dark:group-hover:text-white">
+                                                    {gen.title || gen.user_prompt}
                                                 </p>
                                             </Link>
                                         ))}

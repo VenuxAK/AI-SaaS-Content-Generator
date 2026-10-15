@@ -110,3 +110,35 @@ test('users cannot delete another users generation', function () {
     $response->assertForbidden();
     $this->assertDatabaseHas('generations', ['id' => $generation->id]);
 });
+
+test('generation derives content title from markdown header or fallback prompt', function () {
+    $genWithHeader = Generation::factory()->create([
+        'ai_content' => "# The Knowledge-Action Paradox\n\n**Meta Description:** Analysis...",
+        'user_prompt' => 'Write a philosophical essay',
+    ]);
+
+    expect($genWithHeader->title)->toBe('The Knowledge-Action Paradox');
+
+    $genWithPromptFallback = Generation::factory()->create([
+        'ai_content' => null,
+        'user_prompt' => 'Write a launch post titled "AutoFlow Workspace" for developers',
+    ]);
+
+    expect($genWithPromptFallback->title)->toBe('AutoFlow Workspace');
+});
+
+test('history index provides title in generation payload', function () {
+    $user = User::factory()->create();
+    Generation::factory()->create([
+        'user_id' => $user->id,
+        'ai_content' => "# Awesome Launch Post\n\nContent here",
+    ]);
+
+    $response = $this->actingAs($user)->get(route('history.index'));
+
+    $response->assertSuccessful();
+    $response->assertInertia(fn (Assert $page) => $page
+        ->component('History/Index')
+        ->where('history.data.0.title', 'Awesome Launch Post')
+    );
+});
