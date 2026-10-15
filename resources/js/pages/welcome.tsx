@@ -26,6 +26,7 @@ import {
     X as CloseIcon,
     ChevronDown,
     ArrowUp,
+    Menu,
 } from 'lucide-react';
 
 import { AuroraBackground } from '@/components/ui/aurora-background';
@@ -149,6 +150,7 @@ export default function Welcome() {
     const [displayedOutput, setDisplayedOutput] = useState('');
     const [isTyping, setIsTyping] = useState(false);
     const [copied, setCopied] = useState(false);
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     useEffect(() => {
         setMounted(true);
@@ -245,7 +247,7 @@ export default function Welcome() {
                         </nav>
 
                         {/* Actions */}
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-2 sm:gap-3">
                             {/* Theme Toggle */}
                             <button
                                 onClick={toggleTheme}
@@ -262,44 +264,134 @@ export default function Welcome() {
                             {auth?.user ? (
                                 <Link
                                     href={dashboard()}
-                                    className="inline-flex h-9.5 items-center gap-2 rounded-xl bg-indigo-600 px-4 text-sm font-bold text-white shadow-md shadow-indigo-600/20 transition hover:bg-indigo-500"
+                                    className="inline-flex h-9.5 items-center gap-1.5 sm:gap-2 rounded-xl bg-indigo-600 px-3.5 sm:px-4 text-xs sm:text-sm font-bold text-white shadow-md shadow-indigo-600/20 transition hover:bg-indigo-500"
                                 >
-                                    Dashboard
-                                    <ArrowRight className="size-4" />
+                                    <span>Dashboard</span>
+                                    <ArrowRight className="size-3.5 sm:size-4" />
                                 </Link>
                             ) : (
                                 <>
                                     <Link
                                         href={login()}
-                                        className="hidden sm:inline-flex text-sm font-semibold text-slate-700 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white px-3 py-2"
+                                        className="inline-flex text-xs sm:text-sm font-semibold text-slate-700 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white px-2 sm:px-3 py-2 transition"
                                     >
                                         Log in
                                     </Link>
                                     <Link
                                         href={register()}
-                                        className="inline-flex h-9.5 items-center gap-2 rounded-xl bg-indigo-600 px-4 text-sm font-bold text-white shadow-md shadow-indigo-600/25 transition hover:bg-indigo-500 active:scale-95"
+                                        className="inline-flex h-9.5 items-center gap-1.5 sm:gap-2 rounded-xl bg-indigo-600 px-3 sm:px-4 text-xs sm:text-sm font-bold text-white shadow-md shadow-indigo-600/25 transition hover:bg-indigo-500 active:scale-95"
                                     >
-                                        Get Started Free
-                                        <ArrowRight className="size-4" />
+                                        <span className="hidden xs:inline">Get Started</span>
+                                        <span className="xs:hidden">Join</span>
+                                        <ArrowRight className="size-3.5 sm:size-4" />
                                     </Link>
                                 </>
                             )}
+
+                            {/* Mobile Menu Hamburger Toggle */}
+                            <button
+                                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                                aria-label="Toggle navigation menu"
+                                className="flex size-9 cursor-pointer items-center justify-center rounded-xl border border-slate-200/80 bg-white/50 text-slate-700 transition hover:bg-slate-100 dark:border-slate-800/80 dark:bg-slate-900/50 dark:text-slate-300 dark:hover:bg-slate-800 md:hidden"
+                            >
+                                {mobileMenuOpen ? (
+                                    <CloseIcon className="size-5 text-indigo-600 dark:text-indigo-400" />
+                                ) : (
+                                    <Menu className="size-5" />
+                                )}
+                            </button>
                         </div>
                     </div>
+
+                    {/* Mobile Dropdown Navigation */}
+                    <AnimatePresence>
+                        {mobileMenuOpen && (
+                            <motion.div
+                                initial={{ opacity: 0, height: 0 }}
+                                animate={{ opacity: 1, height: 'auto' }}
+                                exit={{ opacity: 0, height: 0 }}
+                                transition={{ duration: 0.2 }}
+                                className="md:hidden overflow-hidden border-b border-slate-200/80 bg-white/95 dark:border-slate-800/80 dark:bg-[#07080e]/95 backdrop-blur-2xl px-4 py-4 shadow-xl"
+                            >
+                                <nav className="flex flex-col gap-2 font-semibold text-slate-700 dark:text-slate-200 text-sm">
+                                    <a
+                                        href="#playground"
+                                        onClick={() => setMobileMenuOpen(false)}
+                                        className="flex items-center justify-between rounded-xl px-3 py-2.5 hover:bg-slate-100 dark:hover:bg-slate-800/60"
+                                    >
+                                        <span>Live Studio Demo</span>
+                                        <ArrowRight className="size-4 text-slate-400" />
+                                    </a>
+                                    <a
+                                        href="#models"
+                                        onClick={() => setMobileMenuOpen(false)}
+                                        className="flex items-center justify-between rounded-xl px-3 py-2.5 hover:bg-slate-100 dark:hover:bg-slate-800/60"
+                                    >
+                                        <span>Supported Models</span>
+                                        <ArrowRight className="size-4 text-slate-400" />
+                                    </a>
+                                    <a
+                                        href="#why-byok"
+                                        onClick={() => setMobileMenuOpen(false)}
+                                        className="flex items-center justify-between rounded-xl px-3 py-2.5 hover:bg-slate-100 dark:hover:bg-slate-800/60"
+                                    >
+                                        <span>Why BYOK?</span>
+                                        <ArrowRight className="size-4 text-slate-400" />
+                                    </a>
+                                    <a
+                                        href="#features"
+                                        onClick={() => setMobileMenuOpen(false)}
+                                        className="flex items-center justify-between rounded-xl px-3 py-2.5 hover:bg-slate-100 dark:hover:bg-slate-800/60"
+                                    >
+                                        <span>Features</span>
+                                        <ArrowRight className="size-4 text-slate-400" />
+                                    </a>
+
+                                    <div className="pt-2 border-t border-slate-200/80 dark:border-slate-800/80 flex flex-col gap-2">
+                                        {auth?.user ? (
+                                            <Link
+                                                href={dashboard()}
+                                                className="flex min-h-[44px] items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 text-sm font-bold text-white shadow-md shadow-indigo-600/25"
+                                            >
+                                                Open Dashboard
+                                                <ArrowRight className="size-4" />
+                                            </Link>
+                                        ) : (
+                                            <div className="grid grid-cols-2 gap-2">
+                                                <Link
+                                                    href={login()}
+                                                    className="flex min-h-[44px] items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-xs font-bold text-slate-800 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
+                                                >
+                                                    Log in
+                                                </Link>
+                                                <Link
+                                                    href={register()}
+                                                    className="flex min-h-[44px] items-center justify-center gap-1.5 rounded-xl bg-indigo-600 text-xs font-bold text-white shadow-md shadow-indigo-600/25"
+                                                >
+                                                    Get Started
+                                                    <ArrowRight className="size-3.5" />
+                                                </Link>
+                                            </div>
+                                        )}
+                                    </div>
+                                </nav>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
                 </header>
 
                 {/* 2. Hero Section with Aurora Background */}
-                <AuroraBackground className="min-h-[calc(100vh-4rem)] min-h-[calc(100dvh-4rem)] flex flex-col justify-center items-center px-4 sm:px-6 lg:px-8 py-12 md:py-16">
+                <AuroraBackground className="min-h-[calc(100vh-4rem)] min-h-[calc(100dvh-4rem)] flex flex-col justify-center items-center px-4 sm:px-6 lg:px-8 py-10 sm:py-16">
                     <div className="mx-auto max-w-5xl text-center">
                         {/* Glow Badge */}
                         <motion.div
                             initial={{ opacity: 0, y: 15 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.5 }}
-                            className="inline-flex items-center gap-2 rounded-full border border-indigo-500/30 bg-indigo-500/10 px-4 py-1.5 text-xs font-semibold text-indigo-700 dark:text-indigo-300 backdrop-blur-md mb-8"
+                            className="inline-flex items-center gap-1.5 sm:gap-2 rounded-full border border-indigo-500/30 bg-indigo-500/10 px-3 sm:px-4 py-1.5 text-[11px] sm:text-xs font-semibold text-indigo-700 dark:text-indigo-300 backdrop-blur-md mb-6 sm:mb-8 text-center"
                         >
-                            <span className="flex size-2 rounded-full bg-emerald-400 animate-pulse" />
-                            <span>Zero Token Markup • BYOK Freedom • Gemini 3.8 Flash, GPT-5 & Claude 3.7</span>
+                            <span className="flex size-2 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+                            <span>Zero Token Markup • BYOK Freedom • Gemini, GPT-5 & Claude</span>
                         </motion.div>
 
                         {/* Main Title */}
@@ -307,7 +399,7 @@ export default function Welcome() {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.6, delay: 0.1 }}
-                            className="text-4xl font-black tracking-tight sm:text-6xl lg:text-7xl"
+                            className="text-3xl font-black tracking-tight sm:text-5xl lg:text-7xl leading-tight"
                         >
                             Supercharge Your Copy with{' '}
                             <span className="bg-gradient-to-r from-indigo-500 via-purple-500 to-cyan-400 bg-clip-text text-transparent">
@@ -320,7 +412,7 @@ export default function Welcome() {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.6, delay: 0.2 }}
-                            className="mx-auto mt-6 max-w-3xl text-base sm:text-xl leading-relaxed text-slate-600 dark:text-slate-300 font-normal"
+                            className="mx-auto mt-4 sm:mt-6 max-w-3xl text-sm sm:text-xl leading-relaxed text-slate-600 dark:text-slate-300 font-normal px-1 sm:px-0"
                         >
                             Stop renting marked-up AI tokens at $49/month. Nexus AI connects directly to your Google Gemini, OpenAI, or OpenRouter keys—delivering high-converting social copy, viral threads, and SEO blogs with calibrated voice personas.
                         </motion.p>
@@ -330,21 +422,21 @@ export default function Welcome() {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.6, delay: 0.3 }}
-                            className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4"
+                            className="mt-8 sm:mt-10 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 w-full"
                         >
                             <Link
                                 href={auth?.user ? dashboard() : register()}
-                                className="flex h-13 w-full sm:w-auto items-center justify-center gap-2.5 rounded-2xl bg-indigo-600 px-8 text-base font-bold text-white shadow-xl shadow-indigo-600/30 transition hover:bg-indigo-500 hover:shadow-indigo-600/40 active:scale-95"
+                                className="flex h-12 sm:h-13 w-full sm:w-auto items-center justify-center gap-2.5 rounded-2xl bg-indigo-600 px-6 sm:px-8 text-sm sm:text-base font-bold text-white shadow-xl shadow-indigo-600/30 transition hover:bg-indigo-500 hover:shadow-indigo-600/40 active:scale-95"
                             >
-                                <Zap className="size-5" />
+                                <Zap className="size-4.5 sm:size-5" />
                                 {auth?.user ? 'Enter AI Studio' : 'Start Generating Free'}
                             </Link>
 
                             <a
                                 href="#playground"
-                                className="flex h-13 w-full sm:w-auto items-center justify-center gap-2 rounded-2xl border border-slate-300/80 bg-white/70 px-7 text-base font-semibold text-slate-800 backdrop-blur-md transition hover:bg-white hover:text-slate-950 dark:border-slate-800 dark:bg-slate-900/60 dark:text-slate-200 dark:hover:bg-slate-800 dark:hover:text-white"
+                                className="flex h-12 sm:h-13 w-full sm:w-auto items-center justify-center gap-2 rounded-2xl border border-slate-300/80 bg-white/70 px-6 sm:px-7 text-sm sm:text-base font-semibold text-slate-800 backdrop-blur-md transition hover:bg-white hover:text-slate-950 dark:border-slate-800 dark:bg-slate-900/60 dark:text-slate-200 dark:hover:bg-slate-800 dark:hover:text-white"
                             >
-                                <Sparkles className="size-5 text-indigo-500" />
+                                <Sparkles className="size-4.5 sm:size-5 text-indigo-500" />
                                 Live Playground
                             </a>
                         </motion.div>
@@ -354,18 +446,18 @@ export default function Welcome() {
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             transition={{ duration: 0.6, delay: 0.4 }}
-                            className="mt-12 flex flex-wrap items-center justify-center gap-6 sm:gap-10 text-xs font-semibold text-slate-500 dark:text-slate-400"
+                            className="mt-10 sm:mt-12 flex flex-wrap items-center justify-center gap-4 sm:gap-10 text-[11px] sm:text-xs font-semibold text-slate-500 dark:text-slate-400"
                         >
-                            <div className="flex items-center gap-2">
-                                <CheckCircle2 className="size-4 text-emerald-500" />
+                            <div className="flex items-center gap-1.5 sm:gap-2">
+                                <CheckCircle2 className="size-3.5 sm:size-4 text-emerald-500 shrink-0" />
                                 <span>100% Raw API Direct Cost</span>
                             </div>
-                            <div className="flex items-center gap-2">
-                                <Shield className="size-4 text-indigo-500" />
+                            <div className="flex items-center gap-1.5 sm:gap-2">
+                                <Shield className="size-3.5 sm:size-4 text-indigo-500 shrink-0" />
                                 <span>AES-256 Encrypted Keys</span>
                             </div>
-                            <div className="flex items-center gap-2">
-                                <Cpu className="size-4 text-cyan-500" />
+                            <div className="flex items-center gap-1.5 sm:gap-2">
+                                <Cpu className="size-3.5 sm:size-4 text-cyan-500 shrink-0" />
                                 <span>SSE Sub-Second Streaming</span>
                             </div>
                         </motion.div>
@@ -418,7 +510,7 @@ export default function Welcome() {
                             </div>
 
                             {/* Preset Buttons */}
-                            <div className="flex flex-wrap gap-2">
+                            <div className="flex sm:flex-wrap gap-2 overflow-x-auto no-scrollbar pb-1 sm:pb-0">
                                 {DEMO_PRESETS.map((preset) => {
                                     const IconComponent = preset.icon;
                                     const isSelected = activePreset.id === preset.id;
@@ -426,7 +518,7 @@ export default function Welcome() {
                                         <button
                                             key={preset.id}
                                             onClick={() => setActivePreset(preset)}
-                                            className={`flex cursor-pointer items-center gap-2 rounded-xl px-3.5 py-2 text-xs font-bold transition-all ${
+                                            className={`flex cursor-pointer items-center gap-2 rounded-xl px-3.5 py-2 text-xs font-bold transition-all shrink-0 whitespace-nowrap min-h-[38px] active:scale-95 ${
                                                 isSelected
                                                     ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
                                                     : 'border border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-900/60 dark:text-slate-300 dark:hover:bg-slate-800'
