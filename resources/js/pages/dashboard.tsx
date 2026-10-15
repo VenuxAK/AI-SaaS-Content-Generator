@@ -164,11 +164,11 @@ export default function Dashboard({
                         placeholder="Jump-start prompt (e.g. 'Viral LinkedIn hook about AI agents')..."
                         value={quickPrompt}
                         onChange={(e) => setQuickPrompt(e.target.value)}
-                        className="w-full bg-transparent px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm text-slate-900 placeholder-slate-400 focus:outline-none dark:text-white dark:placeholder-slate-500 font-medium"
+                        className="w-full bg-transparent px-3 sm:px-4 py-3 text-xs sm:text-sm text-slate-900 placeholder-slate-400 focus:outline-none dark:text-white dark:placeholder-slate-500 font-medium min-h-[44px]"
                     />
                     <button
                         type="submit"
-                        className="inline-flex h-10 sm:h-11 shrink-0 cursor-pointer items-center gap-1.5 sm:gap-2 rounded-2xl bg-indigo-600 px-3.5 sm:px-5 text-xs font-bold text-white shadow-md shadow-indigo-600/25 transition hover:bg-indigo-500 active:scale-95"
+                        className="inline-flex min-h-[44px] shrink-0 cursor-pointer items-center gap-1.5 sm:gap-2 rounded-2xl bg-indigo-600 px-4 sm:px-5 text-xs font-bold text-white shadow-md shadow-indigo-600/25 transition hover:bg-indigo-500 active:scale-95"
                     >
                         <span className="hidden sm:inline">Start in Studio</span>
                         <span className="sm:hidden">Start</span>
@@ -176,15 +176,18 @@ export default function Dashboard({
                     </button>
                 </form>
 
-                {/* 3. Platform Quick-Start Grid */}
+                {/* 3. Platform Quick-Start Grid / Snap Rail */}
                 <div>
-                    <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-3.5">
-                        Platform Quick-Starts
-                    </h3>
-                    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                    <div className="flex items-center justify-between mb-3 sm:mb-3.5">
+                        <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                            Platform Quick-Starts
+                        </h3>
+                        <span className="text-[11px] text-slate-400 sm:hidden">Swipe →</span>
+                    </div>
+                    <div className="flex sm:grid sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 overflow-x-auto no-scrollbar pb-2 sm:pb-0 snap-x snap-mandatory">
                         <Link
                             href={generateCreate.url()}
-                            className="group flex flex-col justify-between rounded-3xl border border-slate-200/80 bg-white/80 p-5 shadow-md backdrop-blur-xl transition-all hover:border-indigo-500 hover:shadow-xl dark:border-slate-800/80 dark:bg-[#0c0e1a]/80 dark:hover:border-indigo-500/50"
+                            className="group flex flex-col justify-between rounded-3xl border border-slate-200/80 bg-white/80 p-4.5 sm:p-5 shadow-md backdrop-blur-xl transition-all hover:border-indigo-500 hover:shadow-xl dark:border-slate-800/80 dark:bg-[#0c0e1a]/80 dark:hover:border-indigo-500/50 min-w-[240px] sm:min-w-0 shrink-0 sm:shrink snap-start"
                         >
                             <div className="flex items-center justify-between mb-4">
                                 <div className="flex size-10 items-center justify-center rounded-2xl bg-blue-500/10 text-blue-600 dark:text-blue-400">
@@ -206,7 +209,7 @@ export default function Dashboard({
 
                         <Link
                             href={generateCreate.url()}
-                            className="group flex flex-col justify-between rounded-3xl border border-slate-200/80 bg-white/80 p-5 shadow-md backdrop-blur-xl transition-all hover:border-indigo-500 hover:shadow-xl dark:border-slate-800/80 dark:bg-[#0c0e1a]/80 dark:hover:border-indigo-500/50"
+                            className="group flex flex-col justify-between rounded-3xl border border-slate-200/80 bg-white/80 p-4.5 sm:p-5 shadow-md backdrop-blur-xl transition-all hover:border-indigo-500 hover:shadow-xl dark:border-slate-800/80 dark:bg-[#0c0e1a]/80 dark:hover:border-indigo-500/50 min-w-[240px] sm:min-w-0 shrink-0 sm:shrink snap-start"
                         >
                             <div className="flex items-center justify-between mb-4">
                                 <div className="flex size-10 items-center justify-center rounded-2xl bg-sky-500/10 text-sky-500">
@@ -228,7 +231,7 @@ export default function Dashboard({
 
                         <Link
                             href={generateCreate.url()}
-                            className="group flex flex-col justify-between rounded-3xl border border-slate-200/80 bg-white/80 p-5 shadow-md backdrop-blur-xl transition-all hover:border-indigo-500 hover:shadow-xl dark:border-slate-800/80 dark:bg-[#0c0e1a]/80 dark:hover:border-indigo-500/50"
+                            className="group flex flex-col justify-between rounded-3xl border border-slate-200/80 bg-white/80 p-4.5 sm:p-5 shadow-md backdrop-blur-xl transition-all hover:border-indigo-500 hover:shadow-xl dark:border-slate-800/80 dark:bg-[#0c0e1a]/80 dark:hover:border-indigo-500/50 min-w-[240px] sm:min-w-0 shrink-0 sm:shrink snap-start"
                         >
                             <div className="flex items-center justify-between mb-4">
                                 <div className="flex size-10 items-center justify-center rounded-2xl bg-amber-500/10 text-amber-500">
@@ -250,7 +253,7 @@ export default function Dashboard({
 
                         <Link
                             href={generateCreate.url()}
-                            className="group flex flex-col justify-between rounded-3xl border border-slate-200/80 bg-white/80 p-5 shadow-md backdrop-blur-xl transition-all hover:border-indigo-500 hover:shadow-xl dark:border-slate-800/80 dark:bg-[#0c0e1a]/80 dark:hover:border-indigo-500/50"
+                            className="group flex flex-col justify-between rounded-3xl border border-slate-200/80 bg-white/80 p-4.5 sm:p-5 shadow-md backdrop-blur-xl transition-all hover:border-indigo-500 hover:shadow-xl dark:border-slate-800/80 dark:bg-[#0c0e1a]/80 dark:hover:border-indigo-500/50 min-w-[240px] sm:min-w-0 shrink-0 sm:shrink snap-start"
                         >
                             <div className="flex items-center justify-between mb-4">
                                 <div className="flex size-10 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-500">
@@ -273,34 +276,34 @@ export default function Dashboard({
                 </div>
 
                 {/* 4. Telemetry Status Grid */}
-                <div className="grid gap-5 md:grid-cols-3">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 sm:gap-5">
                     {/* Active AI Engine Card */}
-                    <div className="flex items-center justify-between rounded-3xl border border-slate-200/80 bg-white/80 p-6 shadow-md backdrop-blur-xl dark:border-slate-800/80 dark:bg-[#0c0e1a]/80 glow-indigo">
+                    <div className="flex items-center justify-between rounded-3xl border border-slate-200/80 bg-white/80 p-4.5 sm:p-6 shadow-md backdrop-blur-xl dark:border-slate-800/80 dark:bg-[#0c0e1a]/80 glow-indigo">
                         <div>
                             <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
                                 Active Generation Engine
                             </span>
-                            <h3 className="mt-1.5 text-lg font-black tracking-tight text-slate-900 dark:text-white">
+                            <h3 className="mt-1 text-base sm:text-lg font-black tracking-tight text-slate-900 dark:text-white">
                                 {providerNameMap[aiProvider] || aiProvider}
                             </h3>
                             <p className="text-xs text-indigo-600 dark:text-indigo-400 mt-0.5 font-mono font-semibold">
                                 {aiModel}
                             </p>
                         </div>
-                        <div className="flex size-12 items-center justify-center rounded-2xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400">
-                            {aiProvider === 'gemini' && <Zap className="size-6" />}
-                            {aiProvider === 'openai' && <Cpu className="size-6" />}
-                            {aiProvider === 'openrouter' && <Layers className="size-6" />}
+                        <div className="flex size-11 sm:size-12 items-center justify-center rounded-2xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 shrink-0">
+                            {aiProvider === 'gemini' && <Zap className="size-5 sm:size-6" />}
+                            {aiProvider === 'openai' && <Cpu className="size-5 sm:size-6" />}
+                            {aiProvider === 'openrouter' && <Layers className="size-5 sm:size-6" />}
                         </div>
                     </div>
 
                     {/* Brand Tones Card */}
-                    <div className="flex items-center justify-between rounded-3xl border border-slate-200/80 bg-white/80 p-6 shadow-md backdrop-blur-xl dark:border-slate-800/80 dark:bg-[#0c0e1a]/80">
+                    <div className="flex items-center justify-between rounded-3xl border border-slate-200/80 bg-white/80 p-4.5 sm:p-6 shadow-md backdrop-blur-xl dark:border-slate-800/80 dark:bg-[#0c0e1a]/80">
                         <div>
                             <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
                                 Calibrated Personas
                             </span>
-                            <h3 className="mt-1.5 text-2xl font-black tracking-tight text-slate-900 dark:text-white">
+                            <h3 className="mt-1 text-xl sm:text-2xl font-black tracking-tight text-slate-900 dark:text-white">
                                 {tones.length}
                             </h3>
                             <Link
@@ -310,18 +313,18 @@ export default function Dashboard({
                                 Configure personas →
                             </Link>
                         </div>
-                        <div className="flex size-12 items-center justify-center rounded-2xl bg-purple-500/10 text-purple-600 dark:text-purple-400">
-                            <Sparkles className="size-6" />
+                        <div className="flex size-11 sm:size-12 items-center justify-center rounded-2xl bg-purple-500/10 text-purple-600 dark:text-purple-400 shrink-0">
+                            <Sparkles className="size-5 sm:size-6" />
                         </div>
                     </div>
 
                     {/* Key Status Card */}
-                    <div className="flex items-center justify-between rounded-3xl border border-slate-200/80 bg-white/80 p-6 shadow-md backdrop-blur-xl dark:border-slate-800/80 dark:bg-[#0c0e1a]/80">
+                    <div className="flex items-center justify-between rounded-3xl border border-slate-200/80 bg-white/80 p-4.5 sm:p-6 shadow-md backdrop-blur-xl dark:border-slate-800/80 dark:bg-[#0c0e1a]/80">
                         <div>
                             <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
                                 BYOK Key Security
                             </span>
-                            <h3 className="mt-1.5 text-lg font-black tracking-tight">
+                            <h3 className="mt-1 text-base sm:text-lg font-black tracking-tight">
                                 {hasApiKey ? (
                                     <span className="text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
                                         <span className="size-2 rounded-full bg-emerald-500 animate-pulse" />
@@ -338,8 +341,8 @@ export default function Dashboard({
                                 Manage credentials →
                             </Link>
                         </div>
-                        <div className="flex size-12 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
-                            <Key className="size-6" />
+                        <div className="flex size-11 sm:size-12 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 shrink-0">
+                            <Key className="size-5 sm:size-6" />
                         </div>
                     </div>
                 </div>

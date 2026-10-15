@@ -54,7 +54,7 @@ export default function AdminUserShow({
     return (
         <>
             <Head title={`User Profile: ${subjectUser.name}`} />
-            <div className="mx-auto flex h-full w-full max-w-7xl flex-1 flex-col gap-6 p-6">
+            <div className="mx-auto flex h-full w-full max-w-7xl flex-1 flex-col gap-5 sm:gap-6 p-3.5 sm:p-6">
                 {/* Header Section */}
                 <div className="flex items-center justify-between border-b border-neutral-100 pb-5 dark:border-neutral-800">
                     <div>
@@ -184,50 +184,76 @@ export default function AdminUserShow({
                     </CardHeader>
                     <CardContent className="flex-1 p-0">
                         {generations.data.length > 0 ? (
-                            <div className="overflow-x-auto">
-                                <table className="w-full text-left text-sm">
-                                    <thead className="border-b border-neutral-100 bg-neutral-50 text-[10px] font-bold uppercase text-neutral-400 dark:border-neutral-800 dark:bg-neutral-950">
-                                        <tr>
-                                            <th className="p-3">Date</th>
-                                            <th className="p-3">Type</th>
-                                            <th className="p-3">Prompt</th>
-                                            <th className="p-3">Engine</th>
-                                            <th className="p-3">Status</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-neutral-100 dark:divide-neutral-800/60">
-                                        {generations.data.map((gen) => (
-                                            <tr
-                                                key={gen.id}
-                                                className="hover:bg-neutral-50/50 dark:hover:bg-neutral-950/10"
-                                            >
-                                                <td className="whitespace-nowrap p-3 text-xs text-neutral-400">
-                                                    {new Date(
-                                                        gen.created_at
-                                                    ).toLocaleDateString()}
-                                                </td>
-                                                <td className="p-3 text-xs font-bold capitalize text-indigo-600">
-                                                    {gen.content_type.replace(
-                                                        '_',
-                                                        ' '
-                                                    )}
-                                                </td>
-                                                <td className="max-w-[320px] truncate p-3 text-xs text-neutral-600 dark:text-neutral-400">
-                                                    {gen.user_prompt}
-                                                </td>
-                                                <td className="p-3 text-xs capitalize text-neutral-600 dark:text-neutral-300">
-                                                    {gen.ai_provider || 'gemini'}
-                                                </td>
-                                                <td className="p-3 text-xs">
-                                                    <Badge className="bg-neutral-100 text-neutral-600 capitalize">
-                                                        {gen.status}
-                                                    </Badge>
-                                                </td>
+                            <>
+                                {/* Mobile Generations Card List (< md) */}
+                                <div className="block md:hidden divide-y divide-neutral-100 dark:divide-neutral-800/80">
+                                    {generations.data.map((gen) => (
+                                        <div key={gen.id} className="p-4 space-y-2">
+                                            <div className="flex items-center justify-between gap-2">
+                                                <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400 capitalize">
+                                                    {gen.content_type.replace('_', ' ')}
+                                                </span>
+                                                <Badge className="bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 capitalize text-[10px]">
+                                                    {gen.status}
+                                                </Badge>
+                                            </div>
+                                            <p className="text-xs text-neutral-600 dark:text-neutral-400 line-clamp-2">
+                                                {gen.user_prompt}
+                                            </p>
+                                            <div className="flex items-center justify-between text-[11px] text-neutral-400 font-mono pt-1">
+                                                <span className="capitalize">{gen.ai_provider || 'gemini'}</span>
+                                                <span>{new Date(gen.created_at).toLocaleDateString()}</span>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+
+                                {/* Desktop Table View (>= md) */}
+                                <div className="hidden md:block overflow-x-auto">
+                                    <table className="w-full text-left text-sm">
+                                        <thead className="border-b border-neutral-100 bg-neutral-50 text-[10px] font-bold uppercase text-neutral-400 dark:border-neutral-800 dark:bg-neutral-950">
+                                            <tr>
+                                                <th className="p-3">Date</th>
+                                                <th className="p-3">Type</th>
+                                                <th className="p-3">Prompt</th>
+                                                <th className="p-3">Engine</th>
+                                                <th className="p-3">Status</th>
                                             </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
+                                        </thead>
+                                        <tbody className="divide-y divide-neutral-100 dark:divide-neutral-800/60">
+                                            {generations.data.map((gen) => (
+                                                <tr
+                                                    key={gen.id}
+                                                    className="hover:bg-neutral-50/50 dark:hover:bg-neutral-950/10"
+                                                >
+                                                    <td className="whitespace-nowrap p-3 text-xs text-neutral-400">
+                                                        {new Date(
+                                                            gen.created_at
+                                                        ).toLocaleDateString()}
+                                                    </td>
+                                                    <td className="p-3 text-xs font-bold capitalize text-indigo-600">
+                                                        {gen.content_type.replace(
+                                                            '_',
+                                                            ' '
+                                                        )}
+                                                    </td>
+                                                    <td className="max-w-[320px] truncate p-3 text-xs text-neutral-600 dark:text-neutral-400">
+                                                        {gen.user_prompt}
+                                                    </td>
+                                                    <td className="p-3 text-xs capitalize text-neutral-600 dark:text-neutral-300">
+                                                        {gen.ai_provider || 'gemini'}
+                                                    </td>
+                                                    <td className="p-3 text-xs">
+                                                        <Badge className="bg-neutral-100 text-neutral-600 capitalize">
+                                                            {gen.status}
+                                                        </Badge>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </>
                         ) : (
                             <div className="py-8 text-center text-xs text-neutral-400">
                                 No copy generated yet by this user.

@@ -166,7 +166,7 @@ export default function HistoryIndex({ history }: HistoryProps) {
                                                              handleCopyText(gen.id, gen.ai_content);
                                                         }}
                                                         title="Copy AI output"
-                                                        className="flex items-center gap-1 rounded-lg border border-slate-200/80 bg-white px-2 py-1 text-[10.5px] font-semibold text-slate-700 transition hover:border-indigo-400 hover:text-indigo-600 dark:border-slate-800 dark:bg-[#0c0e1a] dark:text-slate-300 dark:hover:border-indigo-500/50 dark:hover:text-white min-h-[30px]"
+                                                        className="flex items-center gap-1 rounded-xl border border-slate-200/80 bg-white px-2.5 py-1.5 text-[11px] font-semibold text-slate-700 transition hover:border-indigo-400 hover:text-indigo-600 dark:border-slate-800 dark:bg-[#0c0e1a] dark:text-slate-300 dark:hover:border-indigo-500/50 dark:hover:text-white min-h-[38px] active:scale-95 cursor-pointer shadow-2xs"
                                                     >
                                                         {copiedId === gen.id ? (
                                                             <>
