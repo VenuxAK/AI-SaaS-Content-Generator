@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Generation;
 use App\Services\GeminiStreamService;
+use App\Services\PromptBuilderService;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
@@ -11,9 +13,14 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class GenerationStreamController extends Controller
 {
+    protected PromptBuilderService $promptBuilder;
+
     public function __construct(
-        protected GeminiStreamService $streamService
-    ) {}
+        protected GeminiStreamService $streamService,
+        ?PromptBuilderService $promptBuilder = null
+    ) {
+        $this->promptBuilder = $promptBuilder ?? app(PromptBuilderService::class);
+    }
 
     /**
      * Open an SSE connection and stream tokens to the browser.
@@ -87,6 +94,103 @@ class GenerationStreamController extends Controller
                 DB::transaction(function () use ($generation) {
                     $generation->update(['status' => 'failed']);
                 });
+
+                $errorMessage = $this->formatErrorMessage($e);
+
+                echo 'data: '.json_encode(['error' => $errorMessage])."\n\n";
+                if (ob_get_level() > 0) {
+                    ob_flush();
+                }
+                flush();
+
+                return;
+            }
+
+            echo 'data: '.json_encode(['done' => true])."\n\n";
+            if (ob_get_level() > 0) {
+                ob_flush();
+            }
+            flush();
+        }, 200, [
+            'Content-Type' => 'text/event-stream; charset=utf-8',
+            'Cache-Control' => 'no-cache, no-store, must-revalidate, no-transform',
+            'Connection' => 'keep-alive',
+            'X-Accel-Buffering' => 'no',
+            'X-No-Buffer' => '1',
+            'Content-Encoding' => 'none',
+        ]);
+    }
+
+    /**
+     * Open an SSE connection and stream a humanized rewrite of the generation content.
+     */
+    public function humanize(Request $request, Generation $generation): StreamedResponse
+    {
+        Gate::authorize('view', $generation);
+
+        $sourceContent = $generation->edited_content ?: $generation->ai_content;
+
+        if (empty($sourceContent)) {
+            abort(400, 'No generated content available to humanize.');
+        }
+
+        $preset = $request->query('preset', 'conversational');
+        if (! in_array($preset, ['conversational', 'punchy', 'executive'], true)) {
+            $preset = 'conversational';
+        }
+
+        $humanizerPrompt = $this->promptBuilder->buildHumanizer(
+            $sourceContent,
+            $generation->output_language,
+            $generation->content_type,
+            $preset
+        );
+
+        return response()->stream(function () use ($generation, $humanizerPrompt) {
+            set_time_limit(120);
+
+            if (function_exists('apache_setenv')) {
+                apache_setenv('no-gzip', '1');
+            }
+            @ini_set('zlib.output_compression', '0');
+            @ini_set('output_buffering', '0');
+            @ini_set('implicit_flush', '1');
+
+            if (! app()->runningUnitTests()) {
+                while (ob_get_level() > 0) {
+                    ob_end_clean();
+                }
+            }
+
+            // Emit initial 2KB SSE comment padding to bypass reverse proxy buffers
+            echo ': '.str_repeat(' ', 2048)."\n\n";
+            if (ob_get_level() > 0) {
+                ob_flush();
+            }
+            flush();
+
+            try {
+                $this->streamService->stream(
+                    $humanizerPrompt,
+                    function (string $token) {
+                        echo 'data: '.json_encode(['token' => $token])."\n\n";
+
+                        if (connection_aborted()) {
+                            throw new \RuntimeException('Connection aborted by client.');
+                        }
+
+                        if (ob_get_level() > 0) {
+                            ob_flush();
+                        }
+                        flush();
+                    },
+                    function (string $fullContent) {
+                        // Streaming completed; full content is held by the client review UI
+                    },
+                    $generation->user
+                );
+            } catch (\Throwable $e) {
+                Log::error("Humanizer streaming error for generation {$generation->id}: ".$e->getMessage());
 
                 $errorMessage = $this->formatErrorMessage($e);
 

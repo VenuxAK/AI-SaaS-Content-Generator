@@ -25,6 +25,7 @@ import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -33,7 +34,8 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { stream as generateStream, create as generateCreate } from '@/routes/generate';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { stream as generateStream, humanize as generateHumanize, create as generateCreate } from '@/routes/generate';
 import { index as historyIndex, update as historyUpdate, destroy as historyDestroy } from '@/routes/history';
 
 interface Tone {
@@ -261,6 +263,18 @@ export default function HistoryShow({ generation, autostream }: ShowProps) {
     const bottomRef = useRef<HTMLDivElement>(null);
     const activeText = generation.edited_content || content;
 
+    // Humanizer Subsystem state
+    const [isHumanizerOpen, setIsHumanizerOpen] = useState(false);
+    const [humanizerPreset, setHumanizerPreset] = useState<'conversational' | 'punchy' | 'executive'>('conversational');
+    const [isHumanizing, setIsHumanizing] = useState(false);
+    const [humanizedContent, setHumanizedContent] = useState('');
+    const [humanizerError, setHumanizerError] = useState<string | null>(null);
+    const [isHumanizedCopied, setIsHumanizedCopied] = useState(false);
+    const humanizerEventSourceRef = useRef<EventSource | null>(null);
+    const humanizedScrollRef = useRef<HTMLDivElement>(null);
+    const isHumanizerAutoScrollRef = useRef<boolean>(true);
+    const [showHumanizerScrollDown, setShowHumanizerScrollDown] = useState<boolean>(false);
+
     // Word, Character, and Read Time Telemetry
     const wordCount = activeText.trim() ? activeText.trim().split(/\s+/).length : 0;
     const charCount = activeText.length;
@@ -299,7 +313,7 @@ export default function HistoryShow({ generation, autostream }: ShowProps) {
     }, []);
 
     // Intelligently monitor scrolling:
-    // 1. While streaming: show "New content streaming below" only when user scrolls up
+    // 1. While streaming: auto-scroll follows generation unless user intentionally scrolls up
     // 2. When completed: show "Scroll to top" when user has scrolled down into content
     useEffect(() => {
         let scrollTimeout: ReturnType<typeof setTimeout> | null = null;
@@ -312,47 +326,58 @@ export default function HistoryShow({ generation, autostream }: ShowProps) {
 
             if (status === 'streaming') {
                 setShowScrollTop(false);
-                if (distanceBelow > 300) {
-                    isAutoScrollActiveRef.current = false;
-                    setShowStreamingScrollDown(true);
-                } else if (distanceBelow < 120) {
+                // If user reached bottom, re-engage auto scroll
+                if (distanceBelow < 120) {
                     isAutoScrollActiveRef.current = true;
                     setShowStreamingScrollDown(false);
                 }
             } else {
                 // When generation is completed or failed:
                 setShowStreamingScrollDown(false);
-                // Show "Scroll to top" if user has scrolled down > 280px
                 setShowScrollTop(scrollY > 280);
             }
         };
 
-        const handleScroll = () => {
-            // If scroll was triggered programmatically by auto-scroll, do NOT process user scroll-up logic
-            if (isProgrammaticScrollRef.current) {
-                isProgrammaticScrollRef.current = false;
-                return;
+        const handleWheel = (e: WheelEvent) => {
+            if (status !== 'streaming') return;
+            if (e.deltaY < 0) {
+                // User intentionally scrolled up!
+                isAutoScrollActiveRef.current = false;
+                setShowStreamingScrollDown(true);
+            } else if (e.deltaY > 0) {
+                const distanceBelow = document.documentElement.scrollHeight - (window.innerHeight + window.scrollY);
+                if (distanceBelow < 120) {
+                    isAutoScrollActiveRef.current = true;
+                    setShowStreamingScrollDown(false);
+                }
             }
+        };
 
+        const handleTouchMove = () => {
+            if (status !== 'streaming') return;
+            const distanceBelow = document.documentElement.scrollHeight - (window.innerHeight + window.scrollY);
+            if (distanceBelow > 200) {
+                isAutoScrollActiveRef.current = false;
+                setShowStreamingScrollDown(true);
+            } else if (distanceBelow < 100) {
+                isAutoScrollActiveRef.current = true;
+                setShowStreamingScrollDown(false);
+            }
+        };
+
+        const handleScroll = () => {
             if (scrollTimeout) clearTimeout(scrollTimeout);
             scrollTimeout = setTimeout(checkScrollPosition, 40);
         };
 
-        const handleUserInteraction = () => {
-            isProgrammaticScrollRef.current = false;
-        };
-
         window.addEventListener('scroll', handleScroll, { passive: true });
-        window.addEventListener('wheel', handleUserInteraction, { passive: true });
-        window.addEventListener('touchmove', handleUserInteraction, { passive: true });
-
-        // Initial check on status change
-        checkScrollPosition();
+        window.addEventListener('wheel', handleWheel, { passive: true });
+        window.addEventListener('touchmove', handleTouchMove, { passive: true });
 
         return () => {
             window.removeEventListener('scroll', handleScroll);
-            window.removeEventListener('wheel', handleUserInteraction);
-            window.removeEventListener('touchmove', handleUserInteraction);
+            window.removeEventListener('wheel', handleWheel);
+            window.removeEventListener('touchmove', handleTouchMove);
             if (scrollTimeout) clearTimeout(scrollTimeout);
         };
     }, [status]);
@@ -390,10 +415,10 @@ export default function HistoryShow({ generation, autostream }: ShowProps) {
 
                 setContent((prev) => prev + chunk);
 
-                // Auto-scroll ONLY if user has not scrolled up to read earlier text
+                // Auto-scroll to follow stream smoothly
                 if (isAutoScrollActiveRef.current && bottomRef.current) {
                     isProgrammaticScrollRef.current = true;
-                    bottomRef.current.scrollIntoView({ behavior: 'auto', block: 'nearest' });
+                    bottomRef.current.scrollIntoView({ behavior: 'auto', block: 'end' });
                 }
             }
 
@@ -531,6 +556,126 @@ export default function HistoryShow({ generation, autostream }: ShowProps) {
         }
     };
 
+    // Humanizer Subsystem Methods
+    const startHumanizer = (presetOverride?: 'conversational' | 'punchy' | 'executive') => {
+        const activePreset = presetOverride || humanizerPreset;
+        if (humanizerEventSourceRef.current) {
+            humanizerEventSourceRef.current.close();
+            humanizerEventSourceRef.current = null;
+        }
+
+        const source = activeText;
+        if (!source) {
+            toast.error('No content available to humanize.');
+            return;
+        }
+
+        setIsHumanizing(true);
+        setHumanizedContent('');
+        setHumanizerError(null);
+        isHumanizerAutoScrollRef.current = true;
+        setShowHumanizerScrollDown(false);
+
+        const url = generateHumanize.url({ generation: generation.id }, { query: { preset: activePreset } });
+        const es = new EventSource(url);
+        humanizerEventSourceRef.current = es;
+
+        es.onmessage = (event) => {
+            if (!event.data || event.data.startsWith(':')) return;
+
+            try {
+                const data = JSON.parse(event.data);
+                if (data.token) {
+                    setHumanizedContent((prev) => prev + data.token);
+                    if (isHumanizerAutoScrollRef.current && humanizedScrollRef.current) {
+                        humanizedScrollRef.current.scrollTop = humanizedScrollRef.current.scrollHeight;
+                    }
+                }
+                if (data.done) {
+                    setIsHumanizing(false);
+                    es.close();
+                    humanizerEventSourceRef.current = null;
+                    toast.success('Humanized draft ready for review!');
+                }
+                if (data.error) {
+                    setIsHumanizing(false);
+                    setHumanizerError(data.error);
+                    es.close();
+                    humanizerEventSourceRef.current = null;
+                    toast.error(data.error);
+                }
+            } catch {
+                // Ignore parse errors
+            }
+        };
+
+        es.onerror = () => {
+            setIsHumanizing(false);
+            es.close();
+            humanizerEventSourceRef.current = null;
+            setHumanizerError('Connection interrupted while streaming humanized rewrite.');
+            toast.error('Connection interrupted.');
+        };
+    };
+
+    const handleHumanizerScroll = () => {
+        if (!humanizedScrollRef.current) return;
+        const { scrollTop, scrollHeight, clientHeight } = humanizedScrollRef.current;
+        const distanceBottom = scrollHeight - (scrollTop + clientHeight);
+        if (distanceBottom > 60) {
+            isHumanizerAutoScrollRef.current = false;
+            setShowHumanizerScrollDown(true);
+        } else {
+            isHumanizerAutoScrollRef.current = true;
+            setShowHumanizerScrollDown(false);
+        }
+    };
+
+    const handleAcceptHumanized = () => {
+        if (!humanizedContent) return;
+
+        editForm.setData('edited_content', humanizedContent);
+        router.put(historyUpdate.url({ generation: generation.id }), {
+            edited_content: humanizedContent,
+        }, {
+            onSuccess: () => {
+                setIsHumanizerOpen(false);
+                toast.success('Humanized copy accepted and saved!');
+            },
+        });
+    };
+
+    const handleCopyHumanized = () => {
+        if (!humanizedContent) return;
+        navigator.clipboard.writeText(humanizedContent).then(() => {
+            setIsHumanizedCopied(true);
+            toast.success('Humanized copy copied to clipboard!');
+            setTimeout(() => setIsHumanizedCopied(false), 2000);
+        });
+    };
+
+    const handleOpenHumanizer = () => {
+        setIsHumanizerOpen(true);
+        if (!humanizedContent && !isHumanizing) {
+            startHumanizer();
+        }
+    };
+
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('humanize') === '1' && (generation.ai_content || generation.edited_content)) {
+                handleOpenHumanizer();
+            }
+        }
+
+        return () => {
+            if (humanizerEventSourceRef.current) {
+                humanizerEventSourceRef.current.close();
+            }
+        };
+    }, []);
+
     const statusBadge = {
         pending: (
             <Badge className="bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 animate-pulse">
@@ -593,18 +738,28 @@ export default function HistoryShow({ generation, autostream }: ShowProps) {
                         {/* Mobile Actions (< sm) */}
                         <div className="flex sm:hidden items-center gap-1.5">
                             {Boolean(activeText) && (
-                                <Button
-                                    variant="outline"
-                                    onClick={handleCopy}
-                                    className="rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-[#0c0e1a] h-10 px-3 flex items-center gap-1.5 cursor-pointer text-xs font-bold transition hover:border-indigo-400 hover:text-indigo-600 dark:hover:text-indigo-400 shadow-2xs active:scale-95"
-                                >
-                                    {isCopied ? (
-                                        <Check className="size-4 text-emerald-500" />
-                                    ) : (
-                                        <Copy className="size-4 text-indigo-500" />
-                                    )}
-                                    <span>{isCopied ? 'Copied' : 'Copy'}</span>
-                                </Button>
+                                <>
+                                    <Button
+                                        variant="outline"
+                                        onClick={handleCopy}
+                                        className="rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-[#0c0e1a] h-10 px-3 flex items-center gap-1.5 cursor-pointer text-xs font-bold transition hover:border-indigo-400 hover:text-indigo-600 dark:hover:text-indigo-400 shadow-2xs active:scale-95"
+                                    >
+                                        {isCopied ? (
+                                            <Check className="size-4 text-emerald-500" />
+                                        ) : (
+                                            <Copy className="size-4 text-indigo-500" />
+                                        )}
+                                        <span>{isCopied ? 'Copied' : 'Copy'}</span>
+                                    </Button>
+                                    <Button
+                                        variant="outline"
+                                        onClick={handleOpenHumanizer}
+                                        className="rounded-xl border border-indigo-200 bg-indigo-50/60 dark:border-indigo-900/40 dark:bg-indigo-950/20 text-indigo-600 dark:text-indigo-400 h-10 px-3 flex items-center gap-1.5 cursor-pointer text-xs font-bold transition hover:bg-indigo-100 dark:hover:bg-indigo-900/30 shadow-2xs active:scale-95"
+                                    >
+                                        <Sparkles className="size-4 text-indigo-500" />
+                                        <span>Humanize</span>
+                                    </Button>
+                                </>
                             )}
                             <Link
                                 href={generateCreate.url()}
@@ -627,6 +782,13 @@ export default function HistoryShow({ generation, autostream }: ShowProps) {
                                 <DropdownMenuContent align="end" className="w-48 rounded-2xl p-1.5 shadow-xl">
                                     {Boolean(activeText) && (
                                         <>
+                                            <DropdownMenuItem
+                                                onClick={handleOpenHumanizer}
+                                                className="cursor-pointer gap-2 rounded-xl py-2 text-xs font-bold text-indigo-600 dark:text-indigo-400"
+                                            >
+                                                <Sparkles className="size-4 text-indigo-500" />
+                                                Humanize Copy
+                                            </DropdownMenuItem>
                                             <DropdownMenuItem
                                                 onClick={() => handleDownload('md')}
                                                 className="cursor-pointer gap-2 rounded-xl py-2 text-xs font-semibold"
@@ -673,6 +835,13 @@ export default function HistoryShow({ generation, autostream }: ShowProps) {
                                             <Copy className="size-4 text-indigo-500" />
                                         )}
                                         <span>{isCopied ? 'Copied' : 'Copy'}</span>
+                                    </Button>
+                                    <Button
+                                        onClick={handleOpenHumanizer}
+                                        className="rounded-xl bg-gradient-to-r from-violet-600 via-indigo-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white h-10 px-3.5 flex items-center gap-1.5 cursor-pointer text-xs font-bold shadow-md shadow-indigo-600/20 active:scale-95 transition"
+                                    >
+                                        <Sparkles className="size-4" />
+                                        <span>Humanize</span>
                                     </Button>
                                     <Button
                                         variant="outline"
@@ -1073,7 +1242,7 @@ export default function HistoryShow({ generation, autostream }: ShowProps) {
                         style={{
                             left: canvasCenterLeft ? `${canvasCenterLeft}px` : '50%',
                         }}
-                        className={`fixed bottom-6 -translate-x-1/2 z-40 transition-all duration-300 ease-out ${
+                        className={`fixed bottom-20 sm:bottom-10 -translate-x-1/2 z-40 transition-all duration-300 ease-out ${
                             (status === 'streaming' ? showStreamingScrollDown : showScrollTop)
                                 ? 'opacity-100 translate-y-0 pointer-events-auto'
                                 : 'opacity-0 translate-y-4 pointer-events-none'
@@ -1101,6 +1270,232 @@ export default function HistoryShow({ generation, autostream }: ShowProps) {
                         )}
                     </div>
                 )}
+
+                {/* Humanizer Side-by-Side Review Dialog */}
+                <Dialog open={isHumanizerOpen} onOpenChange={(open) => {
+                    if (!open && humanizerEventSourceRef.current) {
+                        humanizerEventSourceRef.current.close();
+                        humanizerEventSourceRef.current = null;
+                        setIsHumanizing(false);
+                    }
+                    setIsHumanizerOpen(open);
+                }}>
+                    <DialogContent className="!max-w-6xl sm:!max-w-6xl w-[96vw] max-w-[96vw] h-[88vh] max-h-[88vh] flex flex-col p-4 sm:p-6 rounded-3xl bg-white/95 dark:bg-[#0c0e1a]/95 backdrop-blur-2xl border border-slate-200/80 dark:border-slate-800 shadow-2xl overflow-hidden">
+                        <DialogHeader className="shrink-0 border-b border-slate-200/80 dark:border-slate-800 pb-3 sm:pb-4">
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                                <div className="flex items-center gap-2.5 min-w-0">
+                                    <div className="flex size-9 sm:size-10 items-center justify-center rounded-2xl bg-gradient-to-tr from-violet-600 to-indigo-600 text-white shadow-md shadow-indigo-500/20 shrink-0">
+                                        <Sparkles className="size-5" />
+                                    </div>
+                                    <div className="min-w-0">
+                                        <DialogTitle className="text-base sm:text-lg font-black text-slate-900 dark:text-white flex items-center gap-2">
+                                            Humanize & Naturalize Copy
+                                        </DialogTitle>
+                                        <DialogDescription className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                                            Strip AI clichés, inject natural sentence burstiness, and refine authentic tone.
+                                        </DialogDescription>
+                                    </div>
+                                </div>
+
+                                {/* 3-Pill Preset Selector & Regenerate */}
+                                <div className="flex flex-wrap items-center gap-2 shrink-0">
+                                    <div className="flex items-center p-1 rounded-2xl bg-slate-100 dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 text-xs font-bold">
+                                        <button
+                                            type="button"
+                                            disabled={isHumanizing}
+                                            onClick={() => {
+                                                setHumanizerPreset('conversational');
+                                                startHumanizer('conversational');
+                                            }}
+                                            className={`px-3 py-1.5 rounded-xl transition-all cursor-pointer whitespace-nowrap ${
+                                                humanizerPreset === 'conversational'
+                                                    ? 'bg-white dark:bg-[#141728] text-indigo-600 dark:text-indigo-400 shadow-2xs font-extrabold'
+                                                    : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+                                            }`}
+                                        >
+                                            ☕ Conversational
+                                        </button>
+                                        <button
+                                            type="button"
+                                            disabled={isHumanizing}
+                                            onClick={() => {
+                                                setHumanizerPreset('punchy');
+                                                startHumanizer('punchy');
+                                            }}
+                                            className={`px-3 py-1.5 rounded-xl transition-all cursor-pointer whitespace-nowrap ${
+                                                humanizerPreset === 'punchy'
+                                                    ? 'bg-white dark:bg-[#141728] text-indigo-600 dark:text-indigo-400 shadow-2xs font-extrabold'
+                                                    : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+                                            }`}
+                                        >
+                                            ⚡ Punchy & Direct
+                                        </button>
+                                        <button
+                                            type="button"
+                                            disabled={isHumanizing}
+                                            onClick={() => {
+                                                setHumanizerPreset('executive');
+                                                startHumanizer('executive');
+                                            }}
+                                            className={`px-3 py-1.5 rounded-xl transition-all cursor-pointer whitespace-nowrap ${
+                                                humanizerPreset === 'executive'
+                                                    ? 'bg-white dark:bg-[#141728] text-indigo-600 dark:text-indigo-400 shadow-2xs font-extrabold'
+                                                    : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+                                            }`}
+                                        >
+                                            👔 Executive Polish
+                                        </button>
+                                    </div>
+
+                                    <Button
+                                        size="sm"
+                                        variant="outline"
+                                        onClick={() => startHumanizer()}
+                                        disabled={isHumanizing}
+                                        className="h-9 rounded-xl text-xs font-bold gap-1.5 cursor-pointer shrink-0"
+                                    >
+                                        <RefreshCw className={`size-3.5 ${isHumanizing ? 'animate-spin text-indigo-500' : ''}`} />
+                                        <span className="hidden sm:inline">Regenerate</span>
+                                    </Button>
+                                </div>
+                            </div>
+                        </DialogHeader>
+
+                        {/* Comparison Container: No outer scroll, independent column scrolling */}
+                        <div className="flex-1 min-h-0 grid grid-cols-1 md:grid-cols-2 gap-4 py-3">
+                            {/* Original Draft Box */}
+                            <div className="flex flex-col h-full rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-900/40 p-4 min-h-0 overflow-hidden">
+                                <div className="shrink-0 flex items-center justify-between border-b border-slate-200/80 dark:border-slate-800/80 pb-2 mb-2">
+                                    <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                                        Original Draft
+                                    </span>
+                                    <span className="text-[11px] font-mono text-slate-400">
+                                        {wordCount} words
+                                    </span>
+                                </div>
+                                <div className="flex-1 min-h-0 overflow-y-auto pr-2 pt-1.5 pb-4 text-xs sm:text-sm text-slate-700 dark:text-slate-300 whitespace-pre-wrap leading-[2] font-padauk select-text">
+                                    {activeText}
+                                </div>
+                            </div>
+
+                            {/* Humanized Rewrite Box */}
+                            <div className="flex flex-col h-full rounded-2xl border border-indigo-200 dark:border-indigo-950/70 bg-indigo-50/30 dark:bg-indigo-950/10 p-4 min-h-0 overflow-hidden relative">
+                                <div className="shrink-0 flex items-center justify-between border-b border-indigo-100 dark:border-indigo-900/40 pb-2 mb-2">
+                                    <div className="flex items-center gap-1.5">
+                                        <span className="text-xs font-extrabold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
+                                            Humanized Rewrite
+                                        </span>
+                                        {isHumanizing && (
+                                            <span className="flex size-2 rounded-full bg-indigo-500 animate-ping" />
+                                        )}
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        {Boolean(humanizedContent) && (
+                                            (() => {
+                                                const hwCount = humanizedContent.trim().split(/\s+/).length;
+                                                const diff = hwCount - wordCount;
+                                                if (diff < 0) {
+                                                    return (
+                                                        <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-1.5 py-0.5 rounded-md">
+                                                            {diff} words ({Math.round((Math.abs(diff) / (wordCount || 1)) * 100)}% crisper)
+                                                        </span>
+                                                    );
+                                                }
+                                                if (diff > 0) {
+                                                    return (
+                                                        <span className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-500/10 border border-indigo-500/20 px-1.5 py-0.5 rounded-md">
+                                                            +{diff} words
+                                                        </span>
+                                                    );
+                                                }
+                                                return null;
+                                            })()
+                                        )}
+                                        <span className="text-[11px] font-mono text-indigo-500 font-semibold">
+                                            {humanizedContent ? `${humanizedContent.trim().split(/\s+/).length} words` : isHumanizing ? 'Streaming...' : 'Ready'}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div
+                                    ref={humanizedScrollRef}
+                                    onScroll={handleHumanizerScroll}
+                                    className="flex-1 min-h-0 overflow-y-auto pr-2 pt-1.5 pb-4 text-xs sm:text-sm text-slate-900 dark:text-slate-100 whitespace-pre-wrap leading-[2] font-padauk select-text"
+                                >
+                                    {humanizedContent ? (
+                                        <>
+                                            {humanizedContent}
+                                            {isHumanizing && (
+                                                <span className="inline-block w-1.5 h-4 ml-0.5 bg-indigo-600 dark:bg-indigo-400 animate-pulse align-middle" />
+                                            )}
+                                        </>
+                                    ) : isHumanizing ? (
+                                        <div className="flex flex-col items-center justify-center h-full text-slate-400 py-10 gap-2">
+                                            <RefreshCw className="size-5 animate-spin text-indigo-500" />
+                                            <p className="text-xs font-semibold">Humanizing tone & stripping AI clichés...</p>
+                                        </div>
+                                    ) : humanizerError ? (
+                                        <div className="text-rose-500 text-xs p-3 rounded-xl bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900/40">
+                                            {humanizerError}
+                                        </div>
+                                    ) : (
+                                        <div className="text-slate-400 text-xs italic text-center py-10">
+                                            Click "Regenerate" or change the preset to start humanizing.
+                                        </div>
+                                    )}
+                                </div>
+
+                                {showHumanizerScrollDown && isHumanizing && (
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            isHumanizerAutoScrollRef.current = true;
+                                            setShowHumanizerScrollDown(false);
+                                            if (humanizedScrollRef.current) {
+                                                humanizedScrollRef.current.scrollTop = humanizedScrollRef.current.scrollHeight;
+                                            }
+                                        }}
+                                        className="absolute bottom-4 right-4 z-20 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-indigo-600 text-white text-xs font-bold shadow-lg shadow-indigo-600/30 hover:bg-indigo-500 active:scale-95 transition-all cursor-pointer"
+                                    >
+                                        <span>Follow Stream</span>
+                                        <ArrowDown className="size-3 animate-bounce" />
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+
+                        <DialogFooter className="shrink-0 flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-2.5 pt-3 border-t border-slate-200/80 dark:border-slate-800">
+                            <Button
+                                variant="ghost"
+                                onClick={() => setIsHumanizerOpen(false)}
+                                className="rounded-xl text-xs font-bold text-slate-500 dark:text-slate-400"
+                            >
+                                Discard
+                            </Button>
+
+                            <div className="flex items-center gap-2">
+                                {Boolean(humanizedContent) && (
+                                    <Button
+                                        variant="outline"
+                                        onClick={handleCopyHumanized}
+                                        className="rounded-xl text-xs font-bold gap-1.5"
+                                    >
+                                        {isHumanizedCopied ? <Check className="size-3.5 text-emerald-500" /> : <Copy className="size-3.5" />}
+                                        {isHumanizedCopied ? 'Copied' : 'Copy'}
+                                    </Button>
+                                )}
+
+                                <Button
+                                    onClick={handleAcceptHumanized}
+                                    disabled={!humanizedContent || isHumanizing}
+                                    className="rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-black text-xs px-4 h-9 shadow-md shadow-emerald-600/20 gap-1.5 cursor-pointer"
+                                >
+                                    <Check className="size-4" />
+                                    Accept & Save Changes
+                                </Button>
+                            </div>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
             </div>
         </>
     );

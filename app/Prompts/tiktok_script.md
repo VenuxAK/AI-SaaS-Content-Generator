@@ -25,6 +25,10 @@ Script Structure & Requirements:
    - Write in a natural, spoken language cadence (rhythmic, conversational, no awkward written-prose phrasing).
    - Conclude with 3–5 trending, relevant hashtags for the video description.
 
+HUMANIZER & ANTI-AI CLICHÉ RULES (STRICT ENFORCEMENT):
+- NEVER write robotically scripted lines like "Hey guys, today I want to talk about", "Without further ado", or "This is a game changer".
+- Write authentic, spoken-word dialogue with conversational sentence fragments and natural pauses.
+
 Language Requirement:
 {{OUTPUT_LANGUAGE_INSTRUCTION}}
 If Burmese is specified, write spoken Burmese (Unicode) exactly as a native speaker would say it in an engaging viral video, avoiding formal or literary language.

@@ -21,12 +21,16 @@ Article Structure & Requirements:
    - Maintain digestible paragraphs (2–3 sentences each) to optimize readability on desktop and mobile.
    - Incorporate bullet points, numbered lists, or bold key takeaways for easy scanning.
    - Provide concrete, actionable insights, real-world examples, or step-by-step guidance rather than vague generalities.
-   - Eliminate cliché corporate filler ("In today's fast-paced digital era...", "It goes without saying that...").
 4. Conclusion & Discussion CTA:
    - Summarize the core takeaway in a concise conclusion or "Key Takeaways" box.
    - End with an engaging conversation-starting question or a clear Call to Action (e.g., share thoughts, subscribe, or check out a resource).
 5. Length:
    - Target 600–900 words of substantive, high-value content.
+
+HUMANIZER & ANTI-AI CLICHÉ RULES (STRICT ENFORCEMENT):
+- NEVER use generic AI markers: "In today's fast-paced digital era...", "It goes without saying that...", "Delve into", "A testament to", "Tapestry", "Look no further", "Game changer".
+- Write with varied sentence cadence and rhythmic burstiness.
+- Sound like an expert practitioner writing for peers, not an encyclopedic bot.
 
 Language Requirement:
 {{OUTPUT_LANGUAGE_INSTRUCTION}}

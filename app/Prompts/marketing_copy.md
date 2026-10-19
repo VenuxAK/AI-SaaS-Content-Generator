@@ -24,6 +24,11 @@ Copywriting Framework & Structure:
    - Craft a decisive, friction-free CTA button text/prompt (e.g., "Claim Your Spot Today", "Get Started in 60 Seconds").
    - Include a 1-line urgency or reassurance reminder right below the CTA.
 
+HUMANIZER & ANTI-AI CLICHÉ RULES (STRICT ENFORCEMENT):
+- NEVER use hollow AI buzzwords: "Revolutionize your workflow", "Skyrocket your growth", "Unleash potential", "Game-changing solution", "Look no further", "In today's fast-paced world".
+- Ground every claim in tangible realities, specific pain mechanisms, and clear human outcomes.
+- Write with rhythmic sentence diversity and high-conviction clarity.
+
 Language Requirement:
 {{OUTPUT_LANGUAGE_INSTRUCTION}}
 If Burmese is specified, craft persuasive Burmese (Unicode) using natural commercial and marketing idioms that evoke emotion and action, avoiding awkward word-for-word translation.

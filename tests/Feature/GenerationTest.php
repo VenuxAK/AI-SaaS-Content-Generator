@@ -7,6 +7,7 @@ use App\Models\Generation;
 use App\Models\User;
 use App\Models\UserTone;
 use App\Services\GeminiStreamService;
+use App\Services\PromptBuilderService;
 use Inertia\Testing\AssertableInertia as Assert;
 
 test('guests are redirected to login from generation form', function () {
@@ -206,4 +207,110 @@ test('stream error masks sensitive API keys during development', function () {
         ->toContain('key=AQ.Se***[MASKED]');
 
     $this->assertStringNotContainsString('AQ.SecretKey123456789', $message);
+});
+
+test('all 11 content types have valid prompt templates and can be initiated', function (string $type) {
+    $user = User::factory()->withApiKey('gemini')->create();
+
+    $response = $this->actingAs($user)->post(route('generate.store'), [
+        'content_type' => $type,
+        'output_language' => OutputLanguage::English->value,
+        'user_prompt' => 'Test generation for '.$type,
+    ]);
+
+    $generation = Generation::where('user_id', $user->id)->first();
+    expect($generation)->not->toBeNull()
+        ->and($generation->content_type->value)->toBe($type)
+        ->and($generation->full_prompt)->not->toBeEmpty();
+
+    $response->assertRedirect(route('history.show', $generation->id));
+})->with([
+    'facebook_post',
+    'tiktok_script',
+    'marketing_copy',
+    'caption',
+    'blog_post',
+    'linkedin_post',
+    'twitter_thread',
+    'ad_copy',
+    'cold_email',
+    'carousel_slides',
+    'youtube_script',
+]);
+
+test('prompt builder builds humanizer prompt with presets and anti-AI constraints', function () {
+    $builder = new PromptBuilderService;
+    $sampleContent = 'In today\'s fast-paced digital world, here is some copy.';
+
+    $prompt = $builder->buildHumanizer(
+        $sampleContent,
+        OutputLanguage::English,
+        ContentType::LinkedInPost,
+        'punchy'
+    );
+
+    expect($prompt)
+        ->toContain('Original Draft to Humanize:')
+        ->toContain($sampleContent)
+        ->toContain('Punchy, High-Signal, and Direct')
+        ->toContain('STRIP ALL AI MARKERS')
+        ->toContain('In today\'s fast-paced digital landscape');
+});
+
+test('authorized users can stream humanized rewrite of their generated content', function () {
+    $user = User::factory()->withApiKey('gemini')->create();
+    $generation = Generation::factory()->create([
+        'user_id' => $user->id,
+        'status' => 'completed',
+        'ai_content' => 'First draft of the blog post.',
+    ]);
+
+    $mockStream = Mockery::mock(GeminiStreamService::class);
+    $mockStream->shouldReceive('stream')
+        ->once()
+        ->andReturnUsing(function ($prompt, $onChunk, $onComplete, $user) {
+            $onChunk('Humanized ');
+            $onChunk('token.');
+            $onComplete('Humanized token.');
+        });
+    app()->instance(GeminiStreamService::class, $mockStream);
+
+    $response = $this->actingAs($user)->get(route('generate.humanize', ['generation' => $generation->id, 'preset' => 'conversational']));
+
+    $response->assertSuccessful();
+    expect($response->headers->get('Content-Type'))->toContain('text/event-stream');
+
+    $content = $response->streamedContent();
+    expect($content)
+        ->toContain('data: {"token":"Humanized "}')
+        ->toContain('data: {"token":"token."}')
+        ->toContain('data: {"done":true}');
+});
+
+test('users cannot humanize generation with no content', function () {
+    $user = User::factory()->withApiKey('gemini')->create();
+    $generation = Generation::factory()->create([
+        'user_id' => $user->id,
+        'status' => 'pending',
+        'ai_content' => null,
+        'edited_content' => null,
+    ]);
+
+    $response = $this->actingAs($user)->get(route('generate.humanize', $generation->id));
+
+    $response->assertStatus(400);
+});
+
+test('users cannot stream humanizer for another user generation', function () {
+    $user = User::factory()->withApiKey('gemini')->create();
+    $otherUser = User::factory()->create();
+    $generation = Generation::factory()->create([
+        'user_id' => $otherUser->id,
+        'status' => 'completed',
+        'ai_content' => 'Secret content',
+    ]);
+
+    $response = $this->actingAs($user)->get(route('generate.humanize', $generation->id));
+
+    $response->assertForbidden();
 });

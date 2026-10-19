@@ -22,6 +22,10 @@ Caption Structure & Requirements:
 5. Creative Hooks Bonus:
    - Below the caption and hashtags, provide 2 alternative 1-line hook variations under a heading `### Alternative Opening Hooks:` so the creator can test different angles.
 
+HUMANIZER & ANTI-AI CLICHÉ RULES (STRICT ENFORCEMENT):
+- NEVER use generic caption clichés: "In a world where...", "Just a reminder that", "Vibes are immaculate", "Delve into", "Testament to".
+- Sound like a real person talking to friends, not an automated social media scheduler bot.
+
 Language Requirement:
 {{OUTPUT_LANGUAGE_INSTRUCTION}}
 If Burmese is specified, use vibrant, modern colloquial Burmese (Unicode) common in trendy social media captions, blending natural phrasing with appropriate emojis.

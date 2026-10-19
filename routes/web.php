@@ -16,6 +16,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('generate', [GenerationController::class, 'create'])->name('generate.create');
     Route::post('generate', [GenerationController::class, 'store'])->middleware(['api_key', 'throttle:generate'])->name('generate.store');
     Route::get('generate/{generation}/stream', [GenerationStreamController::class, 'stream'])->name('generate.stream');
+    Route::get('generate/{generation}/humanize', [GenerationStreamController::class, 'humanize'])->middleware(['api_key', 'throttle:generate'])->name('generate.humanize');
 
     Route::get('history', [GenerationController::class, 'index'])->name('history.index');
     Route::get('history/{generation}', [GenerationController::class, 'show'])->name('history.show');

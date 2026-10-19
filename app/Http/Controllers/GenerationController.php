@@ -47,7 +47,7 @@ class GenerationController extends Controller
 
         return Inertia::render('Generate/Create', [
             'tones' => UserTone::availableFor($user)
-                ->select('id', 'name', 'is_system')
+                ->select('id', 'name', 'description', 'is_system')
                 ->orderBy('is_system', 'desc')
                 ->orderBy('name')
                 ->get(),

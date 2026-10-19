@@ -15,13 +15,17 @@ Content Structure & Requirements:
    - Use short, readable paragraphs (1–2 sentences each) with generous white space.
    - Deliver clear value, storytelling, or insight that resonates with the audience.
    - Use bullet points with relevant emojis where appropriate to make the copy easily scannable.
-   - Avoid generic corporate filler, buzzwords, or repetitive phrasing.
 3. Engagement Trigger & Call to Action (CTA):
    - End with an engaging question or interactive prompt that drives comments, saves, or shares.
    - Include a clear, actionable Call to Action (e.g., link visit, direct message, or comment prompt).
 4. Tone & Length:
    - Keep the length between 120–250 words for optimal organic reach.
    - Maintain a natural, conversational, and human tone.
+
+HUMANIZER & ANTI-AI CLICHÉ RULES (STRICT ENFORCEMENT):
+- NEVER use generic AI markers: "In today's fast-paced digital era", "Delve into", "Testament to", "Look no further", "Game changer", "Tapestry of".
+- Avoid artificial hype: speak like an authentic person sharing genuine insights with peers.
+- Vary sentence structures and rhythm.
 
 Language Requirement:
 {{OUTPUT_LANGUAGE_INSTRUCTION}}

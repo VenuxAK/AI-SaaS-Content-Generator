@@ -14,6 +14,8 @@ import {
     Mail,
     Copy,
     Check,
+    Layers,
+    Video,
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -102,13 +104,18 @@ interface HistoryProps {
     };
 }
 
-const PLATFORM_ICONS: Record<string, typeof Linkedin> = {
+const PLATFORM_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
     linkedin_post: Linkedin,
     twitter_thread: Twitter,
     facebook_post: Share2,
     blog_post: FileText,
     ad_copy: Megaphone,
     cold_email: Mail,
+    carousel_slides: Layers,
+    youtube_script: Video,
+    tiktok_script: Video,
+    caption: MessageSquare,
+    marketing_copy: Sparkles,
 };
 
 export default function HistoryIndex({ history }: HistoryProps) {
@@ -213,28 +220,40 @@ export default function HistoryIndex({ history }: HistoryProps) {
                                             <div className="flex items-center gap-2">
                                                 <span className="font-mono text-[10px]">{date}</span>
                                                 {gen.ai_content && (
-                                                    <button
-                                                        type="button"
-                                                        onClick={(e) => {
-                                                             e.preventDefault();
-                                                             e.stopPropagation();
-                                                             handleCopyText(gen.id, gen.ai_content);
-                                                        }}
-                                                        title="Copy AI output"
-                                                        className="flex items-center gap-1 rounded-xl border border-slate-200/80 bg-white px-2.5 py-1.5 text-[11px] font-semibold text-slate-700 transition hover:border-indigo-400 hover:text-indigo-600 dark:border-slate-800 dark:bg-[#0c0e1a] dark:text-slate-300 dark:hover:border-indigo-500/50 dark:hover:text-white min-h-[38px] active:scale-95 cursor-pointer shadow-2xs"
-                                                    >
-                                                        {copiedId === gen.id ? (
-                                                            <>
-                                                                <Check className="size-3 text-emerald-500" />
-                                                                <span className="text-emerald-500 font-bold">Copied</span>
-                                                            </>
-                                                        ) : (
-                                                            <>
-                                                                <Copy className="size-3 text-indigo-500" />
-                                                                <span>Copy</span>
-                                                            </>
-                                                        )}
-                                                    </button>
+                                                    <div className="flex items-center gap-1.5">
+                                                        <button
+                                                            type="button"
+                                                            onClick={(e) => {
+                                                                e.preventDefault();
+                                                                e.stopPropagation();
+                                                                handleCopyText(gen.id, gen.ai_content);
+                                                            }}
+                                                            title="Copy AI output"
+                                                            className="flex items-center gap-1 rounded-xl border border-slate-200/80 bg-white px-2.5 py-1.5 text-[11px] font-semibold text-slate-700 transition hover:border-indigo-400 hover:text-indigo-600 dark:border-slate-800 dark:bg-[#0c0e1a] dark:text-slate-300 dark:hover:border-indigo-500/50 dark:hover:text-white min-h-[38px] active:scale-95 cursor-pointer shadow-2xs"
+                                                        >
+                                                            {copiedId === gen.id ? (
+                                                                <>
+                                                                    <Check className="size-3 text-emerald-500" />
+                                                                    <span className="text-emerald-500 font-bold">Copied</span>
+                                                                </>
+                                                            ) : (
+                                                                <>
+                                                                    <Copy className="size-3 text-indigo-500" />
+                                                                    <span>Copy</span>
+                                                                </>
+                                                            )}
+                                                        </button>
+
+                                                        <Link
+                                                            href={historyShow.url(gen.id) + '?humanize=1'}
+                                                            onClick={(e) => e.stopPropagation()}
+                                                            title="Humanize copy"
+                                                            className="flex items-center gap-1 rounded-xl border border-purple-500/30 bg-purple-50/60 dark:bg-purple-950/20 px-2.5 py-1.5 text-[11px] font-bold text-purple-600 dark:text-purple-400 hover:bg-purple-100 dark:hover:bg-purple-950/40 min-h-[38px] active:scale-95 cursor-pointer shadow-2xs"
+                                                        >
+                                                            <Sparkles className="size-3" />
+                                                            <span className="hidden sm:inline">Humanize</span>
+                                                        </Link>
+                                                    </div>
                                                 )}
                                             </div>
                                         </CardFooter>

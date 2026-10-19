@@ -41,7 +41,7 @@ class DashboardController extends Controller
             'aiModel' => $user->getActiveModel(),
             'hasApiKey' => $user->hasActiveApiKey(),
             'tones' => UserTone::availableFor($user)
-                ->select('id', 'name', 'is_system')
+                ->select('id', 'name', 'description', 'is_system')
                 ->orderBy('is_system', 'desc')
                 ->orderBy('name')
                 ->get(),
