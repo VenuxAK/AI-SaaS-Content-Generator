@@ -1,4 +1,5 @@
 import { createInertiaApp } from '@inertiajs/react';
+import { PageLoadingIndicator } from '@/components/page-loading-indicator';
 import { Toaster } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { initializeTheme } from '@/hooks/use-appearance';
@@ -27,16 +28,13 @@ createInertiaApp({
     withApp(app) {
         return (
             <TooltipProvider delayDuration={0}>
+                <PageLoadingIndicator />
                 {app}
                 <Toaster />
             </TooltipProvider>
         );
     },
-    progress: {
-        delay: 50,
-        color: '#6366f1',
-        showSpinner: false,
-    },
+    progress: false,
 });
 
 // This will set light / dark mode on load...

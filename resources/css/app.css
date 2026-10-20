@@ -285,6 +285,12 @@ html {
     padding-bottom: max(env(safe-area-inset-bottom, 0px), 0.75rem);
 }
 
+/* Page Navigation Cursor Feedback */
+html.cursor-progress,
+html.cursor-progress * {
+    cursor: progress !important;
+}
+
 /* Route Navigation Indicator (NProgress) */
 #nprogress {
     pointer-events: none;
