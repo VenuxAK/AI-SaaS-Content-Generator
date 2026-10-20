@@ -37,16 +37,16 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
     const { isCurrentOrParentUrl } = useCurrentUrl();
 
     return (
-        <div className="px-3.5 sm:px-6 py-4 sm:py-6">
+        <div className="px-3.5 py-4 sm:px-6 sm:py-6">
             <Heading
                 title="Settings"
                 description="Manage your profile, API keys, and account preferences"
             />
 
             <div className="mt-5 flex flex-col lg:flex-row lg:space-x-12">
-                <aside className="w-full lg:w-48 shrink-0">
+                <aside className="w-full shrink-0 lg:w-48">
                     <nav
-                        className="flex flex-row overflow-x-auto space-x-1.5 pb-2 lg:flex-col lg:space-x-0 lg:space-y-1 lg:pb-0 no-scrollbar"
+                        className="no-scrollbar flex flex-row space-x-1.5 overflow-x-auto pb-2 lg:flex-col lg:space-y-1 lg:space-x-0 lg:pb-0"
                         aria-label="Settings"
                     >
                         {sidebarNavItems.map((item, index) => {
@@ -58,10 +58,10 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
                                     variant="ghost"
                                     asChild
                                     className={cn(
-                                        'justify-start whitespace-nowrap min-h-[38px] px-3.5 shrink-0 rounded-lg lg:w-full transition-all active:scale-[0.98]',
+                                        'min-h-[38px] shrink-0 justify-start rounded-lg px-3.5 whitespace-nowrap transition-all active:scale-[0.98] lg:w-full',
                                         active
-                                            ? 'bg-primary/10 text-primary font-semibold hover:bg-primary/15 dark:bg-primary/20 dark:text-primary-foreground'
-                                            : 'text-muted-foreground hover:text-foreground hover:bg-muted/60'
+                                            ? 'bg-primary/10 font-semibold text-primary hover:bg-primary/15 dark:bg-primary/20 dark:text-primary-foreground'
+                                            : 'text-muted-foreground hover:bg-muted/60 hover:text-foreground',
                                     )}
                                 >
                                     <Link href={item.href}>
@@ -78,7 +78,7 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
 
                 <Separator className="my-4 lg:hidden" />
 
-                <div className="flex-1 md:max-w-2xl min-w-0">
+                <div className="min-w-0 flex-1 md:max-w-2xl">
                     <section className="max-w-xl space-y-10">
                         {children}
                     </section>

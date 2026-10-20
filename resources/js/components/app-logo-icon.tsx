@@ -9,7 +9,7 @@ export default function AppLogoIcon({
         <img
             src="/images/logo/logo.png"
             alt={alt}
-            className={className || 'size-8 object-contain shrink-0'}
+            className={className || 'size-8 shrink-0 object-contain'}
             {...props}
         />
     );

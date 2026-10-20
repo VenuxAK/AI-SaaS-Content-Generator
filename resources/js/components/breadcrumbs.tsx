@@ -18,29 +18,49 @@ export function Breadcrumbs({
     return (
         <>
             {breadcrumbs.length > 0 && (
-                <Breadcrumb className="truncate max-w-full">
-                    <BreadcrumbList className="flex-nowrap whitespace-nowrap overflow-hidden text-ellipsis">
+                <Breadcrumb className="max-w-full truncate">
+                    <BreadcrumbList className="flex-nowrap overflow-hidden text-ellipsis whitespace-nowrap">
                         {breadcrumbs.map((item, index) => {
                             const isLast = index === breadcrumbs.length - 1;
-                            const isSecondLast = index === breadcrumbs.length - 2;
+                            const isSecondLast =
+                                index === breadcrumbs.length - 2;
 
                             return (
                                 <Fragment key={index}>
-                                    <BreadcrumbItem className={!isLast && !isSecondLast && breadcrumbs.length > 2 ? 'hidden sm:inline-flex' : ''}>
+                                    <BreadcrumbItem
+                                        className={
+                                            !isLast &&
+                                            !isSecondLast &&
+                                            breadcrumbs.length > 2
+                                                ? 'hidden sm:inline-flex'
+                                                : ''
+                                        }
+                                    >
                                         {isLast ? (
-                                            <BreadcrumbPage className="font-semibold text-xs sm:text-sm truncate max-w-[140px] sm:max-w-none">
+                                            <BreadcrumbPage className="max-w-[140px] truncate text-xs font-semibold sm:max-w-none sm:text-sm">
                                                 {item.title}
                                             </BreadcrumbPage>
                                         ) : (
                                             <BreadcrumbLink asChild>
-                                                <Link href={item.href} className="text-xs sm:text-sm truncate max-w-[100px] sm:max-w-none">
+                                                <Link
+                                                    href={item.href}
+                                                    className="max-w-[100px] truncate text-xs sm:max-w-none sm:text-sm"
+                                                >
                                                     {item.title}
                                                 </Link>
                                             </BreadcrumbLink>
                                         )}
                                     </BreadcrumbItem>
                                     {!isLast && (
-                                        <BreadcrumbSeparator className={!isLast && !isSecondLast && breadcrumbs.length > 2 ? 'hidden sm:inline-flex' : ''} />
+                                        <BreadcrumbSeparator
+                                            className={
+                                                !isLast &&
+                                                !isSecondLast &&
+                                                breadcrumbs.length > 2
+                                                    ? 'hidden sm:inline-flex'
+                                                    : ''
+                                            }
+                                        />
                                     )}
                                 </Fragment>
                             );

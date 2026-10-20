@@ -138,7 +138,7 @@ store.form = storeForm
 
 /**
 * @see \App\Http\Controllers\GenerationStreamController::stream
-* @see app/Http/Controllers/GenerationStreamController.php:24
+* @see app/Http/Controllers/GenerationStreamController.php:28
 * @route '/generate/{generation}/stream'
 */
 export const stream = (args: { generation: number | { id: number } } | [generation: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -153,7 +153,7 @@ stream.definition = {
 
 /**
 * @see \App\Http\Controllers\GenerationStreamController::stream
-* @see app/Http/Controllers/GenerationStreamController.php:24
+* @see app/Http/Controllers/GenerationStreamController.php:28
 * @route '/generate/{generation}/stream'
 */
 stream.url = (args: { generation: number | { id: number } } | [generation: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -186,7 +186,7 @@ stream.url = (args: { generation: number | { id: number } } | [generation: numbe
 
 /**
 * @see \App\Http\Controllers\GenerationStreamController::stream
-* @see app/Http/Controllers/GenerationStreamController.php:24
+* @see app/Http/Controllers/GenerationStreamController.php:28
 * @route '/generate/{generation}/stream'
 */
 stream.get = (args: { generation: number | { id: number } } | [generation: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -196,7 +196,7 @@ stream.get = (args: { generation: number | { id: number } } | [generation: numbe
 
 /**
 * @see \App\Http\Controllers\GenerationStreamController::stream
-* @see app/Http/Controllers/GenerationStreamController.php:24
+* @see app/Http/Controllers/GenerationStreamController.php:28
 * @route '/generate/{generation}/stream'
 */
 stream.head = (args: { generation: number | { id: number } } | [generation: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -206,7 +206,7 @@ stream.head = (args: { generation: number | { id: number } } | [generation: numb
 
 /**
 * @see \App\Http\Controllers\GenerationStreamController::stream
-* @see app/Http/Controllers/GenerationStreamController.php:24
+* @see app/Http/Controllers/GenerationStreamController.php:28
 * @route '/generate/{generation}/stream'
 */
 const streamForm = (args: { generation: number | { id: number } } | [generation: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -216,7 +216,7 @@ const streamForm = (args: { generation: number | { id: number } } | [generation:
 
 /**
 * @see \App\Http\Controllers\GenerationStreamController::stream
-* @see app/Http/Controllers/GenerationStreamController.php:24
+* @see app/Http/Controllers/GenerationStreamController.php:28
 * @route '/generate/{generation}/stream'
 */
 streamForm.get = (args: { generation: number | { id: number } } | [generation: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -226,7 +226,7 @@ streamForm.get = (args: { generation: number | { id: number } } | [generation: n
 
 /**
 * @see \App\Http\Controllers\GenerationStreamController::stream
-* @see app/Http/Controllers/GenerationStreamController.php:24
+* @see app/Http/Controllers/GenerationStreamController.php:28
 * @route '/generate/{generation}/stream'
 */
 streamForm.head = (args: { generation: number | { id: number } } | [generation: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -243,7 +243,7 @@ stream.form = streamForm
 
 /**
 * @see \App\Http\Controllers\GenerationStreamController::humanize
-* @see app/Http/Controllers/GenerationStreamController.php:123
+* @see app/Http/Controllers/GenerationStreamController.php:127
 * @route '/generate/{generation}/humanize'
 */
 export const humanize = (args: { generation: number | { id: number } } | [generation: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -258,7 +258,7 @@ humanize.definition = {
 
 /**
 * @see \App\Http\Controllers\GenerationStreamController::humanize
-* @see app/Http/Controllers/GenerationStreamController.php:123
+* @see app/Http/Controllers/GenerationStreamController.php:127
 * @route '/generate/{generation}/humanize'
 */
 humanize.url = (args: { generation: number | { id: number } } | [generation: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -291,7 +291,7 @@ humanize.url = (args: { generation: number | { id: number } } | [generation: num
 
 /**
 * @see \App\Http\Controllers\GenerationStreamController::humanize
-* @see app/Http/Controllers/GenerationStreamController.php:123
+* @see app/Http/Controllers/GenerationStreamController.php:127
 * @route '/generate/{generation}/humanize'
 */
 humanize.get = (args: { generation: number | { id: number } } | [generation: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -301,7 +301,7 @@ humanize.get = (args: { generation: number | { id: number } } | [generation: num
 
 /**
 * @see \App\Http\Controllers\GenerationStreamController::humanize
-* @see app/Http/Controllers/GenerationStreamController.php:123
+* @see app/Http/Controllers/GenerationStreamController.php:127
 * @route '/generate/{generation}/humanize'
 */
 humanize.head = (args: { generation: number | { id: number } } | [generation: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -311,7 +311,7 @@ humanize.head = (args: { generation: number | { id: number } } | [generation: nu
 
 /**
 * @see \App\Http\Controllers\GenerationStreamController::humanize
-* @see app/Http/Controllers/GenerationStreamController.php:123
+* @see app/Http/Controllers/GenerationStreamController.php:127
 * @route '/generate/{generation}/humanize'
 */
 const humanizeForm = (args: { generation: number | { id: number } } | [generation: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -321,7 +321,7 @@ const humanizeForm = (args: { generation: number | { id: number } } | [generatio
 
 /**
 * @see \App\Http\Controllers\GenerationStreamController::humanize
-* @see app/Http/Controllers/GenerationStreamController.php:123
+* @see app/Http/Controllers/GenerationStreamController.php:127
 * @route '/generate/{generation}/humanize'
 */
 humanizeForm.get = (args: { generation: number | { id: number } } | [generation: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -331,7 +331,7 @@ humanizeForm.get = (args: { generation: number | { id: number } } | [generation:
 
 /**
 * @see \App\Http\Controllers\GenerationStreamController::humanize
-* @see app/Http/Controllers/GenerationStreamController.php:123
+* @see app/Http/Controllers/GenerationStreamController.php:127
 * @route '/generate/{generation}/humanize'
 */
 humanizeForm.head = (args: { generation: number | { id: number } } | [generation: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({

@@ -42,7 +42,7 @@ class DashboardController extends Controller
             'hasApiKey' => $user->hasActiveApiKey(),
             'tones' => UserTone::availableFor($user)
                 ->select('id', 'name', 'description', 'is_system')
-                ->orderBy('is_system', 'desc')
+                ->orderBy('is_system', 'asc')
                 ->orderBy('name')
                 ->get(),
             'contentTypes' => $contentTypes,

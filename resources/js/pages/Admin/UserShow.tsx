@@ -54,7 +54,7 @@ export default function AdminUserShow({
     return (
         <>
             <Head title={`User Profile: ${subjectUser.name}`} />
-            <div className="mx-auto flex h-full w-full max-w-7xl flex-1 flex-col gap-5 sm:gap-6 p-3.5 sm:p-6">
+            <div className="mx-auto flex h-full w-full max-w-7xl flex-1 flex-col gap-5 p-3.5 sm:gap-6 sm:p-6">
                 {/* Header Section */}
                 <div className="flex items-center justify-between border-b border-neutral-100 pb-5 dark:border-neutral-800">
                     <div>
@@ -69,7 +69,8 @@ export default function AdminUserShow({
                             User Profile: {subjectUser.name}
                         </h1>
                         <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
-                            Review AI engine preferences and generated copywriting history for this user.
+                            Review AI engine preferences and generated
+                            copywriting history for this user.
                         </p>
                     </div>
                 </div>
@@ -83,7 +84,7 @@ export default function AdminUserShow({
                         </h3>
                         <div className="grid grid-cols-2 gap-4">
                             <div>
-                                <span className="block text-[10px] font-bold uppercase tracking-wider text-neutral-400">
+                                <span className="block text-[10px] font-bold tracking-wider text-neutral-400 uppercase">
                                     User ID
                                 </span>
                                 <span className="text-xs font-medium text-neutral-800 dark:text-neutral-200">
@@ -91,7 +92,7 @@ export default function AdminUserShow({
                                 </span>
                             </div>
                             <div>
-                                <span className="block text-[10px] font-bold uppercase tracking-wider text-neutral-400">
+                                <span className="block text-[10px] font-bold tracking-wider text-neutral-400 uppercase">
                                     Role
                                 </span>
                                 <div className="mt-0.5">
@@ -109,7 +110,7 @@ export default function AdminUserShow({
                             </div>
                         </div>
                         <div>
-                            <span className="block text-[10px] font-bold uppercase tracking-wider text-neutral-400">
+                            <span className="block text-[10px] font-bold tracking-wider text-neutral-400 uppercase">
                                 Email Address
                             </span>
                             <span className="text-xs font-medium text-neutral-800 dark:text-neutral-200">
@@ -117,18 +118,20 @@ export default function AdminUserShow({
                             </span>
                         </div>
                         <div>
-                            <span className="block text-[10px] font-bold uppercase tracking-wider text-neutral-400">
+                            <span className="block text-[10px] font-bold tracking-wider text-neutral-400 uppercase">
                                 Registration Date
                             </span>
                             <span className="text-xs font-medium text-neutral-800 dark:text-neutral-200">
-                                {new Date(subjectUser.created_at).toLocaleString()}
+                                {new Date(
+                                    subjectUser.created_at,
+                                ).toLocaleString()}
                             </span>
                         </div>
                     </Card>
 
                     {/* AI Configuration Card */}
                     <Card className="space-y-4 rounded-2xl border border-neutral-200 bg-white p-6 shadow-xs dark:border-neutral-800 dark:bg-neutral-900">
-                        <h3 className="border-b border-neutral-100 pb-2 text-sm font-bold text-neutral-950 dark:border-neutral-800 dark:text-neutral-50 flex items-center gap-1.5">
+                        <h3 className="flex items-center gap-1.5 border-b border-neutral-100 pb-2 text-sm font-bold text-neutral-950 dark:border-neutral-800 dark:text-neutral-50">
                             <ShieldCheck className="size-4 text-indigo-600" />
                             AI Engine Preferences (BYOK)
                         </h3>
@@ -149,27 +152,30 @@ export default function AdminUserShow({
                                 )}
                             </div>
                             <div>
-                                <span className="block text-[10px] font-bold uppercase tracking-wider text-neutral-400">
+                                <span className="block text-[10px] font-bold tracking-wider text-neutral-400 uppercase">
                                     Primary Provider
                                 </span>
                                 <h4 className="text-base font-bold text-neutral-950 dark:text-neutral-50">
-                                    {providerNameMap[subjectUser.ai_provider ?? 'gemini'] ||
-                                        subjectUser.ai_provider}
+                                    {providerNameMap[
+                                        subjectUser.ai_provider ?? 'gemini'
+                                    ] || subjectUser.ai_provider}
                                 </h4>
                             </div>
                         </div>
 
                         <div>
-                            <span className="block text-[10px] font-bold uppercase tracking-wider text-neutral-400">
+                            <span className="block text-[10px] font-bold tracking-wider text-neutral-400 uppercase">
                                 Active Model
                             </span>
                             <span className="font-mono text-xs font-semibold text-neutral-800 dark:text-neutral-200">
-                                {subjectUser.ai_model || 'Default provider model'}
+                                {subjectUser.ai_model ||
+                                    'Default provider model'}
                             </span>
                         </div>
 
                         <div className="rounded-xl bg-neutral-50 p-3 text-[11px] text-neutral-500 dark:bg-neutral-950 dark:text-neutral-400">
-                            API keys are encrypted using AES-256 at rest and cannot be viewed in the admin console.
+                            API keys are encrypted using AES-256 at rest and
+                            cannot be viewed in the admin console.
                         </div>
                     </Card>
                 </div>
@@ -186,32 +192,45 @@ export default function AdminUserShow({
                         {generations.data.length > 0 ? (
                             <>
                                 {/* Mobile Generations Card List (< md) */}
-                                <div className="block md:hidden divide-y divide-neutral-100 dark:divide-neutral-800/80">
+                                <div className="block divide-y divide-neutral-100 md:hidden dark:divide-neutral-800/80">
                                     {generations.data.map((gen) => (
-                                        <div key={gen.id} className="p-4 space-y-2">
+                                        <div
+                                            key={gen.id}
+                                            className="space-y-2 p-4"
+                                        >
                                             <div className="flex items-center justify-between gap-2">
-                                                <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400 capitalize">
-                                                    {gen.content_type.replace('_', ' ')}
+                                                <span className="text-xs font-bold text-indigo-600 capitalize dark:text-indigo-400">
+                                                    {gen.content_type.replace(
+                                                        '_',
+                                                        ' ',
+                                                    )}
                                                 </span>
-                                                <Badge className="bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 capitalize text-[10px]">
+                                                <Badge className="bg-neutral-100 text-[10px] text-neutral-600 capitalize dark:bg-neutral-800 dark:text-neutral-300">
                                                     {gen.status}
                                                 </Badge>
                                             </div>
-                                            <p className="text-xs text-neutral-600 dark:text-neutral-400 line-clamp-2">
+                                            <p className="line-clamp-2 text-xs text-neutral-600 dark:text-neutral-400">
                                                 {gen.user_prompt}
                                             </p>
-                                            <div className="flex items-center justify-between text-[11px] text-neutral-400 font-mono pt-1">
-                                                <span className="capitalize">{gen.ai_provider || 'gemini'}</span>
-                                                <span>{new Date(gen.created_at).toLocaleDateString()}</span>
+                                            <div className="flex items-center justify-between pt-1 font-mono text-[11px] text-neutral-400">
+                                                <span className="capitalize">
+                                                    {gen.ai_provider ||
+                                                        'gemini'}
+                                                </span>
+                                                <span>
+                                                    {new Date(
+                                                        gen.created_at,
+                                                    ).toLocaleDateString()}
+                                                </span>
                                             </div>
                                         </div>
                                     ))}
                                 </div>
 
                                 {/* Desktop Table View (>= md) */}
-                                <div className="hidden md:block overflow-x-auto">
+                                <div className="hidden overflow-x-auto md:block">
                                     <table className="w-full text-left text-sm">
-                                        <thead className="border-b border-neutral-100 bg-neutral-50 text-[10px] font-bold uppercase text-neutral-400 dark:border-neutral-800 dark:bg-neutral-950">
+                                        <thead className="border-b border-neutral-100 bg-neutral-50 text-[10px] font-bold text-neutral-400 uppercase dark:border-neutral-800 dark:bg-neutral-950">
                                             <tr>
                                                 <th className="p-3">Date</th>
                                                 <th className="p-3">Type</th>
@@ -226,22 +245,23 @@ export default function AdminUserShow({
                                                     key={gen.id}
                                                     className="hover:bg-neutral-50/50 dark:hover:bg-neutral-950/10"
                                                 >
-                                                    <td className="whitespace-nowrap p-3 text-xs text-neutral-400">
+                                                    <td className="p-3 text-xs whitespace-nowrap text-neutral-400">
                                                         {new Date(
-                                                            gen.created_at
+                                                            gen.created_at,
                                                         ).toLocaleDateString()}
                                                     </td>
-                                                    <td className="p-3 text-xs font-bold capitalize text-indigo-600">
+                                                    <td className="p-3 text-xs font-bold text-indigo-600 capitalize">
                                                         {gen.content_type.replace(
                                                             '_',
-                                                            ' '
+                                                            ' ',
                                                         )}
                                                     </td>
                                                     <td className="max-w-[320px] truncate p-3 text-xs text-neutral-600 dark:text-neutral-400">
                                                         {gen.user_prompt}
                                                     </td>
-                                                    <td className="p-3 text-xs capitalize text-neutral-600 dark:text-neutral-300">
-                                                        {gen.ai_provider || 'gemini'}
+                                                    <td className="p-3 text-xs text-neutral-600 capitalize dark:text-neutral-300">
+                                                        {gen.ai_provider ||
+                                                            'gemini'}
                                                     </td>
                                                     <td className="p-3 text-xs">
                                                         <Badge className="bg-neutral-100 text-neutral-600 capitalize">
@@ -266,12 +286,12 @@ export default function AdminUserShow({
                                 <Link
                                     key={idx}
                                     href={link.url || '#'}
-                                    className={`rounded px-2 py-1 text-[10px] font-semibold border transition ${
+                                    className={`rounded border px-2 py-1 text-[10px] font-semibold transition ${
                                         link.active
                                             ? 'border-indigo-600 bg-indigo-600 text-white'
                                             : link.url
-                                            ? 'border-neutral-200 bg-white text-neutral-700 hover:bg-neutral-50 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-300'
-                                            : 'pointer-events-none border-neutral-100 text-neutral-400 dark:border-neutral-900'
+                                              ? 'border-neutral-200 bg-white text-neutral-700 hover:bg-neutral-50 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-300'
+                                              : 'pointer-events-none border-neutral-100 text-neutral-400 dark:border-neutral-900'
                                     }`}
                                     dangerouslySetInnerHTML={{
                                         __html: link.label,

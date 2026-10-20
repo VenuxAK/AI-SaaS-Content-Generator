@@ -100,7 +100,8 @@ const FORMAT_REGISTRY: Record<string, FormatMeta> = {
         icon: Linkedin,
         accentColor: 'text-blue-600 dark:text-blue-400',
         iconBg: 'bg-blue-500/10 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400',
-        badgeStyle: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20',
+        badgeStyle:
+            'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20',
     },
     twitter_thread: {
         value: 'twitter_thread',
@@ -111,7 +112,8 @@ const FORMAT_REGISTRY: Record<string, FormatMeta> = {
         icon: Twitter,
         accentColor: 'text-sky-500 dark:text-sky-400',
         iconBg: 'bg-sky-500/10 text-sky-500 dark:bg-sky-500/20 dark:text-sky-400',
-        badgeStyle: 'bg-sky-500/10 text-sky-500 dark:text-sky-400 border-sky-500/20',
+        badgeStyle:
+            'bg-sky-500/10 text-sky-500 dark:text-sky-400 border-sky-500/20',
     },
     carousel_slides: {
         value: 'carousel_slides',
@@ -122,7 +124,8 @@ const FORMAT_REGISTRY: Record<string, FormatMeta> = {
         icon: Layers,
         accentColor: 'text-purple-600 dark:text-purple-400',
         iconBg: 'bg-purple-500/10 text-purple-600 dark:bg-purple-500/20 dark:text-purple-400',
-        badgeStyle: 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20',
+        badgeStyle:
+            'bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20',
     },
     ad_copy: {
         value: 'ad_copy',
@@ -133,7 +136,8 @@ const FORMAT_REGISTRY: Record<string, FormatMeta> = {
         icon: Megaphone,
         accentColor: 'text-amber-500 dark:text-amber-400',
         iconBg: 'bg-amber-500/10 text-amber-500 dark:bg-amber-500/20 dark:text-amber-400',
-        badgeStyle: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20',
+        badgeStyle:
+            'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20',
     },
     cold_email: {
         value: 'cold_email',
@@ -144,7 +148,8 @@ const FORMAT_REGISTRY: Record<string, FormatMeta> = {
         icon: Mail,
         accentColor: 'text-emerald-600 dark:text-emerald-400',
         iconBg: 'bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400',
-        badgeStyle: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20',
+        badgeStyle:
+            'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20',
     },
     blog_post: {
         value: 'blog_post',
@@ -155,7 +160,8 @@ const FORMAT_REGISTRY: Record<string, FormatMeta> = {
         icon: FileText,
         accentColor: 'text-indigo-600 dark:text-indigo-400',
         iconBg: 'bg-indigo-500/10 text-indigo-600 dark:bg-indigo-500/20 dark:text-indigo-400',
-        badgeStyle: 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-500/20',
+        badgeStyle:
+            'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-500/20',
     },
     youtube_script: {
         value: 'youtube_script',
@@ -166,7 +172,8 @@ const FORMAT_REGISTRY: Record<string, FormatMeta> = {
         icon: Video,
         accentColor: 'text-rose-500 dark:text-rose-400',
         iconBg: 'bg-rose-500/10 text-rose-500 dark:bg-rose-500/20 dark:text-rose-400',
-        badgeStyle: 'bg-rose-500/10 text-rose-500 dark:text-rose-400 border-rose-500/20',
+        badgeStyle:
+            'bg-rose-500/10 text-rose-500 dark:text-rose-400 border-rose-500/20',
     },
     tiktok_script: {
         value: 'tiktok_script',
@@ -177,18 +184,21 @@ const FORMAT_REGISTRY: Record<string, FormatMeta> = {
         icon: Video,
         accentColor: 'text-pink-500 dark:text-pink-400',
         iconBg: 'bg-pink-500/10 text-pink-500 dark:bg-pink-500/20 dark:text-pink-400',
-        badgeStyle: 'bg-pink-500/10 text-pink-500 dark:text-pink-400 border-pink-500/20',
+        badgeStyle:
+            'bg-pink-500/10 text-pink-500 dark:text-pink-400 border-pink-500/20',
     },
     facebook_post: {
         value: 'facebook_post',
         label: 'Facebook Post',
         category: 'social',
         tag: 'Community Post',
-        description: 'Discussion-starting questions, customer stories & launches',
+        description:
+            'Discussion-starting questions, customer stories & launches',
         icon: Share2,
         accentColor: 'text-blue-600 dark:text-blue-400',
         iconBg: 'bg-blue-500/10 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400',
-        badgeStyle: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20',
+        badgeStyle:
+            'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20',
     },
     caption: {
         value: 'caption',
@@ -199,7 +209,8 @@ const FORMAT_REGISTRY: Record<string, FormatMeta> = {
         icon: MessageSquare,
         accentColor: 'text-violet-600 dark:text-violet-400',
         iconBg: 'bg-violet-500/10 text-violet-600 dark:bg-violet-500/20 dark:text-violet-400',
-        badgeStyle: 'bg-violet-500/10 text-violet-600 dark:text-violet-400 border-violet-500/20',
+        badgeStyle:
+            'bg-violet-500/10 text-violet-600 dark:text-violet-400 border-violet-500/20',
     },
     marketing_copy: {
         value: 'marketing_copy',
@@ -210,11 +221,15 @@ const FORMAT_REGISTRY: Record<string, FormatMeta> = {
         icon: Sparkles,
         accentColor: 'text-orange-500 dark:text-orange-400',
         iconBg: 'bg-orange-500/10 text-orange-500 dark:bg-orange-500/20 dark:text-orange-400',
-        badgeStyle: 'bg-orange-500/10 text-orange-500 dark:text-orange-400 border-orange-500/20',
+        badgeStyle:
+            'bg-orange-500/10 text-orange-500 dark:text-orange-400 border-orange-500/20',
     },
 };
 
-const FORMAT_SUGGESTIONS: Record<string, Array<{ title: string; prompt: string }>> = {
+const FORMAT_SUGGESTIONS: Record<
+    string,
+    Array<{ title: string; prompt: string }>
+> = {
     linkedin_post: [
         {
             title: 'Founder Hard Truth',
@@ -305,7 +320,7 @@ const FORMAT_SUGGESTIONS: Record<string, Array<{ title: string; prompt: string }
             prompt: 'The definitive guide to BYOK AI SaaS architectures in 2026: cost optimization, security boundaries, and high-throughput streaming.',
         },
         {
-            title: 'Comparison & Buyer\'s Guide',
+            title: "Comparison & Buyer's Guide",
             prompt: 'Self-hosted AI solutions vs managed APIs: A realistic cost, privacy compliance, and latency benchmark for growing engineering teams.',
         },
         {
@@ -387,7 +402,9 @@ export default function Create({
         openrouter: 'OpenRouter',
     };
 
-    const [activeCategory, setActiveCategory] = useState<'all' | 'social' | 'marketing' | 'longform'>('all');
+    const [activeCategory, setActiveCategory] = useState<
+        'all' | 'social' | 'marketing' | 'longform'
+    >('all');
     const [copiedRecentId, setCopiedRecentId] = useState<number | null>(null);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -402,7 +419,10 @@ export default function Create({
         if (typeof window !== 'undefined') {
             const params = new URLSearchParams(window.location.search);
             const typeParam = params.get('type') || params.get('content_type');
-            if (typeParam && contentTypes.some((ct) => ct.value === typeParam)) {
+            if (
+                typeParam &&
+                contentTypes.some((ct) => ct.value === typeParam)
+            ) {
                 setData('content_type', typeParam);
                 const meta = FORMAT_REGISTRY[typeParam];
                 if (meta) {
@@ -456,43 +476,52 @@ export default function Create({
         return meta?.category === activeCategory;
     });
 
-    const activeMeta = FORMAT_REGISTRY[data.content_type] || FORMAT_REGISTRY['linkedin_post'];
-    const currentSuggestions = FORMAT_SUGGESTIONS[data.content_type] || DEFAULT_SUGGESTIONS;
+    const activeMeta =
+        FORMAT_REGISTRY[data.content_type] || FORMAT_REGISTRY['linkedin_post'];
+    const currentSuggestions =
+        FORMAT_SUGGESTIONS[data.content_type] || DEFAULT_SUGGESTIONS;
 
     return (
         <>
             <Head title="AI Studio - Generate Copy" />
-            <div className="mx-auto flex h-full w-full max-w-7xl flex-1 flex-col gap-4 sm:gap-6 p-3 sm:p-6 lg:p-8 min-w-0 max-w-full overflow-x-hidden pb-24 sm:pb-8">
+            <div className="mx-auto flex h-full w-full max-w-7xl max-w-full min-w-0 flex-1 flex-col gap-4 overflow-x-hidden p-3 pb-32 sm:gap-6 sm:p-6 sm:pb-8 lg:p-8">
                 {/* Studio Header */}
-                <div className="flex flex-col gap-3 border-b border-slate-200/80 pb-4 sm:pb-5 dark:border-slate-800/80 md:flex-row md:items-center md:justify-between min-w-0">
-                    <div className="flex flex-col gap-1 min-w-0">
-                        <div className="flex flex-wrap items-center gap-2.5 min-w-0">
-                            <div className="flex size-9 sm:size-10 items-center justify-center rounded-2xl bg-gradient-to-tr from-indigo-600 to-violet-600 text-white shadow-md shadow-indigo-500/20 shrink-0">
+                <div className="flex min-w-0 flex-col gap-3 border-b border-slate-200/80 pb-4 sm:pb-5 md:flex-row md:items-center md:justify-between dark:border-slate-800/80">
+                    <div className="flex min-w-0 flex-col gap-1">
+                        <div className="flex min-w-0 flex-wrap items-center gap-2.5">
+                            <div className="flex size-9 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-tr from-indigo-600 to-violet-600 text-white shadow-md shadow-indigo-500/20 sm:size-10">
                                 <PenTool className="size-4.5 sm:size-5" />
                             </div>
-                            <h1 className="text-xl sm:text-2xl font-black tracking-tight text-slate-900 dark:text-white shrink-0 whitespace-nowrap">
+                            <h1 className="shrink-0 text-xl font-black tracking-tight whitespace-nowrap text-slate-900 sm:text-2xl dark:text-white">
                                 AI Copy Studio
                             </h1>
-                            <span className="rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-[11px] sm:text-xs font-bold text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 shrink-0 whitespace-nowrap">
+                            <span className="shrink-0 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-0.5 text-[11px] font-bold whitespace-nowrap text-emerald-600 sm:text-xs dark:text-emerald-400">
                                 BYOK 0% Markup
                             </span>
                         </div>
-                        <p className="hidden sm:block text-xs sm:text-sm text-slate-500 dark:text-slate-400">
-                            Stream high-converting marketing copy, viral social threads, and blogs directly through your calibrated AI keys.
+                        <p className="hidden text-xs text-slate-500 sm:block sm:text-sm dark:text-slate-400">
+                            Stream high-converting marketing copy, viral social
+                            threads, and blogs directly through your calibrated
+                            AI keys.
                         </p>
                     </div>
 
                     {/* Active Model Quick Badge */}
-                    <div className="flex items-center min-w-0">
+                    <div className="flex min-w-0 items-center">
                         <Link
                             href="/settings/api-keys"
-                            className="inline-flex items-center gap-2 rounded-2xl border border-slate-200/90 bg-white/90 px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-2xs transition hover:border-indigo-400 hover:text-indigo-600 dark:border-slate-800 dark:bg-[#0c0e1a] dark:text-slate-300 dark:hover:border-indigo-500/50 max-w-full"
+                            className="inline-flex max-w-full items-center gap-2 rounded-2xl border border-slate-200/90 bg-white/90 px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-2xs transition hover:border-indigo-400 hover:text-indigo-600 dark:border-slate-800 dark:bg-[#0c0e1a] dark:text-slate-300 dark:hover:border-indigo-500/50"
                         >
-                            <span className="size-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
-                            <span className="font-mono text-xs truncate">
-                                {providerNames[aiProvider] || 'AI'}: <strong className="font-bold text-slate-900 dark:text-white">{aiModel}</strong>
+                            <span className="size-2 shrink-0 animate-pulse rounded-full bg-emerald-500" />
+                            <span className="truncate font-mono text-xs">
+                                {providerNames[aiProvider] || 'AI'}:{' '}
+                                <strong className="font-bold text-slate-900 dark:text-white">
+                                    {aiModel}
+                                </strong>
                             </span>
-                            <span className="text-indigo-500 text-[11px] font-bold shrink-0 ml-1">Settings →</span>
+                            <span className="ml-1 shrink-0 text-[11px] font-bold text-indigo-500">
+                                Settings →
+                            </span>
                         </Link>
                     </div>
                 </div>
@@ -502,15 +531,17 @@ export default function Create({
                     <motion.div
                         initial={{ opacity: 0, y: -10 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 rounded-3xl border border-amber-500/30 bg-amber-500/10 p-4 sm:p-5 text-amber-900 dark:text-amber-200 backdrop-blur-md min-w-0"
+                        className="flex min-w-0 flex-col items-start justify-between gap-3 rounded-3xl border border-amber-500/30 bg-amber-500/10 p-4 text-amber-900 backdrop-blur-md sm:flex-row sm:items-center sm:gap-4 sm:p-5 dark:text-amber-200"
                     >
-                        <div className="flex items-center gap-3 min-w-0">
-                            <div className="rounded-2xl bg-amber-500/20 p-2.5 text-amber-600 dark:text-amber-400 shrink-0">
+                        <div className="flex min-w-0 items-center gap-3">
+                            <div className="shrink-0 rounded-2xl bg-amber-500/20 p-2.5 text-amber-600 dark:text-amber-400">
                                 <AlertTriangle className="size-5" />
                             </div>
                             <div className="min-w-0">
-                                <h4 className="text-xs sm:text-sm font-bold">BYOK API Key Required</h4>
-                                <p className="text-[11px] sm:text-xs text-amber-800/80 dark:text-amber-300/80 mt-0.5">
+                                <h4 className="text-xs font-bold sm:text-sm">
+                                    BYOK API Key Required
+                                </h4>
+                                <p className="mt-0.5 text-[11px] text-amber-800/80 sm:text-xs dark:text-amber-300/80">
                                     {pageErrors?.api_key ||
                                         `Connect your ${providerNames[aiProvider] || 'AI'} API key to unlock zero-markup streaming generation.`}
                                 </p>
@@ -518,7 +549,7 @@ export default function Create({
                         </div>
                         <Link
                             href="/settings/api-keys"
-                            className="inline-flex w-full sm:w-auto justify-center items-center gap-2 rounded-xl bg-amber-600 hover:bg-amber-500 px-5 py-2.5 text-xs font-bold text-white shadow-md transition shrink-0 active:scale-95"
+                            className="inline-flex w-full shrink-0 items-center justify-center gap-2 rounded-xl bg-amber-600 px-5 py-2.5 text-xs font-bold text-white shadow-md transition hover:bg-amber-500 active:scale-95 sm:w-auto"
                         >
                             <Key className="size-4" />
                             Configure Key
@@ -527,13 +558,13 @@ export default function Create({
                 )}
 
                 {/* Mobile Segmented Switcher (Studio Form vs Recent Copies) */}
-                <div className="flex lg:hidden items-center p-1 rounded-2xl bg-slate-200/60 dark:bg-slate-900 border border-slate-300/40 dark:border-slate-800 text-xs font-bold shadow-2xs min-w-0">
+                <div className="flex min-w-0 items-center rounded-2xl border border-slate-300/40 bg-slate-200/60 p-1 text-xs font-bold shadow-2xs lg:hidden dark:border-slate-800 dark:bg-slate-900">
                     <button
                         type="button"
                         onClick={() => setMobileTab('create')}
-                        className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl transition-all cursor-pointer ${
+                        className={`flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-xl py-2.5 transition-all ${
                             mobileTab === 'create'
-                                ? 'bg-white dark:bg-[#0c0e1a] text-indigo-600 dark:text-indigo-400 shadow-xs font-extrabold'
+                                ? 'bg-white font-extrabold text-indigo-600 shadow-xs dark:bg-[#0c0e1a] dark:text-indigo-400'
                                 : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
                         }`}
                     >
@@ -543,9 +574,9 @@ export default function Create({
                     <button
                         type="button"
                         onClick={() => setMobileTab('recent')}
-                        className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl transition-all cursor-pointer ${
+                        className={`flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-xl py-2.5 transition-all ${
                             mobileTab === 'recent'
-                                ? 'bg-white dark:bg-[#0c0e1a] text-indigo-600 dark:text-indigo-400 shadow-xs font-extrabold'
+                                ? 'bg-white font-extrabold text-indigo-600 shadow-xs dark:bg-[#0c0e1a] dark:text-indigo-400'
                                 : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
                         }`}
                     >
@@ -555,31 +586,40 @@ export default function Create({
                 </div>
 
                 {/* Split-Pane Studio Layout */}
-                <div className="grid gap-6 sm:gap-8 lg:grid-cols-12 min-w-0">
+                <div className="grid min-w-0 gap-6 sm:gap-8 lg:grid-cols-12">
                     {/* Left Studio Input Pane */}
-                    <div className={`${mobileTab === 'create' ? 'block' : 'hidden'} lg:block lg:col-span-8 space-y-6 min-w-0`}>
-                        <Card className="rounded-3xl border border-slate-200/90 bg-white/95 p-4 sm:p-7 shadow-xl backdrop-blur-xl dark:border-slate-800/90 dark:bg-[#0c0e1a]/95 glow-indigo min-w-0 w-full overflow-hidden">
-                            <form onSubmit={submit} className="space-y-6 min-w-0">
+                    <div
+                        className={`${mobileTab === 'create' ? 'block' : 'hidden'} min-w-0 space-y-6 lg:col-span-8 lg:block`}
+                    >
+                        <Card className="glow-indigo w-full min-w-0 overflow-hidden rounded-3xl border border-slate-200/90 bg-white/95 p-4 shadow-xl backdrop-blur-xl sm:p-7 dark:border-slate-800/90 dark:bg-[#0c0e1a]/95">
+                            <form
+                                onSubmit={submit}
+                                className="min-w-0 space-y-6"
+                            >
                                 {/* 1. Target Format Selection with Category Filter Tabs */}
-                                <div className="min-w-0 w-full space-y-3">
-                                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                                <div className="w-full min-w-0 space-y-3">
+                                    <div className="flex flex-col justify-between gap-2 sm:flex-row sm:items-center">
                                         <div>
-                                            <label className="block text-[11px] sm:text-xs font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                                            <label className="block text-[11px] font-extrabold tracking-wider text-slate-500 uppercase sm:text-xs dark:text-slate-400">
                                                 1. Select Target Format
                                             </label>
-                                            <p className="text-[11px] text-slate-400 dark:text-slate-500 hidden sm:block">
-                                                Choose the platform format calibrated with specialized anti-cliché prompts
+                                            <p className="hidden text-[11px] text-slate-400 sm:block dark:text-slate-500">
+                                                Choose the platform format
+                                                calibrated with specialized
+                                                anti-cliché prompts
                                             </p>
                                         </div>
 
                                         {/* Category Tabs */}
-                                        <div className="flex items-center p-1 rounded-xl bg-slate-100 dark:bg-slate-900/90 border border-slate-200/70 dark:border-slate-800 text-xs font-semibold overflow-x-auto no-scrollbar">
+                                        <div className="no-scrollbar flex items-center overflow-x-auto rounded-xl border border-slate-200/70 bg-slate-100 p-1 text-xs font-semibold dark:border-slate-800 dark:bg-slate-900/90">
                                             <button
                                                 type="button"
-                                                onClick={() => setActiveCategory('all')}
-                                                className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer whitespace-nowrap ${
+                                                onClick={() =>
+                                                    setActiveCategory('all')
+                                                }
+                                                className={`cursor-pointer rounded-lg px-2.5 py-1 whitespace-nowrap transition-all ${
                                                     activeCategory === 'all'
-                                                        ? 'bg-white dark:bg-[#141728] text-indigo-600 dark:text-indigo-400 shadow-2xs font-bold'
+                                                        ? 'bg-white font-bold text-indigo-600 shadow-2xs dark:bg-[#141728] dark:text-indigo-400'
                                                         : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
                                                 }`}
                                             >
@@ -587,10 +627,12 @@ export default function Create({
                                             </button>
                                             <button
                                                 type="button"
-                                                onClick={() => setActiveCategory('social')}
-                                                className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer whitespace-nowrap ${
+                                                onClick={() =>
+                                                    setActiveCategory('social')
+                                                }
+                                                className={`cursor-pointer rounded-lg px-2.5 py-1 whitespace-nowrap transition-all ${
                                                     activeCategory === 'social'
-                                                        ? 'bg-white dark:bg-[#141728] text-indigo-600 dark:text-indigo-400 shadow-2xs font-bold'
+                                                        ? 'bg-white font-bold text-indigo-600 shadow-2xs dark:bg-[#141728] dark:text-indigo-400'
                                                         : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
                                                 }`}
                                             >
@@ -598,10 +640,15 @@ export default function Create({
                                             </button>
                                             <button
                                                 type="button"
-                                                onClick={() => setActiveCategory('marketing')}
-                                                className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer whitespace-nowrap ${
-                                                    activeCategory === 'marketing'
-                                                        ? 'bg-white dark:bg-[#141728] text-indigo-600 dark:text-indigo-400 shadow-2xs font-bold'
+                                                onClick={() =>
+                                                    setActiveCategory(
+                                                        'marketing',
+                                                    )
+                                                }
+                                                className={`cursor-pointer rounded-lg px-2.5 py-1 whitespace-nowrap transition-all ${
+                                                    activeCategory ===
+                                                    'marketing'
+                                                        ? 'bg-white font-bold text-indigo-600 shadow-2xs dark:bg-[#141728] dark:text-indigo-400'
                                                         : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
                                                 }`}
                                             >
@@ -609,10 +656,15 @@ export default function Create({
                                             </button>
                                             <button
                                                 type="button"
-                                                onClick={() => setActiveCategory('longform')}
-                                                className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer whitespace-nowrap ${
-                                                    activeCategory === 'longform'
-                                                        ? 'bg-white dark:bg-[#141728] text-indigo-600 dark:text-indigo-400 shadow-2xs font-bold'
+                                                onClick={() =>
+                                                    setActiveCategory(
+                                                        'longform',
+                                                    )
+                                                }
+                                                className={`cursor-pointer rounded-lg px-2.5 py-1 whitespace-nowrap transition-all ${
+                                                    activeCategory ===
+                                                    'longform'
+                                                        ? 'bg-white font-bold text-indigo-600 shadow-2xs dark:bg-[#141728] dark:text-indigo-400'
                                                         : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
                                                 }`}
                                             >
@@ -622,44 +674,55 @@ export default function Create({
                                     </div>
 
                                     {/* Responsive Format Cards Grid */}
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5 sm:gap-3 max-h-[340px] overflow-y-auto pr-1">
+                                    <div className="grid max-h-none grid-cols-2 gap-2 pr-1 sm:max-h-[340px] sm:grid-cols-2 sm:gap-3 sm:overflow-y-auto md:grid-cols-3">
                                         {visibleFormats.map((type) => {
-                                            const meta = FORMAT_REGISTRY[type.value] || {
+                                            const meta = FORMAT_REGISTRY[
+                                                type.value
+                                            ] || {
                                                 label: type.label,
                                                 tag: 'Content',
-                                                description: 'Direct AI prompt structure',
+                                                description:
+                                                    'Direct AI prompt structure',
                                                 icon: FileText,
                                                 iconBg: 'bg-indigo-500/10 text-indigo-600',
-                                                badgeStyle: 'bg-indigo-500/10 text-indigo-600 border-indigo-500/20',
+                                                badgeStyle:
+                                                    'bg-indigo-500/10 text-indigo-600 border-indigo-500/20',
                                             };
                                             const IconComponent = meta.icon;
-                                            const isSelected = data.content_type === type.value;
+                                            const isSelected =
+                                                data.content_type ===
+                                                type.value;
 
                                             return (
                                                 <button
                                                     key={type.value}
                                                     type="button"
-                                                    onClick={() => setData('content_type', type.value)}
-                                                    className={`group relative flex flex-col justify-between p-3.5 rounded-2xl border text-left transition-all cursor-pointer active:scale-[0.98] ${
+                                                    onClick={() =>
+                                                        setData(
+                                                            'content_type',
+                                                            type.value,
+                                                        )
+                                                    }
+                                                    className={`group relative flex cursor-pointer flex-col justify-between rounded-2xl border p-2.5 text-left transition-all active:scale-[0.98] sm:p-3.5 ${
                                                         isSelected
-                                                            ? 'border-indigo-600 bg-indigo-50/70 text-indigo-950 shadow-sm dark:border-indigo-500 dark:bg-indigo-950/40 dark:text-indigo-100 ring-2 ring-indigo-500/30'
-                                                            : 'border-slate-200/80 bg-slate-50/50 hover:bg-slate-100/80 hover:border-slate-300 dark:border-slate-800/80 dark:bg-slate-900/30 dark:hover:bg-slate-900/60 dark:hover:border-slate-700'
+                                                            ? 'border-indigo-600 bg-indigo-50/70 text-indigo-950 shadow-sm ring-2 ring-indigo-500/30 dark:border-indigo-500 dark:bg-indigo-950/40 dark:text-indigo-100'
+                                                            : 'border-slate-200/80 bg-slate-50/50 hover:border-slate-300 hover:bg-slate-100/80 dark:border-slate-800/80 dark:bg-slate-900/30 dark:hover:border-slate-700 dark:hover:bg-slate-900/60'
                                                     }`}
                                                 >
-                                                    <div className="flex items-start justify-between gap-2 mb-2">
+                                                    <div className="mb-1.5 flex items-center justify-between gap-1.5">
                                                         <div
-                                                            className={`flex size-8 items-center justify-center rounded-xl transition-all ${
+                                                            className={`flex size-7 items-center justify-center rounded-xl transition-all sm:size-8 ${
                                                                 isSelected
-                                                                    ? 'bg-indigo-600 text-white dark:bg-indigo-500 shadow-sm'
+                                                                    ? 'bg-indigo-600 text-white shadow-sm dark:bg-indigo-500'
                                                                     : meta.iconBg
                                                             }`}
                                                         >
-                                                            <IconComponent className="size-4" />
+                                                            <IconComponent className="size-3.5 sm:size-4" />
                                                         </div>
                                                         <span
-                                                            className={`rounded-full px-2 py-0.5 text-[9.5px] font-bold border uppercase tracking-wider ${
+                                                            className={`max-w-[85px] truncate rounded-full border px-1.5 py-0.5 text-[8.5px] font-bold tracking-wider uppercase sm:max-w-none sm:text-[9.5px] ${
                                                                 isSelected
-                                                                    ? 'bg-indigo-600/10 text-indigo-700 dark:text-indigo-300 border-indigo-500/30'
+                                                                    ? 'border-indigo-500/30 bg-indigo-600/10 text-indigo-700 dark:text-indigo-300'
                                                                     : meta.badgeStyle
                                                             }`}
                                                         >
@@ -669,14 +732,14 @@ export default function Create({
 
                                                     <div>
                                                         <div className="flex items-center justify-between">
-                                                            <h4 className="text-xs font-extrabold tracking-tight text-slate-900 dark:text-white">
+                                                            <h4 className="truncate text-xs font-extrabold tracking-tight text-slate-900 dark:text-white">
                                                                 {meta.label}
                                                             </h4>
                                                             {isSelected && (
-                                                                <Check className="size-3.5 text-indigo-600 dark:text-indigo-400 font-bold" />
+                                                                <Check className="ml-1 size-3.5 shrink-0 font-bold text-indigo-600 dark:text-indigo-400" />
                                                             )}
                                                         </div>
-                                                        <p className="mt-1 text-[11px] text-slate-500 dark:text-slate-400 line-clamp-1">
+                                                        <p className="mt-1 line-clamp-1 hidden text-[11px] text-slate-500 sm:block dark:text-slate-400">
                                                             {meta.description}
                                                         </p>
                                                     </div>
@@ -692,19 +755,19 @@ export default function Create({
                                 </div>
 
                                 {/* 2. Tone and 3. Language Controls */}
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1 border-t border-slate-100 dark:border-slate-800/60">
+                                <div className="grid grid-cols-1 gap-4 border-t border-slate-100 pt-1 sm:grid-cols-2 dark:border-slate-800/60">
                                     {/* Tone Selector with Live Tone Preview */}
-                                    <div className="space-y-1.5 min-w-0">
+                                    <div className="min-w-0 space-y-1.5">
                                         <div className="flex items-center justify-between">
                                             <label
                                                 htmlFor="tone_id"
-                                                className="block text-[11px] sm:text-xs font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400"
+                                                className="block text-[11px] font-extrabold tracking-wider text-slate-500 uppercase sm:text-xs dark:text-slate-400"
                                             >
                                                 2. Voice Persona & Tone
                                             </label>
                                             <Link
                                                 href={tonesIndex.url()}
-                                                className="text-[11px] font-bold text-indigo-600 hover:underline dark:text-indigo-400 inline-flex items-center gap-1 shrink-0"
+                                                className="inline-flex shrink-0 items-center gap-1 text-[11px] font-bold text-indigo-600 hover:underline dark:text-indigo-400"
                                             >
                                                 <Sparkles className="size-3" />
                                                 Manage Tones →
@@ -712,139 +775,189 @@ export default function Create({
                                         </div>
 
                                         <Select
-                                            value={data.tone_id ? String(data.tone_id) : 'none'}
+                                            value={
+                                                data.tone_id
+                                                    ? String(data.tone_id)
+                                                    : 'none'
+                                            }
                                             onValueChange={(val) =>
-                                                setData('tone_id', val === 'none' ? '' : val)
+                                                setData(
+                                                    'tone_id',
+                                                    val === 'none' ? '' : val,
+                                                )
                                             }
                                         >
                                             <SelectTrigger className="h-11 w-full cursor-pointer rounded-2xl border border-slate-200 bg-white px-3.5 text-xs font-semibold text-slate-900 shadow-xs hover:border-slate-300 focus:ring-2 focus:ring-indigo-500 dark:border-slate-800 dark:bg-[#07080e] dark:text-slate-100">
                                                 <SelectValue placeholder="Select tone..." />
                                             </SelectTrigger>
-                                            <SelectContent className="border border-slate-200 bg-white dark:border-slate-800 dark:bg-[#07080e] rounded-2xl">
+                                            <SelectContent className="rounded-2xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-[#07080e]">
                                                 <SelectItem value="none">
-                                                    Neutral & Natural (Standard Default)
+                                                    Neutral & Natural (Standard
+                                                    Default)
                                                 </SelectItem>
-                                                {systemTones.length > 0 && (
-                                                    <SelectGroup>
-                                                        <SelectSeparator className="my-1 border-slate-200/60 dark:border-slate-800/60" />
-                                                        <SelectLabel className="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-2 py-1 flex items-center gap-1.5">
-                                                            <Sparkles className="size-3 text-indigo-500" />
-                                                            Built-in Presets
-                                                        </SelectLabel>
-                                                        {systemTones.map((t) => (
-                                                            <SelectItem key={t.id} value={String(t.id)}>
-                                                                {t.name}
-                                                            </SelectItem>
-                                                        ))}
-                                                    </SelectGroup>
-                                                )}
                                                 {customTones.length > 0 && (
                                                     <SelectGroup>
                                                         <SelectSeparator className="my-1 border-slate-200/60 dark:border-slate-800/60" />
-                                                        <SelectLabel className="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-2 py-1 flex items-center gap-1.5">
+                                                        <SelectLabel className="flex items-center gap-1.5 px-2 py-1 text-[10px] font-bold tracking-wider text-slate-400 uppercase">
                                                             <Layers className="size-3 text-emerald-500" />
                                                             My Custom Personas
                                                         </SelectLabel>
-                                                        {customTones.map((t) => (
-                                                            <SelectItem key={t.id} value={String(t.id)}>
-                                                                {t.name}
-                                                            </SelectItem>
-                                                        ))}
+                                                        {customTones.map(
+                                                            (t) => (
+                                                                <SelectItem
+                                                                    key={t.id}
+                                                                    value={String(
+                                                                        t.id,
+                                                                    )}
+                                                                >
+                                                                    {t.name}
+                                                                </SelectItem>
+                                                            ),
+                                                        )}
+                                                    </SelectGroup>
+                                                )}
+                                                {systemTones.length > 0 && (
+                                                    <SelectGroup>
+                                                        <SelectSeparator className="my-1 border-slate-200/60 dark:border-slate-800/60" />
+                                                        <SelectLabel className="flex items-center gap-1.5 px-2 py-1 text-[10px] font-bold tracking-wider text-slate-400 uppercase">
+                                                            <Sparkles className="size-3 text-indigo-500" />
+                                                            Built-in Presets
+                                                        </SelectLabel>
+                                                        {systemTones.map(
+                                                            (t) => (
+                                                                <SelectItem
+                                                                    key={t.id}
+                                                                    value={String(
+                                                                        t.id,
+                                                                    )}
+                                                                >
+                                                                    {t.name}
+                                                                </SelectItem>
+                                                            ),
+                                                        )}
                                                     </SelectGroup>
                                                 )}
                                             </SelectContent>
                                         </Select>
 
-                                        {/* Dynamic Tone Description Preview */}
-                                        <div className="rounded-xl bg-slate-50/80 dark:bg-slate-900/40 p-2.5 border border-slate-200/60 dark:border-slate-800/60 text-[11px] text-slate-600 dark:text-slate-400">
-                                            {activeTone ? (
+                                        {/* Dynamic Tone Description Preview (shown when custom/preset tone is selected) */}
+                                        {activeTone && (
+                                            <div className="rounded-xl border border-slate-200/60 bg-slate-50/80 p-2.5 text-[11px] text-slate-600 dark:border-slate-800/60 dark:bg-slate-900/40 dark:text-slate-400">
                                                 <div className="space-y-0.5">
                                                     <div className="flex items-center gap-1.5 font-bold text-indigo-600 dark:text-indigo-400">
                                                         <span className="size-1.5 rounded-full bg-indigo-500" />
-                                                        <span>{activeTone.name}</span>
-                                                        <span className="text-[10px] text-slate-400 font-normal">
-                                                            ({activeTone.is_system ? 'Built-in' : 'Custom'})
+                                                        <span>
+                                                            {activeTone.name}
+                                                        </span>
+                                                        <span className="text-[10px] font-normal text-slate-400">
+                                                            (
+                                                            {activeTone.is_system
+                                                                ? 'Built-in'
+                                                                : 'Custom'}
+                                                            )
                                                         </span>
                                                     </div>
                                                     <p className="line-clamp-2 text-[10.5px] leading-relaxed">
-                                                        {activeTone.description || 'Custom calibrated brand tone persona.'}
+                                                        {activeTone.description ||
+                                                            'Custom calibrated brand tone persona.'}
                                                     </p>
                                                 </div>
-                                            ) : (
-                                                <div className="flex items-center gap-1.5 text-slate-500">
-                                                    <span className="size-1.5 rounded-full bg-slate-400" />
-                                                    <span>Standard neutral tone with authentic conversational flow.</span>
-                                                </div>
-                                            )}
-                                        </div>
+                                            </div>
+                                        )}
                                     </div>
 
                                     {/* Instant 2-Pill Output Language Selector */}
-                                    <div className="space-y-1.5 min-w-0">
+                                    <div className="min-w-0 space-y-1.5">
                                         <div className="flex items-center justify-between">
-                                            <label className="block text-[11px] sm:text-xs font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                                            <label className="block text-[11px] font-extrabold tracking-wider text-slate-500 uppercase sm:text-xs dark:text-slate-400">
                                                 3. Output Language
                                             </label>
-                                            <span className="text-[11px] text-slate-400 flex items-center gap-1">
+                                            <span className="flex items-center gap-1 text-[11px] text-slate-400">
                                                 <Globe2 className="size-3 text-indigo-500" />
                                                 Instant 1-Click
                                             </span>
                                         </div>
 
-                                        <div className="flex items-center p-1 rounded-2xl bg-slate-100 dark:bg-[#07080e] border border-slate-200 dark:border-slate-800 h-11">
+                                        <div className="flex h-11 items-center rounded-2xl border border-slate-200 bg-slate-100 p-1 dark:border-slate-800 dark:bg-[#07080e]">
                                             <button
                                                 type="button"
-                                                onClick={() => setData('output_language', 'en')}
-                                                className={`flex-1 flex items-center justify-center gap-1.5 h-full rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                                                    data.output_language === 'en'
-                                                        ? 'bg-white dark:bg-[#141728] text-indigo-600 dark:text-indigo-400 shadow-xs ring-1 ring-slate-200/80 dark:ring-slate-700'
-                                                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                                                onClick={() =>
+                                                    setData(
+                                                        'output_language',
+                                                        'en',
+                                                    )
+                                                }
+                                                className={`flex h-full flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-xl text-xs font-bold transition-all ${
+                                                    data.output_language ===
+                                                    'en'
+                                                        ? 'bg-white text-indigo-600 shadow-xs ring-1 ring-slate-200/80 dark:bg-[#141728] dark:text-indigo-400 dark:ring-slate-700'
+                                                        : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'
                                                 }`}
                                             >
-                                                <span className="text-sm">🇺🇸</span>
+                                                <span className="text-sm">
+                                                    🇺🇸
+                                                </span>
                                                 <span>English</span>
-                                                {data.output_language === 'en' && (
-                                                    <Check className="size-3 text-indigo-500 shrink-0 font-bold" />
+                                                {data.output_language ===
+                                                    'en' && (
+                                                    <Check className="size-3 shrink-0 font-bold text-indigo-500" />
                                                 )}
                                             </button>
                                             <button
                                                 type="button"
-                                                onClick={() => setData('output_language', 'my')}
-                                                className={`flex-1 flex items-center justify-center gap-1.5 h-full rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                                                    data.output_language === 'my'
-                                                        ? 'bg-white dark:bg-[#141728] text-indigo-600 dark:text-indigo-400 shadow-xs ring-1 ring-slate-200/80 dark:ring-slate-700'
-                                                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                                                onClick={() =>
+                                                    setData(
+                                                        'output_language',
+                                                        'my',
+                                                    )
+                                                }
+                                                className={`flex h-full flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-xl text-xs font-bold transition-all ${
+                                                    data.output_language ===
+                                                    'my'
+                                                        ? 'bg-white text-indigo-600 shadow-xs ring-1 ring-slate-200/80 dark:bg-[#141728] dark:text-indigo-400 dark:ring-slate-700'
+                                                        : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'
                                                 }`}
                                             >
-                                                <span className="text-sm">🇲🇲</span>
+                                                <span className="text-sm">
+                                                    🇲🇲
+                                                </span>
                                                 <span>မြန်မာ (Unicode)</span>
-                                                {data.output_language === 'my' && (
-                                                    <Check className="size-3 text-indigo-500 shrink-0 font-bold" />
+                                                {data.output_language ===
+                                                    'my' && (
+                                                    <Check className="size-3 shrink-0 font-bold text-indigo-500" />
                                                 )}
                                             </button>
                                         </div>
 
-                                        <div className="rounded-xl bg-slate-50/80 dark:bg-slate-900/40 p-2.5 border border-slate-200/60 dark:border-slate-800/60 text-[11px] text-slate-500">
+                                        <div className="hidden rounded-xl border border-slate-200/60 bg-slate-50/80 p-2.5 text-[11px] text-slate-500 sm:block dark:border-slate-800/60 dark:bg-slate-900/40">
                                             {data.output_language === 'my' ? (
-                                                <span>✨ Localized natural Myanmar copywriting (no literal robotic translations).</span>
+                                                <span>
+                                                    ✨ Localized natural Myanmar
+                                                    copywriting (no literal
+                                                    robotic translations).
+                                                </span>
                                             ) : (
-                                                <span>✨ Native-level English with high conversational burstiness.</span>
+                                                <span>
+                                                    ✨ Native-level English with
+                                                    high conversational
+                                                    burstiness.
+                                                </span>
                                             )}
                                         </div>
                                     </div>
                                 </div>
 
                                 {/* 4. Prompt Input Box with Shortcut Indicator & Clear Button */}
-                                <div className="space-y-2 pt-1 border-t border-slate-100 dark:border-slate-800/60 min-w-0">
+                                <div className="min-w-0 space-y-2 border-t border-slate-100 pt-1 dark:border-slate-800/60">
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center gap-2">
                                             <label
                                                 htmlFor="user_prompt"
-                                                className="block text-[11px] sm:text-xs font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400"
+                                                className="block text-[11px] font-extrabold tracking-wider text-slate-500 uppercase sm:text-xs dark:text-slate-400"
                                             >
                                                 4. Campaign Brief & Instructions
                                             </label>
-                                            <span className="hidden sm:inline-flex items-center gap-1 rounded-md bg-slate-100 dark:bg-slate-800/80 px-1.5 py-0.5 text-[10px] font-mono text-slate-500">
+                                            <span className="hidden items-center gap-1 rounded-md bg-slate-100 px-1.5 py-0.5 font-mono text-[10px] text-slate-500 sm:inline-flex dark:bg-slate-800/80">
                                                 ⌘+Enter to send
                                             </span>
                                         </div>
@@ -853,17 +966,23 @@ export default function Create({
                                             {data.user_prompt.length > 0 && (
                                                 <button
                                                     type="button"
-                                                    onClick={() => setData('user_prompt', '')}
-                                                    className="text-[11px] font-bold text-slate-400 hover:text-rose-500 transition cursor-pointer flex items-center gap-1"
+                                                    onClick={() =>
+                                                        setData(
+                                                            'user_prompt',
+                                                            '',
+                                                        )
+                                                    }
+                                                    className="flex cursor-pointer items-center gap-1 text-[11px] font-bold text-slate-400 transition hover:text-rose-500"
                                                 >
                                                     <RotateCcw className="size-3" />
                                                     Clear
                                                 </button>
                                             )}
                                             <span
-                                                className={`font-mono text-[10px] sm:text-xs font-semibold ${
-                                                    data.user_prompt.length > 1800
-                                                        ? 'text-rose-500 font-bold'
+                                                className={`font-mono text-[10px] font-semibold sm:text-xs ${
+                                                    data.user_prompt.length >
+                                                    1800
+                                                        ? 'font-bold text-rose-500'
                                                         : 'text-slate-400'
                                                 }`}
                                             >
@@ -878,9 +997,14 @@ export default function Create({
                                         rows={4}
                                         placeholder={`Describe what you want to write for this ${activeMeta.label}...\nInclude target audience, core pain point, unique value proposition, or call to action.`}
                                         value={data.user_prompt}
-                                        onChange={(e) => setData('user_prompt', e.target.value)}
+                                        onChange={(e) =>
+                                            setData(
+                                                'user_prompt',
+                                                e.target.value,
+                                            )
+                                        }
                                         onKeyDown={handleKeyDown}
-                                        className="w-full box-border resize-none rounded-2xl border border-slate-200 bg-white p-3.5 sm:p-4 font-sans text-sm leading-relaxed text-slate-900 shadow-xs focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 dark:border-slate-800 dark:bg-[#07080e] dark:text-slate-100"
+                                        className="box-border w-full resize-none rounded-2xl border border-slate-200 bg-white p-3.5 font-sans text-sm leading-relaxed text-slate-900 shadow-xs focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 focus:outline-none sm:p-4 dark:border-slate-800 dark:bg-[#07080e] dark:text-slate-100"
                                         maxLength={2000}
                                         required
                                     />
@@ -891,36 +1015,47 @@ export default function Create({
                                     )}
 
                                     {/* Format-Aware Quick-Start Ideas */}
-                                    <div className="pt-2 min-w-0 w-full">
-                                        <div className="flex items-center justify-between mb-2">
+                                    <div className="w-full min-w-0 pt-2">
+                                        <div className="mb-2 flex items-center justify-between">
                                             <div className="flex items-center gap-1.5">
-                                                <Sparkles className="size-3.5 text-indigo-500 shrink-0" />
-                                                <span className="text-[11px] font-extrabold text-slate-600 dark:text-slate-300 uppercase tracking-wider">
-                                                    {activeMeta.label} Quick-Start Templates:
+                                                <Sparkles className="size-3.5 shrink-0 text-indigo-500" />
+                                                <span className="text-[11px] font-extrabold tracking-wider text-slate-600 uppercase dark:text-slate-300">
+                                                    {activeMeta.label}{' '}
+                                                    Quick-Start Templates:
                                                 </span>
                                             </div>
-                                            <span className="text-[10px] text-slate-400">Click to apply</span>
+                                            <span className="text-[10px] text-slate-400">
+                                                Click to apply
+                                            </span>
                                         </div>
 
-                                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 min-w-0">
-                                            {currentSuggestions.map((sugg, i) => (
-                                                <button
-                                                    key={i}
-                                                    type="button"
-                                                    onClick={() => handleApplySuggestion(sugg.prompt)}
-                                                    className="group flex flex-col justify-between p-2.5 rounded-xl border border-slate-200/80 bg-slate-50/80 hover:bg-indigo-50/70 hover:border-indigo-300 text-left transition-all cursor-pointer dark:border-slate-800 dark:bg-slate-900/40 dark:hover:border-indigo-500/50 dark:hover:bg-slate-900/80 active:scale-95"
-                                                >
-                                                    <div className="flex items-center justify-between gap-1 mb-1">
-                                                        <span className="text-xs font-bold text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400">
-                                                            {sugg.title}
-                                                        </span>
-                                                        <span className="text-indigo-500 font-bold text-sm leading-none">+</span>
-                                                    </div>
-                                                    <p className="text-[10.5px] text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed">
-                                                        {sugg.prompt}
-                                                    </p>
-                                                </button>
-                                            ))}
+                                        <div className="no-scrollbar flex min-w-0 gap-2 overflow-x-auto pb-1 sm:grid sm:grid-cols-3 sm:overflow-visible">
+                                            {currentSuggestions.map(
+                                                (sugg, i) => (
+                                                    <button
+                                                        key={i}
+                                                        type="button"
+                                                        onClick={() =>
+                                                            handleApplySuggestion(
+                                                                sugg.prompt,
+                                                            )
+                                                        }
+                                                        className="group flex w-[220px] shrink-0 cursor-pointer flex-col justify-between rounded-xl border border-slate-200/80 bg-slate-50/80 p-2.5 text-left transition-all hover:border-indigo-300 hover:bg-indigo-50/70 active:scale-95 sm:w-auto sm:shrink dark:border-slate-800 dark:bg-slate-900/40 dark:hover:border-indigo-500/50 dark:hover:bg-slate-900/80"
+                                                    >
+                                                        <div className="mb-1 flex items-center justify-between gap-1">
+                                                            <span className="truncate text-xs font-bold text-slate-900 group-hover:text-indigo-600 dark:text-white dark:group-hover:text-indigo-400">
+                                                                {sugg.title}
+                                                            </span>
+                                                            <span className="shrink-0 text-sm leading-none font-bold text-indigo-500">
+                                                                +
+                                                            </span>
+                                                        </div>
+                                                        <p className="line-clamp-2 text-[10.5px] leading-relaxed text-slate-500 dark:text-slate-400">
+                                                            {sugg.prompt}
+                                                        </p>
+                                                    </button>
+                                                ),
+                                            )}
                                         </div>
                                     </div>
                                 </div>
@@ -928,31 +1063,45 @@ export default function Create({
                                 {/* Submit Studio Button */}
                                 <Button
                                     type="submit"
-                                    disabled={processing || !hasApiKey || !data.user_prompt.trim()}
-                                    className="relative flex min-h-[50px] sm:min-h-[54px] w-full cursor-pointer items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-indigo-600 via-indigo-500 to-purple-600 text-sm sm:text-base font-extrabold text-white shadow-xl shadow-indigo-600/25 transition-all hover:opacity-95 hover:shadow-indigo-600/35 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+                                    disabled={
+                                        processing ||
+                                        !hasApiKey ||
+                                        !data.user_prompt.trim()
+                                    }
+                                    className="relative flex min-h-[50px] w-full cursor-pointer items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-indigo-600 via-indigo-500 to-purple-600 text-sm font-extrabold text-white shadow-xl shadow-indigo-600/25 transition-all hover:opacity-95 hover:shadow-indigo-600/35 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 sm:min-h-[54px] sm:text-base"
                                 >
                                     {processing ? (
                                         <>
                                             <motion.div
                                                 animate={{ rotate: 360 }}
-                                                transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}
+                                                transition={{
+                                                    repeat: Infinity,
+                                                    duration: 1,
+                                                    ease: 'linear',
+                                                }}
                                             >
                                                 <Sparkles className="size-5" />
                                             </motion.div>
-                                            <span>Initializing Neural Stream...</span>
+                                            <span>
+                                                Initializing Neural Stream...
+                                            </span>
                                         </>
                                     ) : hasApiKey ? (
                                         <>
                                             <Sparkles className="size-5 shrink-0" />
-                                            <span>Generate {activeMeta.label}</span>
-                                            <span className="hidden sm:inline font-normal text-xs text-indigo-100 opacity-80">
+                                            <span>
+                                                Generate {activeMeta.label}
+                                            </span>
+                                            <span className="hidden text-xs font-normal text-indigo-100 opacity-80 sm:inline">
                                                 (0% Markup Direct Stream)
                                             </span>
                                         </>
                                     ) : (
                                         <>
                                             <Key className="size-5 shrink-0" />
-                                            <span>Connect API Key to Generate</span>
+                                            <span>
+                                                Connect API Key to Generate
+                                            </span>
                                         </>
                                     )}
                                 </Button>
@@ -961,49 +1110,66 @@ export default function Create({
                     </div>
 
                     {/* Right Telemetry & Archive Sidebar */}
-                    <div className={`${mobileTab === 'recent' ? 'block' : 'hidden'} lg:block lg:col-span-4 space-y-4 sm:space-y-6 min-w-0`}>
-                        <div className="flex flex-col-reverse lg:flex-col gap-4 sm:gap-6 min-w-0">
+                    <div
+                        className={`${mobileTab === 'recent' ? 'block' : 'hidden'} min-w-0 space-y-4 sm:space-y-6 lg:col-span-4 lg:block`}
+                    >
+                        <div className="flex min-w-0 flex-col-reverse gap-4 sm:gap-6 lg:flex-col">
                             {/* BYOK Status Card */}
-                            <Card className="rounded-3xl border border-slate-200/80 bg-white/80 p-5 shadow-md backdrop-blur-xl dark:border-slate-800/80 dark:bg-[#0c0e1a]/80 min-w-0">
-                                <div className="flex items-center justify-between border-b border-slate-100 pb-3 dark:border-slate-800/60 min-w-0">
-                                    <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                            <Card className="min-w-0 rounded-3xl border border-slate-200/80 bg-white/80 p-5 shadow-md backdrop-blur-xl dark:border-slate-800/80 dark:bg-[#0c0e1a]/80">
+                                <div className="flex min-w-0 items-center justify-between border-b border-slate-100 pb-3 dark:border-slate-800/60">
+                                    <span className="text-xs font-bold tracking-wider text-slate-500 uppercase dark:text-slate-400">
                                         Direct AI Engine
                                     </span>
                                     <span
                                         className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-bold ${
                                             hasApiKey
-                                                ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20'
-                                                : 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20'
+                                                ? 'border border-emerald-500/20 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
+                                                : 'border border-amber-500/20 bg-amber-500/10 text-amber-600 dark:text-amber-400'
                                         }`}
                                     >
                                         <span
                                             className={`size-2 rounded-full ${
-                                                hasApiKey ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'
+                                                hasApiKey
+                                                    ? 'animate-pulse bg-emerald-500'
+                                                    : 'bg-amber-500'
                                             }`}
                                         />
-                                        {hasApiKey ? 'Connected' : 'Missing Key'}
+                                        {hasApiKey
+                                            ? 'Connected'
+                                            : 'Missing Key'}
                                     </span>
                                 </div>
 
-                                <div className="mt-4 flex items-center gap-3.5 min-w-0">
-                                    <div className="flex size-11 items-center justify-center rounded-2xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 shrink-0">
-                                        {aiProvider === 'gemini' && <Zap className="size-6" />}
-                                        {aiProvider === 'openai' && <Cpu className="size-6" />}
-                                        {aiProvider === 'openrouter' && <Layers className="size-6" />}
+                                <div className="mt-4 flex min-w-0 items-center gap-3.5">
+                                    <div className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400">
+                                        {aiProvider === 'gemini' && (
+                                            <Zap className="size-6" />
+                                        )}
+                                        {aiProvider === 'openai' && (
+                                            <Cpu className="size-6" />
+                                        )}
+                                        {aiProvider === 'openrouter' && (
+                                            <Layers className="size-6" />
+                                        )}
                                     </div>
-                                    <div className="flex flex-col min-w-0">
-                                        <h4 className="font-extrabold text-sm text-slate-900 dark:text-white truncate">
-                                            {providerNames[aiProvider] || aiProvider}
+                                    <div className="flex min-w-0 flex-col">
+                                        <h4 className="truncate text-sm font-extrabold text-slate-900 dark:text-white">
+                                            {providerNames[aiProvider] ||
+                                                aiProvider}
                                         </h4>
-                                        <span className="font-mono text-xs text-indigo-600 dark:text-indigo-400 font-semibold truncate">
+                                        <span className="truncate font-mono text-xs font-semibold text-indigo-600 dark:text-indigo-400">
                                             {aiModel}
                                         </span>
                                     </div>
                                 </div>
 
-                                <div className="mt-4 pt-3.5 border-t border-slate-100 dark:border-slate-800/60 flex items-center justify-between text-xs">
-                                    <span className="text-slate-500 dark:text-slate-400">Markup Overhead:</span>
-                                    <strong className="font-bold text-emerald-600 dark:text-emerald-400">0% (Pure Direct Cost)</strong>
+                                <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-3.5 text-xs dark:border-slate-800/60">
+                                    <span className="text-slate-500 dark:text-slate-400">
+                                        Markup Overhead:
+                                    </span>
+                                    <strong className="font-bold text-emerald-600 dark:text-emerald-400">
+                                        0% (Pure Direct Cost)
+                                    </strong>
                                 </div>
 
                                 <Link
@@ -1016,11 +1182,11 @@ export default function Create({
                             </Card>
 
                             {/* Recent Generations Feed with Quick Copy */}
-                            <Card className="rounded-3xl border border-slate-200/80 bg-white/80 p-5 shadow-md backdrop-blur-xl dark:border-slate-800/80 dark:bg-[#0c0e1a]/80 min-w-0">
+                            <Card className="min-w-0 rounded-3xl border border-slate-200/80 bg-white/80 p-5 shadow-md backdrop-blur-xl dark:border-slate-800/80 dark:bg-[#0c0e1a]/80">
                                 <div className="mb-3.5 flex items-center justify-between border-b border-slate-100 pb-3 dark:border-slate-800/60">
                                     <div className="flex items-center gap-2">
                                         <History className="size-4 text-indigo-600 dark:text-indigo-400" />
-                                        <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white">
+                                        <h3 className="text-xs font-bold tracking-wider text-slate-900 uppercase dark:text-white">
                                             Recent Copies
                                         </h3>
                                     </div>
@@ -1033,63 +1199,89 @@ export default function Create({
                                 </div>
 
                                 {recentGenerations.length > 0 ? (
-                                    <div className="space-y-2.5 max-h-[380px] overflow-y-auto pr-1">
+                                    <div className="max-h-[380px] space-y-2.5 overflow-y-auto pr-1">
                                         {recentGenerations.map((gen) => {
-                                            const meta = FORMAT_REGISTRY[gen.content_type] || FORMAT_REGISTRY['linkedin_post'];
+                                            const meta =
+                                                FORMAT_REGISTRY[
+                                                    gen.content_type
+                                                ] ||
+                                                FORMAT_REGISTRY[
+                                                    'linkedin_post'
+                                                ];
                                             const IconComp = meta.icon;
                                             return (
                                                 <div
                                                     key={gen.id}
                                                     className="group rounded-2xl border border-slate-100 bg-slate-50/60 p-3 transition hover:border-indigo-200 hover:bg-indigo-50/30 dark:border-slate-800/60 dark:bg-slate-900/40 dark:hover:border-indigo-500/30 dark:hover:bg-slate-900/70"
                                                 >
-                                                    <div className="flex items-center justify-between mb-1">
+                                                    <div className="mb-1 flex items-center justify-between">
                                                         <div className="flex items-center gap-1.5">
                                                             <div className="flex size-5 items-center justify-center rounded-md bg-indigo-500/10 text-indigo-600 dark:text-indigo-400">
                                                                 <IconComp className="size-3" />
                                                             </div>
-                                                            <span className="text-[11px] font-bold capitalize text-slate-900 dark:text-slate-100">
+                                                            <span className="text-[11px] font-bold text-slate-900 capitalize dark:text-slate-100">
                                                                 {meta.label}
                                                             </span>
                                                         </div>
-                                                        <span className="text-[10px] text-slate-400 font-mono">
-                                                            {new Date(gen.created_at).toLocaleDateString()}
+                                                        <span className="font-mono text-[10px] text-slate-400">
+                                                            {new Date(
+                                                                gen.created_at,
+                                                            ).toLocaleDateString()}
                                                         </span>
                                                     </div>
 
                                                     <Link
-                                                        href={historyShow.url(gen.id)}
-                                                        className="block text-xs font-medium text-slate-700 hover:text-indigo-600 dark:text-slate-300 dark:hover:text-white line-clamp-2 my-1.5 leading-snug"
+                                                        href={historyShow.url(
+                                                            gen.id,
+                                                        )}
+                                                        className="my-1.5 line-clamp-2 block text-xs leading-snug font-medium text-slate-700 hover:text-indigo-600 dark:text-slate-300 dark:hover:text-white"
                                                     >
-                                                        {gen.title || gen.user_prompt}
+                                                        {gen.title ||
+                                                            gen.user_prompt}
                                                     </Link>
 
-                                                    <div className="flex items-center justify-between pt-1 border-t border-slate-200/40 dark:border-slate-800/40">
-                                                        <span className="text-[10px] font-mono uppercase text-slate-400">
-                                                            {gen.output_language === 'my' ? '🇲🇲 Myanmar' : '🇺🇸 English'}
+                                                    <div className="flex items-center justify-between border-t border-slate-200/40 pt-1 dark:border-slate-800/40">
+                                                        <span className="font-mono text-[10px] text-slate-400 uppercase">
+                                                            {gen.output_language ===
+                                                            'my'
+                                                                ? '🇲🇲 Myanmar'
+                                                                : '🇺🇸 English'}
                                                         </span>
                                                         <div className="flex items-center gap-2">
                                                             {gen.ai_content && (
                                                                 <button
                                                                     type="button"
-                                                                    onClick={() => handleCopyRecent(gen.id, gen.ai_content)}
-                                                                    className="text-[11px] font-semibold text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-300 flex items-center gap-1 cursor-pointer"
+                                                                    onClick={() =>
+                                                                        handleCopyRecent(
+                                                                            gen.id,
+                                                                            gen.ai_content,
+                                                                        )
+                                                                    }
+                                                                    className="flex cursor-pointer items-center gap-1 text-[11px] font-semibold text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-300"
                                                                     title="Copy Content"
                                                                 >
-                                                                    {copiedRecentId === gen.id ? (
+                                                                    {copiedRecentId ===
+                                                                    gen.id ? (
                                                                         <>
                                                                             <Check className="size-3 text-emerald-500" />
-                                                                            <span className="text-emerald-500">Copied</span>
+                                                                            <span className="text-emerald-500">
+                                                                                Copied
+                                                                            </span>
                                                                         </>
                                                                     ) : (
                                                                         <>
                                                                             <Copy className="size-3" />
-                                                                            <span>Copy</span>
+                                                                            <span>
+                                                                                Copy
+                                                                            </span>
                                                                         </>
                                                                     )}
                                                                 </button>
                                                             )}
                                                             <Link
-                                                                href={historyShow.url(gen.id)}
+                                                                href={historyShow.url(
+                                                                    gen.id,
+                                                                )}
                                                                 className="text-[11px] font-bold text-indigo-600 hover:underline dark:text-indigo-400"
                                                             >
                                                                 View →
@@ -1102,48 +1294,13 @@ export default function Create({
                                     </div>
                                 ) : (
                                     <div className="py-8 text-center text-xs text-slate-400 dark:text-slate-500">
-                                        No copies generated yet. Your past generations will appear here.
+                                        No copies generated yet. Your past
+                                        generations will appear here.
                                     </div>
                                 )}
                             </Card>
                         </div>
                     </div>
-                </div>
-
-                {/* Sticky Mobile Floating Action Bar */}
-                <div className="fixed bottom-0 left-0 right-0 p-3 bg-white/90 dark:bg-[#07080e]/95 backdrop-blur-xl border-t border-slate-200/80 dark:border-slate-800 flex items-center justify-between gap-3 lg:hidden z-40 shadow-2xl">
-                    <div className="flex items-center gap-2 min-w-0">
-                        <div className="flex size-9 items-center justify-center rounded-xl bg-indigo-600 text-white shrink-0">
-                            {(() => {
-                                const Icon = activeMeta.icon;
-                                return <Icon className="size-4" />;
-                            })()}
-                        </div>
-                        <div className="min-w-0">
-                            <span className="block text-xs font-bold text-slate-900 dark:text-white truncate">
-                                {activeMeta.label}
-                            </span>
-                            <span className="text-[10px] text-slate-400 font-mono">
-                                {data.output_language === 'my' ? '🇲🇲 မြန်မာ' : '🇺🇸 English'}
-                            </span>
-                        </div>
-                    </div>
-
-                    <Button
-                        type="button"
-                        onClick={submit}
-                        disabled={processing || !hasApiKey || !data.user_prompt.trim()}
-                        className="rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 px-5 text-xs font-extrabold text-white shadow-md active:scale-95 shrink-0 min-h-[40px]"
-                    >
-                        {processing ? (
-                            <span>Streaming...</span>
-                        ) : (
-                            <span className="flex items-center gap-1.5">
-                                <Sparkles className="size-3.5" />
-                                Generate Now
-                            </span>
-                        )}
-                    </Button>
                 </div>
             </div>
         </>

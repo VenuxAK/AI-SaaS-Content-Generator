@@ -22,7 +22,7 @@ class ToneController extends Controller
     public function index(Request $request): Response
     {
         $tones = UserTone::availableFor($request->user())
-            ->orderBy('is_system', 'desc')
+            ->orderBy('is_system', 'asc')
             ->orderBy('name')
             ->get();
 

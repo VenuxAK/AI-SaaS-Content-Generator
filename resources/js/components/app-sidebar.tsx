@@ -77,12 +77,24 @@ export function AppSidebar() {
     }
 
     return (
-        <Sidebar collapsible="icon" variant="inset" className="border-r border-slate-200/80 dark:border-slate-800/80">
-            <SidebarHeader className="border-b border-slate-100 dark:border-slate-800/60 p-3">
+        <Sidebar
+            collapsible="icon"
+            variant="inset"
+            className="border-r border-slate-200/80 dark:border-slate-800/80"
+        >
+            <SidebarHeader className="border-b border-slate-100 p-3 dark:border-slate-800/60">
                 <SidebarMenu>
                     <SidebarMenuItem>
-                        <SidebarMenuButton size="lg" asChild className="hover:bg-transparent">
-                            <Link href={dashboard()} prefetch onClick={handleMobileDismiss}>
+                        <SidebarMenuButton
+                            size="lg"
+                            asChild
+                            className="hover:bg-transparent"
+                        >
+                            <Link
+                                href={dashboard()}
+                                prefetch
+                                onClick={handleMobileDismiss}
+                            >
                                 <AppLogo />
                             </Link>
                         </SidebarMenuButton>
@@ -96,14 +108,14 @@ export function AppSidebar() {
                 {/* BYOK Status Card (when expanded) */}
                 {!isCollapsed && (
                     <div className="mx-3 mt-auto mb-2 rounded-2xl border border-indigo-500/20 bg-indigo-50/50 p-3.5 dark:border-indigo-500/15 dark:bg-[#0c0e1a]/80">
-                        <div className="flex items-center justify-between text-[10px] font-extrabold uppercase tracking-wider text-indigo-700 dark:text-indigo-400">
+                        <div className="flex items-center justify-between text-[10px] font-extrabold tracking-wider text-indigo-700 uppercase dark:text-indigo-400">
                             <span className="flex items-center gap-1.5">
                                 <Zap className="size-3 text-indigo-600 dark:text-indigo-400" />
                                 BYOK Connected
                             </span>
-                            <span className="flex size-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                            <span className="flex size-1.5 animate-pulse rounded-full bg-emerald-500" />
                         </div>
-                        <p className="mt-1 text-[11px] text-slate-600 dark:text-slate-400 font-medium">
+                        <p className="mt-1 text-[11px] font-medium text-slate-600 dark:text-slate-400">
                             0% Token markup. Unlimited direct streaming.
                         </p>
                         <Link
@@ -117,7 +129,7 @@ export function AppSidebar() {
                 )}
             </SidebarContent>
 
-            <SidebarFooter className="border-t border-slate-100 dark:border-slate-800/60 p-2">
+            <SidebarFooter className="border-t border-slate-100 p-2 dark:border-slate-800/60">
                 <NavUser />
             </SidebarFooter>
         </Sidebar>

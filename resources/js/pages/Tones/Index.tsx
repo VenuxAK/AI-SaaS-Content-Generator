@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Head, useForm, router } from '@inertiajs/react';
 import { Sparkles, Plus, Edit2, Trash2, X, Check, Zap } from 'lucide-react';
 import {
@@ -16,6 +16,14 @@ import {
     CardContent,
     CardFooter,
 } from '@/components/ui/card';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
 
 interface Tone {
     id: number;
@@ -48,6 +56,17 @@ const TONE_TEMPLATES = [
 ];
 
 export default function TonesIndex({ tones }: TonesIndexProps) {
+    const sortedTones = useMemo(() => {
+        return [...tones].sort((a, b) => {
+            const aIsSystem = Boolean(a.is_system);
+            const bIsSystem = Boolean(b.is_system);
+            if (aIsSystem === bIsSystem) {
+                return a.name.localeCompare(b.name);
+            }
+            return aIsSystem ? 1 : -1;
+        });
+    }, [tones]);
+
     const [isCreateOpen, setIsCreateOpen] = useState(false);
     const [editingTone, setEditingTone] = useState<Tone | null>(null);
 
@@ -82,14 +101,19 @@ export default function TonesIndex({ tones }: TonesIndexProps) {
         });
     };
 
+    const [deletingToneId, setDeletingToneId] = useState<number | null>(null);
+
     const handleDelete = (id: number) => {
-        if (
-            confirm(
-                'Are you sure you want to delete this custom writing tone? Existing generated copy will preserve its tone snapshot, but the tone itself will be removed.'
-            )
-        ) {
-            router.delete(tonesDestroy.url({ tone: id }));
-        }
+        setDeletingToneId(id);
+    };
+
+    const confirmDeleteTone = () => {
+        if (!deletingToneId) return;
+        router.delete(tonesDestroy.url({ tone: deletingToneId }), {
+            onSuccess: () => {
+                setDeletingToneId(null);
+            },
+        });
     };
 
     const openEdit = (tone: Tone) => {
@@ -100,7 +124,10 @@ export default function TonesIndex({ tones }: TonesIndexProps) {
         });
     };
 
-    const handleApplyTemplate = (tpl: { name: string; description: string }) => {
+    const handleApplyTemplate = (tpl: {
+        name: string;
+        description: string;
+    }) => {
         createForm.setData({
             name: tpl.name,
             description: tpl.description,
@@ -111,27 +138,28 @@ export default function TonesIndex({ tones }: TonesIndexProps) {
     return (
         <>
             <Head title="Voice Personas - Nexus AI" />
-            <div className="mx-auto flex h-full w-full max-w-7xl flex-1 flex-col gap-5 sm:gap-6 p-3.5 sm:p-6 lg:p-8">
+            <div className="mx-auto flex h-full w-full max-w-7xl flex-1 flex-col gap-5 p-3.5 sm:gap-6 sm:p-6 lg:p-8">
                 {/* Header Section */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200/80 pb-4 sm:pb-5 dark:border-slate-800/80">
+                <div className="flex flex-col justify-between gap-4 border-b border-slate-200/80 pb-4 sm:flex-row sm:items-center sm:pb-5 dark:border-slate-800/80">
                     <div>
                         <div className="flex items-center gap-2 sm:gap-2.5">
                             <div className="flex size-9 items-center justify-center rounded-2xl bg-indigo-600/10 text-indigo-600 dark:bg-indigo-500/20 dark:text-indigo-400">
                                 <Sparkles className="size-5" />
                             </div>
-                            <h1 className="text-xl sm:text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">
+                            <h1 className="text-xl font-black text-slate-900 sm:text-2xl sm:text-3xl dark:text-white">
                                 Voice Personas & Tones
                             </h1>
                         </div>
-                        <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
-                            Define your unique vocabulary, tone, and brand persona to personalize generated AI copy.
+                        <p className="mt-1 text-xs text-slate-500 sm:text-sm dark:text-slate-400">
+                            Define your unique vocabulary, tone, and brand
+                            persona to personalize generated AI copy.
                         </p>
                     </div>
 
                     {!isCreateOpen && !editingTone && (
                         <Button
                             onClick={() => setIsCreateOpen(true)}
-                            className="bg-indigo-600 hover:bg-indigo-500 text-white rounded-2xl font-bold flex items-center justify-center gap-2 cursor-pointer shadow-xl shadow-indigo-600/20 h-11 px-5 transition active:scale-95 w-full sm:w-auto"
+                            className="flex h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-2xl bg-indigo-600 px-5 font-bold text-white shadow-xl shadow-indigo-600/20 transition hover:bg-indigo-500 active:scale-95 sm:w-auto"
                         >
                             <Plus className="size-4" />
                             Create Persona
@@ -141,20 +169,21 @@ export default function TonesIndex({ tones }: TonesIndexProps) {
 
                 {/* Form: Create Tone Form Card */}
                 {isCreateOpen && (
-                    <Card className="border border-indigo-500/30 shadow-xl bg-white/90 dark:bg-[#0c0e1a]/90 backdrop-blur-2xl rounded-3xl p-4 sm:p-6 glow-indigo">
-                        <div className="flex justify-between items-start pb-3 sm:pb-4 border-b border-slate-100 dark:border-slate-800/60 mb-4 sm:mb-5">
+                    <Card className="glow-indigo rounded-3xl border border-indigo-500/30 bg-white/90 p-4 shadow-xl backdrop-blur-2xl sm:p-6 dark:bg-[#0c0e1a]/90">
+                        <div className="mb-4 flex items-start justify-between border-b border-slate-100 pb-3 sm:mb-5 sm:pb-4 dark:border-slate-800/60">
                             <div>
-                                <h2 className="text-sm sm:text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                                <h2 className="flex items-center gap-2 text-sm font-extrabold text-slate-900 sm:text-base dark:text-white">
                                     <Sparkles className="size-4 text-indigo-600 dark:text-indigo-400" />
                                     Create New Voice Persona
                                 </h2>
-                                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                                    Instruct the AI on word choice, formality, sentence structure, and slang.
+                                <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
+                                    Instruct the AI on word choice, formality,
+                                    sentence structure, and slang.
                                 </p>
                             </div>
                             <button
                                 onClick={() => setIsCreateOpen(false)}
-                                className="p-1.5 rounded-xl text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+                                className="cursor-pointer rounded-xl p-1.5 text-slate-400 transition hover:bg-slate-100 dark:hover:bg-slate-800"
                             >
                                 <X className="size-4" />
                             </button>
@@ -164,7 +193,7 @@ export default function TonesIndex({ tones }: TonesIndexProps) {
                             <div>
                                 <label
                                     htmlFor="create_name"
-                                    className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5"
+                                    className="mb-1.5 block text-xs font-bold tracking-wider text-slate-500 uppercase dark:text-slate-400"
                                 >
                                     Persona Name
                                 </label>
@@ -173,12 +202,17 @@ export default function TonesIndex({ tones }: TonesIndexProps) {
                                     type="text"
                                     placeholder="e.g. Visionary Tech Founder, High-Converting Direct Sales, Chill Gen-Z Creator"
                                     value={createForm.data.name}
-                                    onChange={(e) => createForm.setData('name', e.target.value)}
-                                    className="w-full rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#07080e] px-3.5 sm:px-4 py-2.5 sm:py-3 text-base sm:text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                    onChange={(e) =>
+                                        createForm.setData(
+                                            'name',
+                                            e.target.value,
+                                        )
+                                    }
+                                    className="w-full rounded-2xl border border-slate-200 bg-white px-3.5 py-2.5 text-base text-slate-900 focus:ring-2 focus:ring-indigo-500 focus:outline-none sm:px-4 sm:py-3 sm:text-sm dark:border-slate-800 dark:bg-[#07080e] dark:text-slate-100"
                                     required
                                 />
                                 {createForm.errors.name && (
-                                    <span className="text-xs text-rose-500 mt-1 block">
+                                    <span className="mt-1 block text-xs text-rose-500">
                                         {createForm.errors.name}
                                     </span>
                                 )}
@@ -187,7 +221,7 @@ export default function TonesIndex({ tones }: TonesIndexProps) {
                             <div>
                                 <label
                                     htmlFor="create_description"
-                                    className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5"
+                                    className="mb-1.5 block text-xs font-bold tracking-wider text-slate-500 uppercase dark:text-slate-400"
                                 >
                                     Voice Guidelines & Rules
                                 </label>
@@ -196,19 +230,24 @@ export default function TonesIndex({ tones }: TonesIndexProps) {
                                     rows={4}
                                     placeholder="Describe the style. e.g. 'Write with intense confidence and directness. Avoid corporate jargon like synergy or leverage. Use bullet points and 1-line paragraphs.'"
                                     value={createForm.data.description}
-                                    onChange={(e) => createForm.setData('description', e.target.value)}
-                                    className="w-full rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#07080e] p-4 text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+                                    onChange={(e) =>
+                                        createForm.setData(
+                                            'description',
+                                            e.target.value,
+                                        )
+                                    }
+                                    className="w-full resize-none rounded-2xl border border-slate-200 bg-white p-4 text-sm text-slate-900 focus:ring-2 focus:ring-indigo-500 focus:outline-none dark:border-slate-800 dark:bg-[#07080e] dark:text-slate-100"
                                     required
                                 />
                                 {createForm.errors.description && (
-                                    <span className="text-xs text-rose-500 mt-1 block">
+                                    <span className="mt-1 block text-xs text-rose-500">
                                         {createForm.errors.description}
                                     </span>
                                 )}
                             </div>
 
                             {/* Preset Templates */}
-                            <div className="pt-2 flex flex-wrap items-center gap-2">
+                            <div className="flex flex-wrap items-center gap-2 pt-2">
                                 <span className="text-[11px] font-semibold text-slate-400">
                                     Load Preset Idea:
                                 </span>
@@ -224,21 +263,23 @@ export default function TonesIndex({ tones }: TonesIndexProps) {
                                 ))}
                             </div>
 
-                            <div className="flex justify-end gap-3 pt-4 border-t border-slate-100 dark:border-slate-800/60">
+                            <div className="flex justify-end gap-3 border-t border-slate-100 pt-4 dark:border-slate-800/60">
                                 <Button
                                     type="button"
                                     variant="outline"
                                     onClick={() => setIsCreateOpen(false)}
-                                    className="rounded-xl border border-slate-200 dark:border-slate-800 cursor-pointer"
+                                    className="cursor-pointer rounded-xl border border-slate-200 dark:border-slate-800"
                                 >
                                     Cancel
                                 </Button>
                                 <Button
                                     type="submit"
                                     disabled={createForm.processing}
-                                    className="bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-bold cursor-pointer shadow-md"
+                                    className="cursor-pointer rounded-xl bg-indigo-600 font-bold text-white shadow-md hover:bg-indigo-500"
                                 >
-                                    {createForm.processing ? 'Saving...' : 'Save Voice Persona'}
+                                    {createForm.processing
+                                        ? 'Saving...'
+                                        : 'Save Voice Persona'}
                                 </Button>
                             </div>
                         </form>
@@ -247,17 +288,17 @@ export default function TonesIndex({ tones }: TonesIndexProps) {
 
                 {/* Form: Edit Tone Form Card */}
                 {editingTone && (
-                    <Card className="border border-indigo-500/30 shadow-xl bg-white/90 dark:bg-[#0c0e1a]/90 backdrop-blur-2xl rounded-3xl p-4 sm:p-6 glow-indigo">
-                        <div className="flex justify-between items-start pb-3 sm:pb-4 border-b border-slate-100 dark:border-slate-800/60 mb-4 sm:mb-5">
+                    <Card className="glow-indigo rounded-3xl border border-indigo-500/30 bg-white/90 p-4 shadow-xl backdrop-blur-2xl sm:p-6 dark:bg-[#0c0e1a]/90">
+                        <div className="mb-4 flex items-start justify-between border-b border-slate-100 pb-3 sm:mb-5 sm:pb-4 dark:border-slate-800/60">
                             <div>
-                                <h2 className="text-sm sm:text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                                <h2 className="flex items-center gap-2 text-sm font-extrabold text-slate-900 sm:text-base dark:text-white">
                                     <Edit2 className="size-4 text-indigo-600 dark:text-indigo-400" />
                                     Edit Persona: {editingTone.name}
                                 </h2>
                             </div>
                             <button
                                 onClick={() => setEditingTone(null)}
-                                className="p-1.5 rounded-xl text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+                                className="cursor-pointer rounded-xl p-1.5 text-slate-400 transition hover:bg-slate-100 dark:hover:bg-slate-800"
                             >
                                 <X className="size-4" />
                             </button>
@@ -267,7 +308,7 @@ export default function TonesIndex({ tones }: TonesIndexProps) {
                             <div>
                                 <label
                                     htmlFor="edit_name"
-                                    className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5"
+                                    className="mb-1.5 block text-xs font-bold tracking-wider text-slate-500 uppercase dark:text-slate-400"
                                 >
                                     Persona Name
                                 </label>
@@ -275,12 +316,14 @@ export default function TonesIndex({ tones }: TonesIndexProps) {
                                     id="edit_name"
                                     type="text"
                                     value={editForm.data.name}
-                                    onChange={(e) => editForm.setData('name', e.target.value)}
-                                    className="w-full rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#07080e] px-3.5 sm:px-4 py-2.5 sm:py-3 text-base sm:text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                    onChange={(e) =>
+                                        editForm.setData('name', e.target.value)
+                                    }
+                                    className="w-full rounded-2xl border border-slate-200 bg-white px-3.5 py-2.5 text-base text-slate-900 focus:ring-2 focus:ring-indigo-500 focus:outline-none sm:px-4 sm:py-3 sm:text-sm dark:border-slate-800 dark:bg-[#07080e] dark:text-slate-100"
                                     required
                                 />
                                 {editForm.errors.name && (
-                                    <span className="text-xs text-rose-500 mt-1 block">
+                                    <span className="mt-1 block text-xs text-rose-500">
                                         {editForm.errors.name}
                                     </span>
                                 )}
@@ -289,7 +332,7 @@ export default function TonesIndex({ tones }: TonesIndexProps) {
                             <div>
                                 <label
                                     htmlFor="edit_description"
-                                    className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5"
+                                    className="mb-1.5 block text-xs font-bold tracking-wider text-slate-500 uppercase dark:text-slate-400"
                                 >
                                     Voice Guidelines & Rules
                                 </label>
@@ -297,32 +340,39 @@ export default function TonesIndex({ tones }: TonesIndexProps) {
                                     id="edit_description"
                                     rows={4}
                                     value={editForm.data.description}
-                                    onChange={(e) => editForm.setData('description', e.target.value)}
-                                    className="w-full rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#07080e] p-3.5 sm:p-4 text-base sm:text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+                                    onChange={(e) =>
+                                        editForm.setData(
+                                            'description',
+                                            e.target.value,
+                                        )
+                                    }
+                                    className="w-full resize-none rounded-2xl border border-slate-200 bg-white p-3.5 text-base text-slate-900 focus:ring-2 focus:ring-indigo-500 focus:outline-none sm:p-4 sm:text-sm dark:border-slate-800 dark:bg-[#07080e] dark:text-slate-100"
                                     required
                                 />
                                 {editForm.errors.description && (
-                                    <span className="text-xs text-rose-500 mt-1 block">
+                                    <span className="mt-1 block text-xs text-rose-500">
                                         {editForm.errors.description}
                                     </span>
                                 )}
                             </div>
 
-                            <div className="flex justify-end gap-3 pt-3 border-t border-slate-100 dark:border-slate-800/60">
+                            <div className="flex justify-end gap-3 border-t border-slate-100 pt-3 dark:border-slate-800/60">
                                 <Button
                                     type="button"
                                     variant="outline"
                                     onClick={() => setEditingTone(null)}
-                                    className="rounded-xl border border-slate-200 dark:border-slate-800 cursor-pointer"
+                                    className="cursor-pointer rounded-xl border border-slate-200 dark:border-slate-800"
                                 >
                                     Cancel
                                 </Button>
                                 <Button
                                     type="submit"
                                     disabled={editForm.processing}
-                                    className="bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-bold cursor-pointer shadow-md"
+                                    className="cursor-pointer rounded-xl bg-indigo-600 font-bold text-white shadow-md hover:bg-indigo-500"
                                 >
-                                    {editForm.processing ? 'Saving...' : 'Save Changes'}
+                                    {editForm.processing
+                                        ? 'Saving...'
+                                        : 'Save Changes'}
                                 </Button>
                             </div>
                         </form>
@@ -330,23 +380,26 @@ export default function TonesIndex({ tones }: TonesIndexProps) {
                 )}
 
                 {/* Tone Cards Grid */}
-                {tones.length > 0 ? (
-                    <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-                        {tones.map((tone) => (
+                {sortedTones.length > 0 ? (
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
+                        {sortedTones.map((tone) => (
                             <Card
                                 key={tone.id}
-                                className="group rounded-3xl border border-slate-200/80 bg-white/80 shadow-md backdrop-blur-xl transition duration-200 hover:shadow-xl hover:border-indigo-400 dark:border-slate-800/80 dark:bg-[#0c0e1a]/80 dark:hover:border-indigo-500/40 flex flex-col justify-between overflow-hidden"
+                                className="group flex flex-col justify-between overflow-hidden rounded-3xl border border-slate-200/80 bg-white/80 shadow-md backdrop-blur-xl transition duration-200 hover:border-indigo-400 hover:shadow-xl dark:border-slate-800/80 dark:bg-[#0c0e1a]/80 dark:hover:border-indigo-500/40"
                             >
-                                <CardHeader className="pb-3 pt-4 sm:pt-5 px-4 sm:px-6 bg-slate-50/50 dark:bg-[#080911]/60 border-b border-slate-100 dark:border-slate-800/60">
-                                    <div className="flex justify-between items-center gap-2">
-                                        <div className="flex items-center gap-2 flex-wrap">
-                                            <CardTitle className="text-sm font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
-                                                <span className={`flex size-2 rounded-full ${tone.is_system ? 'bg-indigo-500 animate-pulse' : 'bg-emerald-500'}`} />
+                                <CardHeader className="border-b border-slate-100 bg-slate-50/50 px-4 pt-4 pb-3 sm:px-6 sm:pt-5 dark:border-slate-800/60 dark:bg-[#080911]/60">
+                                    <div className="flex items-center justify-between gap-2">
+                                        <div className="flex flex-wrap items-center gap-2">
+                                            <CardTitle className="flex items-center gap-2 text-sm font-extrabold text-slate-900 dark:text-white">
+                                                <span
+                                                    className={`flex size-2 rounded-full ${tone.is_system ? 'animate-pulse bg-indigo-500' : 'bg-emerald-500'}`}
+                                                />
                                                 {tone.name}
                                             </CardTitle>
                                             {tone.is_system && (
-                                                <span className="inline-flex items-center gap-1 rounded-full bg-indigo-500/10 px-2 py-0.5 text-[10px] font-bold text-indigo-600 border border-indigo-500/20 dark:text-indigo-400">
-                                                    <Sparkles className="size-2.5" /> Preset
+                                                <span className="inline-flex items-center gap-1 rounded-full border border-indigo-500/20 bg-indigo-500/10 px-2 py-0.5 text-[10px] font-bold text-indigo-600 dark:text-indigo-400">
+                                                    <Sparkles className="size-2.5" />{' '}
+                                                    Preset
                                                 </span>
                                             )}
                                         </div>
@@ -357,26 +410,34 @@ export default function TonesIndex({ tones }: TonesIndexProps) {
                                                     onClick={() =>
                                                         handleApplyTemplate({
                                                             name: `${tone.name} (Custom)`,
-                                                            description: tone.description,
+                                                            description:
+                                                                tone.description,
                                                         })
                                                     }
-                                                    className="px-2.5 py-1 rounded-xl text-[11px] font-bold text-indigo-600 hover:bg-indigo-50 dark:text-indigo-400 dark:hover:bg-indigo-950/40 transition cursor-pointer flex items-center gap-1 border border-indigo-500/20 shadow-2xs min-h-[30px]"
+                                                    className="flex min-h-[30px] cursor-pointer items-center gap-1 rounded-xl border border-indigo-500/20 px-2.5 py-1 text-[11px] font-bold text-indigo-600 shadow-2xs transition hover:bg-indigo-50 dark:text-indigo-400 dark:hover:bg-indigo-950/40"
                                                     title="Duplicate as customizable template"
                                                 >
-                                                    <Plus className="size-3" /> Duplicate
+                                                    <Plus className="size-3" />{' '}
+                                                    Duplicate
                                                 </button>
                                             ) : (
                                                 <div className="flex items-center gap-1">
                                                     <button
-                                                        onClick={() => openEdit(tone)}
-                                                        className="p-2 rounded-lg text-slate-400 hover:text-indigo-600 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer min-h-[36px] min-w-[36px] flex items-center justify-center"
+                                                        onClick={() =>
+                                                            openEdit(tone)
+                                                        }
+                                                        className="flex min-h-[36px] min-w-[36px] cursor-pointer items-center justify-center rounded-lg p-2 text-slate-400 transition hover:bg-slate-100 hover:text-indigo-600 dark:hover:bg-slate-800"
                                                         title="Edit tone"
                                                     >
                                                         <Edit2 className="size-3.5" />
                                                     </button>
                                                     <button
-                                                        onClick={() => handleDelete(tone.id)}
-                                                        className="p-2 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer min-h-[36px] min-w-[36px] flex items-center justify-center"
+                                                        onClick={() =>
+                                                            handleDelete(
+                                                                tone.id,
+                                                            )
+                                                        }
+                                                        className="flex min-h-[36px] min-w-[36px] cursor-pointer items-center justify-center rounded-lg p-2 text-slate-400 transition hover:bg-slate-100 hover:text-rose-600 dark:hover:bg-slate-800"
                                                         title="Delete tone"
                                                     >
                                                         <Trash2 className="size-3.5" />
@@ -386,41 +447,81 @@ export default function TonesIndex({ tones }: TonesIndexProps) {
                                         </div>
                                     </div>
                                 </CardHeader>
-                                <CardContent className="pt-3.5 sm:pt-4 pb-4 sm:pb-5 px-4 sm:px-6 flex-1">
-                                    <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed whitespace-pre-line">
+                                <CardContent className="flex-1 px-4 pt-3.5 pb-4 sm:px-6 sm:pt-4 sm:pb-5">
+                                    <p className="text-xs leading-relaxed whitespace-pre-line text-slate-600 dark:text-slate-400">
                                         {tone.description}
                                     </p>
                                 </CardContent>
-                                <CardFooter className="py-2.5 sm:py-3 px-4 sm:px-6 bg-slate-50/30 dark:bg-[#080911]/40 border-t border-slate-100 dark:border-slate-800/60 text-[10px] text-slate-400 font-mono flex items-center justify-between">
+                                <CardFooter className="flex items-center justify-between border-t border-slate-100 bg-slate-50/30 px-4 py-2.5 font-mono text-[10px] text-slate-400 sm:px-6 sm:py-3 dark:border-slate-800/60 dark:bg-[#080911]/40">
                                     <span>
                                         {tone.is_system
                                             ? 'Built-in system preset'
                                             : `Configured on ${new Date(tone.created_at).toLocaleDateString()}`}
                                     </span>
                                     {tone.is_system && (
-                                        <span className="text-emerald-500 font-semibold">Active in Generator</span>
+                                        <span className="font-semibold text-emerald-500">
+                                            Active in Generator
+                                        </span>
                                     )}
                                 </CardFooter>
                             </Card>
                         ))}
                     </div>
                 ) : (
-                    <div className="border border-dashed border-slate-200 dark:border-slate-800 rounded-3xl p-16 text-center max-w-md mx-auto my-12 w-full bg-white/50 dark:bg-[#0c0e1a]/50">
-                        <Sparkles className="size-10 text-slate-300 dark:text-slate-700 mx-auto mb-3" />
+                    <div className="mx-auto my-12 w-full max-w-md rounded-3xl border border-dashed border-slate-200 bg-white/50 p-16 text-center dark:border-slate-800 dark:bg-[#0c0e1a]/50">
+                        <Sparkles className="mx-auto mb-3 size-10 text-slate-300 dark:text-slate-700" />
                         <h3 className="text-base font-extrabold text-slate-900 dark:text-white">
                             Define your first voice persona
                         </h3>
-                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 mb-6">
-                            Customize how the AI talks to match your voice or your brand identity perfectly.
+                        <p className="mt-1 mb-6 text-xs text-slate-500 dark:text-slate-400">
+                            Customize how the AI talks to match your voice or
+                            your brand identity perfectly.
                         </p>
                         <Button
                             onClick={() => setIsCreateOpen(true)}
-                            className="bg-indigo-600 hover:bg-indigo-500 text-white rounded-2xl font-bold cursor-pointer shadow-md"
+                            className="cursor-pointer rounded-2xl bg-indigo-600 font-bold text-white shadow-md hover:bg-indigo-500"
                         >
                             Create Voice Tone
                         </Button>
                     </div>
                 )}
+
+                {/* Delete Tone Confirmation Dialog */}
+                <Dialog
+                    open={deletingToneId !== null}
+                    onOpenChange={(open) => !open && setDeletingToneId(null)}
+                >
+                    <DialogContent className="rounded-3xl border border-slate-200/80 bg-white/95 p-6 shadow-2xl backdrop-blur-2xl sm:max-w-md dark:border-slate-800 dark:bg-[#0c0e1a]/95">
+                        <DialogHeader>
+                            <DialogTitle className="flex items-center gap-2 text-base font-extrabold text-rose-600 dark:text-rose-400">
+                                <Trash2 className="size-5" />
+                                Delete Voice Persona
+                            </DialogTitle>
+                            <DialogDescription className="mt-1.5 text-xs leading-relaxed text-slate-500 dark:text-slate-400">
+                                Are you sure you want to delete this custom
+                                writing tone? Existing generated copy will
+                                preserve its tone snapshot, but the persona
+                                itself will be permanently removed.
+                            </DialogDescription>
+                        </DialogHeader>
+                        <DialogFooter className="mt-3 flex flex-row items-center justify-end gap-2 border-t border-slate-100 pt-4 dark:border-slate-800/60">
+                            <Button
+                                variant="outline"
+                                onClick={() => setDeletingToneId(null)}
+                                className="cursor-pointer rounded-xl border border-slate-200 text-xs font-semibold dark:border-slate-800"
+                            >
+                                Cancel
+                            </Button>
+                            <Button
+                                variant="destructive"
+                                onClick={confirmDeleteTone}
+                                className="cursor-pointer rounded-xl bg-rose-600 text-xs font-bold text-white shadow-md hover:bg-rose-500"
+                            >
+                                Delete Persona
+                            </Button>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
             </div>
         </>
     );

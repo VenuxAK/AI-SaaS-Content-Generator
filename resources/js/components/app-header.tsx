@@ -1,6 +1,14 @@
 import { useState, useEffect } from 'react';
 import { Link, usePage } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid, Menu, Search, Sun, Moon } from 'lucide-react';
+import {
+    BookOpen,
+    Folder,
+    LayoutGrid,
+    Menu,
+    Search,
+    Sun,
+    Moon,
+} from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import AppLogoIcon from '@/components/app-logo-icon';
 import { Breadcrumbs } from '@/components/breadcrumbs';
@@ -70,7 +78,8 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
     const { auth } = page.props;
     const getInitials = useInitials();
     const { isCurrentUrl, whenCurrentUrl } = useCurrentUrl();
-    const { appearance, resolvedAppearance, updateAppearance } = useAppearance();
+    const { appearance, resolvedAppearance, updateAppearance } =
+        useAppearance();
 
     const [mounted, setMounted] = useState(false);
     useEffect(() => {
@@ -153,12 +162,12 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                         prefetch
                         className="flex items-center space-x-2"
                     >
-                        <img 
-                            src={`/images/logo/icon-only-${logoTheme}.png`} 
-                            alt="Nexus AI Icon" 
-                            className="size-6 object-contain" 
+                        <img
+                            src={`/images/logo/icon-only-${logoTheme}.png`}
+                            alt="Nexus AI Icon"
+                            className="size-6 object-contain"
                         />
-                        <span className="font-extrabold text-sm tracking-tight text-neutral-900 dark:text-neutral-50 ml-1">
+                        <span className="ml-1 text-sm font-extrabold tracking-tight text-neutral-900 dark:text-neutral-50">
                             Nexus AI
                         </span>
                     </Link>
@@ -235,10 +244,18 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                             variant="ghost"
                             size="icon"
                             onClick={toggleTheme}
-                            className="h-9 w-9 rounded-md text-neutral-500 dark:text-neutral-450 hover:bg-neutral-100 dark:hover:bg-neutral-800 mr-2 cursor-pointer"
-                            title={appearance === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+                            className="dark:text-neutral-450 mr-2 h-9 w-9 cursor-pointer rounded-md text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-800"
+                            title={
+                                appearance === 'dark'
+                                    ? 'Switch to Light Mode'
+                                    : 'Switch to Dark Mode'
+                            }
                         >
-                            {appearance === 'dark' ? <Sun className="size-5" /> : <Moon className="size-5" />}
+                            {appearance === 'dark' ? (
+                                <Sun className="size-5" />
+                            ) : (
+                                <Moon className="size-5" />
+                            )}
                         </Button>
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>

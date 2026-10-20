@@ -14,14 +14,14 @@ export default function AppLogo() {
     const logoTheme = mounted ? resolvedAppearance : 'light';
 
     return (
-        <div className="flex items-center gap-2 w-full transition-all duration-200">
-            <img 
-                src={`/images/logo/icon-only-${logoTheme}.png`} 
-                alt="Nexus AI" 
-                className="size-7 object-contain shrink-0" 
+        <div className="flex w-full items-center gap-2 transition-all duration-200">
+            <img
+                src={`/images/logo/icon-only-${logoTheme}.png`}
+                alt="Nexus AI"
+                className="size-7 shrink-0 object-contain"
             />
             {state !== 'collapsed' && (
-                <span className="font-extrabold text-sm tracking-tight text-neutral-900 dark:text-neutral-50 truncate">
+                <span className="truncate text-sm font-extrabold tracking-tight text-neutral-900 dark:text-neutral-50">
                     Nexus AI
                 </span>
             )}

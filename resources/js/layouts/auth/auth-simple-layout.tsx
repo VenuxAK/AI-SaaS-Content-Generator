@@ -22,9 +22,12 @@ export default function AuthSimpleLayout({
                             </div>
                             <div className="flex flex-col items-center">
                                 <span className="text-lg font-black tracking-tight text-slate-900 dark:text-white">
-                                    Nexus<span className="text-indigo-600 dark:text-indigo-400">AI</span>
+                                    Nexus
+                                    <span className="text-indigo-600 dark:text-indigo-400">
+                                        AI
+                                    </span>
                                 </span>
-                                <span className="text-[10px] font-semibold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 -mt-1">
+                                <span className="-mt-1 text-[10px] font-semibold tracking-wider text-indigo-600 uppercase dark:text-indigo-400">
                                     BYOK Studio
                                 </span>
                             </div>

@@ -36,7 +36,7 @@ test('system tones are properly seeded by SystemToneSeeder', function () {
     ]);
 });
 
-test('users can see system tones on the tones index page', function () {
+test('users see custom tones on top before system tones on the tones index page', function () {
     $this->seed(SystemToneSeeder::class);
 
     $user = User::factory()->create();
@@ -51,7 +51,30 @@ test('users can see system tones on the tones index page', function () {
     $response->assertInertia(fn (Assert $page) => $page
         ->component('Tones/Index')
         ->has('tones', 5)
-        ->where('tones.0.is_system', true)
+        ->where('tones.0.is_system', false)
+        ->where('tones.0.name', 'My Custom Persona')
+        ->where('tones.1.is_system', true)
+    );
+});
+
+test('generation studio returns custom tones on top before system tones', function () {
+    $this->seed(SystemToneSeeder::class);
+
+    $user = User::factory()->create();
+    UserTone::factory()->create([
+        'user_id' => $user->id,
+        'name' => 'My Custom Persona',
+    ]);
+
+    $response = $this->actingAs($user)->get(route('generate.create'));
+
+    $response->assertSuccessful();
+    $response->assertInertia(fn (Assert $page) => $page
+        ->component('Generate/Create')
+        ->has('tones', 5)
+        ->where('tones.0.is_system', false)
+        ->where('tones.0.name', 'My Custom Persona')
+        ->where('tones.1.is_system', true)
     );
 });
 

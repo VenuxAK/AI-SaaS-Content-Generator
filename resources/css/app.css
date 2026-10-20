@@ -14,8 +14,8 @@ html {
 @theme {
     --font-sans:
         'Plus Jakarta Sans', 'Noto Sans Myanmar', 'Padauk', 'Pyidaungsu',
-        'Myanmar Text', -apple-system, BlinkMacSystemFont, 'Segoe UI',
-        Roboto, sans-serif;
+        'Myanmar Text', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+        sans-serif;
     --font-mono:
         'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
         monospace;
@@ -161,15 +161,36 @@ html {
 
 /* Dedicated Content & Reading Typography */
 .font-sans-myanmar {
-    font-family: 'Plus Jakarta Sans', 'Noto Sans Myanmar', 'Padauk', 'Pyidaungsu', 'Myanmar Text', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+    font-family:
+        'Plus Jakarta Sans',
+        'Noto Sans Myanmar',
+        'Padauk',
+        'Pyidaungsu',
+        'Myanmar Text',
+        -apple-system,
+        BlinkMacSystemFont,
+        'Segoe UI',
+        Roboto,
+        sans-serif !important;
 }
 
 .font-padauk {
-    font-family: 'Padauk', 'Noto Sans Myanmar', 'Pyidaungsu', 'Myanmar Text', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+    font-family:
+        'Padauk',
+        'Noto Sans Myanmar',
+        'Pyidaungsu',
+        'Myanmar Text',
+        -apple-system,
+        BlinkMacSystemFont,
+        'Segoe UI',
+        Roboto,
+        sans-serif !important;
 }
 
 .font-serif-myanmar {
-    font-family: 'Noto Serif Myanmar', 'Plus Jakarta Sans', Georgia, 'Times New Roman', serif !important;
+    font-family:
+        'Noto Serif Myanmar', 'Plus Jakarta Sans', Georgia, 'Times New Roman',
+        serif !important;
 }
 
 .ai-response-canvas {
@@ -216,7 +237,8 @@ html {
 }
 
 @keyframes cursor-blink {
-    0%, 100% {
+    0%,
+    100% {
         opacity: 1;
     }
     50% {
@@ -254,8 +276,8 @@ html {
 
 /* Hide scrollbar for IE, Edge and Firefox */
 .no-scrollbar {
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
 }
 
 /* Safe area bottom padding for iPhone notch / dynamic island */
@@ -270,14 +292,21 @@ html {
 }
 
 #nprogress .bar {
-    background: linear-gradient(90deg, #6366f1 0%, #a855f7 50%, #ec4899 100%) !important;
+    background: linear-gradient(
+        90deg,
+        #6366f1 0%,
+        #a855f7 50%,
+        #ec4899 100%
+    ) !important;
     position: fixed !important;
     z-index: 99999 !important;
     top: 0 !important;
     left: 0 !important;
     width: 100% !important;
     height: 3px !important;
-    box-shadow: 0 0 14px rgba(99, 102, 241, 0.9), 0 0 6px rgba(168, 85, 247, 0.7) !important;
+    box-shadow:
+        0 0 14px rgba(99, 102, 241, 0.9),
+        0 0 6px rgba(168, 85, 247, 0.7) !important;
 }
 
 #nprogress .peg {
@@ -286,7 +315,9 @@ html {
     right: 0px !important;
     width: 120px !important;
     height: 100% !important;
-    box-shadow: 0 0 16px #ec4899, 0 0 8px #a855f7 !important;
+    box-shadow:
+        0 0 16px #ec4899,
+        0 0 8px #a855f7 !important;
     opacity: 1 !important;
     transform: rotate(3deg) translate(0px, -4px) !important;
 }
@@ -302,14 +333,18 @@ html {
     backdrop-filter: blur(8px);
     border-radius: 9999px;
     padding: 6px;
-    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15), 0 0 10px rgba(99, 102, 241, 0.2);
+    box-shadow:
+        0 4px 12px rgba(99, 102, 241, 0.15),
+        0 0 10px rgba(99, 102, 241, 0.2);
     transition: opacity 0.2s ease;
 }
 
 .dark #nprogress .spinner {
     background: rgba(13, 15, 26, 0.85);
     border: 1px solid rgba(99, 102, 241, 0.35);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35), 0 0 14px rgba(99, 102, 241, 0.35);
+    box-shadow:
+        0 4px 12px rgba(0, 0, 0, 0.35),
+        0 0 14px rgba(99, 102, 241, 0.35);
 }
 
 #nprogress .spinner-icon {

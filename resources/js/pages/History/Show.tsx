@@ -25,7 +25,14 @@ import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -34,9 +41,23 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { stream as generateStream, humanize as generateHumanize, create as generateCreate } from '@/routes/generate';
-import { index as historyIndex, update as historyUpdate, destroy as historyDestroy } from '@/routes/history';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
+import {
+    stream as generateStream,
+    humanize as generateHumanize,
+    create as generateCreate,
+} from '@/routes/generate';
+import {
+    index as historyIndex,
+    update as historyUpdate,
+    destroy as historyDestroy,
+} from '@/routes/history';
 
 interface Tone {
     id: number;
@@ -82,19 +103,34 @@ function parseMarkdown(md: string, size: 'sm' | 'base' | 'lg' = 'base') {
     // Inline code (`code`)
     html = html.replace(
         /`([^`]+)`/g,
-        '<code class="bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 px-1.5 py-0.5 rounded-md font-mono text-xs border border-indigo-500/20 font-semibold">$1</code>'
+        '<code class="bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 px-1.5 py-0.5 rounded-md font-mono text-xs border border-indigo-500/20 font-semibold">$1</code>',
     );
 
     // Bold (**text** or __text__)
-    html = html.replace(/\*\*([^*]+)\*\*/g, '<strong class="font-extrabold text-slate-950 dark:text-white">$1</strong>');
-    html = html.replace(/__([^_]+)__/g, '<strong class="font-extrabold text-slate-950 dark:text-white">$1</strong>');
+    html = html.replace(
+        /\*\*([^*]+)\*\*/g,
+        '<strong class="font-extrabold text-slate-950 dark:text-white">$1</strong>',
+    );
+    html = html.replace(
+        /__([^_]+)__/g,
+        '<strong class="font-extrabold text-slate-950 dark:text-white">$1</strong>',
+    );
 
     // Italic (*text* or _text_)
-    html = html.replace(/\*([^*]+)\*/g, '<em class="italic text-slate-700 dark:text-slate-300">$1</em>');
-    html = html.replace(/_([^_]+)_/g, '<em class="italic text-slate-700 dark:text-slate-300">$1</em>');
+    html = html.replace(
+        /\*([^*]+)\*/g,
+        '<em class="italic text-slate-700 dark:text-slate-300">$1</em>',
+    );
+    html = html.replace(
+        /_([^_]+)_/g,
+        '<em class="italic text-slate-700 dark:text-slate-300">$1</em>',
+    );
 
     // Horizontal Rules (--- or *** or ___)
-    html = html.replace(/^(?:---|—|\*\*\*|___)\s*$/gim, '<hr class="my-6 sm:my-8 border-t border-slate-200 dark:border-slate-800" />');
+    html = html.replace(
+        /^(?:---|—|\*\*\*|___)\s*$/gim,
+        '<hr class="my-6 sm:my-8 border-t border-slate-200 dark:border-slate-800" />',
+    );
 
     // Headers with size-responsive classes
     const h1Class =
@@ -133,25 +169,25 @@ function parseMarkdown(md: string, size: 'sm' | 'base' | 'lg' = 'base') {
     // Standalone Myanmar section titles: e.g. "၁။ Database Replication ဆိုတာ ဘာလဲ။"
     html = html.replace(
         /^([၁-၉0-9]+[။]\s*.*$)/gim,
-        `<h4 class="${h2Class} text-indigo-900 dark:text-indigo-200 mt-7 mb-3">$1</h4>`
+        `<h4 class="${h2Class} text-indigo-900 dark:text-indigo-200 mt-7 mb-3">$1</h4>`,
     );
 
     // Blockquotes (> text)
     html = html.replace(
         /^\> (.*$)/gim,
-        '<blockquote class="border-l-4 border-indigo-500 pl-4 py-2 my-4 text-slate-700 dark:text-slate-300 italic bg-indigo-50/60 dark:bg-indigo-950/30 rounded-r-2xl leading-[1.85]">$1</blockquote>'
+        '<blockquote class="border-l-4 border-indigo-500 pl-4 py-2 my-4 text-slate-700 dark:text-slate-300 italic bg-indigo-50/60 dark:bg-indigo-950/30 rounded-r-2xl leading-[1.85]">$1</blockquote>',
     );
 
     // Unordered Lists
     html = html.replace(
         /^\s*[\-\*]\s+(.*$)/gim,
-        '<li class="list-disc ml-6 my-2 text-slate-800 dark:text-slate-100 leading-[1.95]">$1</li>'
+        '<li class="list-disc ml-6 my-2 text-slate-800 dark:text-slate-100 leading-[1.95]">$1</li>',
     );
 
     // Ordered Lists
     html = html.replace(
         /^\s*(\d+)\.\s+(.*$)/gim,
-        '<li class="list-decimal ml-6 my-2 text-slate-800 dark:text-slate-100 leading-[1.95]">$2</li>'
+        '<li class="list-decimal ml-6 my-2 text-slate-800 dark:text-slate-100 leading-[1.95]">$2</li>',
     );
 
     const lines = html.split('\n');
@@ -185,10 +221,12 @@ function parseMarkdown(md: string, size: 'sm' | 'base' | 'lg' = 'base') {
 
         // Check for SEO Meta Description line and render as structured SEO card
         const metaDescMatch = trimmed.match(
-            /^(?:<strong[^>]*>)?\s*(?:Meta Description|SEO Description|မေတ္တာရပ်ခံချက်|ဖော်ပြချက်)\s*:?\s*(?:<\/strong>)?\s*:?\s*(.+)$/i
+            /^(?:<strong[^>]*>)?\s*(?:Meta Description|SEO Description|မေတ္တာရပ်ခံချက်|ဖော်ပြချက်)\s*:?\s*(?:<\/strong>)?\s*:?\s*(.+)$/i,
         );
         if (metaDescMatch) {
-            const desc = metaDescMatch[1].replace(/^<\/strong>\s*:?\s*/, '').trim();
+            const desc = metaDescMatch[1]
+                .replace(/^<\/strong>\s*:?\s*/, '')
+                .trim();
             return `<div class="my-5 p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-indigo-50/80 via-slate-50/50 to-purple-50/30 dark:from-indigo-950/30 dark:via-slate-900/40 dark:to-purple-950/20 border border-indigo-200/80 dark:border-indigo-800/50 shadow-xs">
                 <div class="flex items-center gap-1.5 font-mono text-[11px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 mb-2">
                     <span class="size-2 rounded-full bg-indigo-500 animate-pulse"></span>
@@ -200,10 +238,12 @@ function parseMarkdown(md: string, size: 'sm' | 'base' | 'lg' = 'base') {
 
         // Check for Estimated Reading Time line and render as structured pill
         const readTimeMatch = trimmed.match(
-            /^(?:<strong[^>]*>)?\s*(?:Estimated Reading Time|Reading Time|ခန့်မှန်းဖတ်ရှုချိန်)\s*:?\s*(?:<\/strong>)?\s*:?\s*(.+)$/i
+            /^(?:<strong[^>]*>)?\s*(?:Estimated Reading Time|Reading Time|ခန့်မှန်းဖတ်ရှုချိန်)\s*:?\s*(?:<\/strong>)?\s*:?\s*(.+)$/i,
         );
         if (readTimeMatch) {
-            const time = readTimeMatch[1].replace(/^<\/strong>\s*:?\s*/, '').trim();
+            const time = readTimeMatch[1]
+                .replace(/^<\/strong>\s*:?\s*/, '')
+                .trim();
             return `<div class="inline-flex items-center gap-1.5 px-3 py-1 mb-4 rounded-full bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/60 text-xs font-semibold text-slate-600 dark:text-slate-300 font-mono shadow-2xs">
                 <span class="text-indigo-500">⏱️</span>
                 <span class="font-bold text-slate-900 dark:text-white">Reading Time:</span>
@@ -229,18 +269,22 @@ export default function HistoryShow({ generation, autostream }: ShowProps) {
     const [fontSize, setFontSize] = useState<'sm' | 'base' | 'lg'>(() => {
         if (typeof window !== 'undefined') {
             const saved = localStorage.getItem('nexus_ai_font_size');
-            if (saved === 'sm' || saved === 'base' || saved === 'lg') return saved;
+            if (saved === 'sm' || saved === 'base' || saved === 'lg')
+                return saved;
         }
         return 'base';
     });
 
-    const [fontFamily, setFontFamily] = useState<'sans' | 'padauk' | 'serif'>(() => {
-        if (typeof window !== 'undefined') {
-            const saved = localStorage.getItem('nexus_ai_font_family');
-            if (saved === 'sans' || saved === 'padauk' || saved === 'serif') return saved;
-        }
-        return 'sans';
-    });
+    const [fontFamily, setFontFamily] = useState<'sans' | 'padauk' | 'serif'>(
+        () => {
+            if (typeof window !== 'undefined') {
+                const saved = localStorage.getItem('nexus_ai_font_family');
+                if (saved === 'sans' || saved === 'padauk' || saved === 'serif')
+                    return saved;
+            }
+            return 'sans';
+        },
+    );
 
     const handleFontSizeChange = (size: 'sm' | 'base' | 'lg') => {
         setFontSize(size);
@@ -257,7 +301,8 @@ export default function HistoryShow({ generation, autostream }: ShowProps) {
     };
 
     const editForm = useForm({
-        edited_content: generation.edited_content || generation.ai_content || '',
+        edited_content:
+            generation.edited_content || generation.ai_content || '',
     });
 
     const bottomRef = useRef<HTMLDivElement>(null);
@@ -265,7 +310,9 @@ export default function HistoryShow({ generation, autostream }: ShowProps) {
 
     // Humanizer Subsystem state
     const [isHumanizerOpen, setIsHumanizerOpen] = useState(false);
-    const [humanizerPreset, setHumanizerPreset] = useState<'conversational' | 'punchy' | 'executive'>('conversational');
+    const [humanizerPreset, setHumanizerPreset] = useState<
+        'conversational' | 'punchy' | 'executive'
+    >('conversational');
     const [isHumanizing, setIsHumanizing] = useState(false);
     const [humanizedContent, setHumanizedContent] = useState('');
     const [humanizerError, setHumanizerError] = useState<string | null>(null);
@@ -273,10 +320,13 @@ export default function HistoryShow({ generation, autostream }: ShowProps) {
     const humanizerEventSourceRef = useRef<EventSource | null>(null);
     const humanizedScrollRef = useRef<HTMLDivElement>(null);
     const isHumanizerAutoScrollRef = useRef<boolean>(true);
-    const [showHumanizerScrollDown, setShowHumanizerScrollDown] = useState<boolean>(false);
+    const [showHumanizerScrollDown, setShowHumanizerScrollDown] =
+        useState<boolean>(false);
 
     // Word, Character, and Read Time Telemetry
-    const wordCount = activeText.trim() ? activeText.trim().split(/\s+/).length : 0;
+    const wordCount = activeText.trim()
+        ? activeText.trim().split(/\s+/).length
+        : 0;
     const charCount = activeText.length;
     const readTimeMin = Math.max(1, Math.ceil(wordCount / 200));
 
@@ -288,10 +338,13 @@ export default function HistoryShow({ generation, autostream }: ShowProps) {
     // Smart Auto-Scroll refs and state
     const isProgrammaticScrollRef = useRef<boolean>(false);
     const isAutoScrollActiveRef = useRef<boolean>(true);
-    const [showStreamingScrollDown, setShowStreamingScrollDown] = useState<boolean>(false);
+    const [showStreamingScrollDown, setShowStreamingScrollDown] =
+        useState<boolean>(false);
     const [showScrollTop, setShowScrollTop] = useState<boolean>(false);
     const canvasCardRef = useRef<HTMLDivElement>(null);
-    const [canvasCenterLeft, setCanvasCenterLeft] = useState<number | null>(null);
+    const [canvasCenterLeft, setCanvasCenterLeft] = useState<number | null>(
+        null,
+    );
 
     // Keep floating action button centered precisely over the AI output card box
     useEffect(() => {
@@ -345,7 +398,9 @@ export default function HistoryShow({ generation, autostream }: ShowProps) {
                 isAutoScrollActiveRef.current = false;
                 setShowStreamingScrollDown(true);
             } else if (e.deltaY > 0) {
-                const distanceBelow = document.documentElement.scrollHeight - (window.innerHeight + window.scrollY);
+                const distanceBelow =
+                    document.documentElement.scrollHeight -
+                    (window.innerHeight + window.scrollY);
                 if (distanceBelow < 120) {
                     isAutoScrollActiveRef.current = true;
                     setShowStreamingScrollDown(false);
@@ -355,7 +410,9 @@ export default function HistoryShow({ generation, autostream }: ShowProps) {
 
         const handleTouchMove = () => {
             if (status !== 'streaming') return;
-            const distanceBelow = document.documentElement.scrollHeight - (window.innerHeight + window.scrollY);
+            const distanceBelow =
+                document.documentElement.scrollHeight -
+                (window.innerHeight + window.scrollY);
             if (distanceBelow > 200) {
                 isAutoScrollActiveRef.current = false;
                 setShowStreamingScrollDown(true);
@@ -372,7 +429,9 @@ export default function HistoryShow({ generation, autostream }: ShowProps) {
 
         window.addEventListener('scroll', handleScroll, { passive: true });
         window.addEventListener('wheel', handleWheel, { passive: true });
-        window.addEventListener('touchmove', handleTouchMove, { passive: true });
+        window.addEventListener('touchmove', handleTouchMove, {
+            passive: true,
+        });
 
         return () => {
             window.removeEventListener('scroll', handleScroll);
@@ -418,11 +477,17 @@ export default function HistoryShow({ generation, autostream }: ShowProps) {
                 // Auto-scroll to follow stream smoothly
                 if (isAutoScrollActiveRef.current && bottomRef.current) {
                     isProgrammaticScrollRef.current = true;
-                    bottomRef.current.scrollIntoView({ behavior: 'auto', block: 'end' });
+                    bottomRef.current.scrollIntoView({
+                        behavior: 'auto',
+                        block: 'end',
+                    });
                 }
             }
 
-            if (tokenBufferRef.current.length > 0 || !isStreamFinishedRef.current) {
+            if (
+                tokenBufferRef.current.length > 0 ||
+                !isStreamFinishedRef.current
+            ) {
                 animFrameRef.current = requestAnimationFrame(tick);
             } else {
                 // Stream is completely drained and finished
@@ -526,7 +591,9 @@ export default function HistoryShow({ generation, autostream }: ShowProps) {
         const textToDownload = generation.edited_content || content;
         if (!textToDownload) return;
 
-        const blob = new Blob([textToDownload], { type: 'text/plain;charset=utf-8' });
+        const blob = new Blob([textToDownload], {
+            type: 'text/plain;charset=utf-8',
+        });
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
@@ -549,15 +616,26 @@ export default function HistoryShow({ generation, autostream }: ShowProps) {
         });
     };
 
+    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+
     // Delete generation
     const handleDelete = () => {
-        if (confirm('Are you sure you want to delete this generation from your history?')) {
-            router.delete(historyDestroy.url({ generation: generation.id }));
-        }
+        setIsDeleteDialogOpen(true);
+    };
+
+    const confirmDelete = () => {
+        router.delete(historyDestroy.url({ generation: generation.id }), {
+            onSuccess: () => {
+                setIsDeleteDialogOpen(false);
+                toast.success('Generation deleted');
+            },
+        });
     };
 
     // Humanizer Subsystem Methods
-    const startHumanizer = (presetOverride?: 'conversational' | 'punchy' | 'executive') => {
+    const startHumanizer = (
+        presetOverride?: 'conversational' | 'punchy' | 'executive',
+    ) => {
         const activePreset = presetOverride || humanizerPreset;
         if (humanizerEventSourceRef.current) {
             humanizerEventSourceRef.current.close();
@@ -576,7 +654,10 @@ export default function HistoryShow({ generation, autostream }: ShowProps) {
         isHumanizerAutoScrollRef.current = true;
         setShowHumanizerScrollDown(false);
 
-        const url = generateHumanize.url({ generation: generation.id }, { query: { preset: activePreset } });
+        const url = generateHumanize.url(
+            { generation: generation.id },
+            { query: { preset: activePreset } },
+        );
         const es = new EventSource(url);
         humanizerEventSourceRef.current = es;
 
@@ -587,8 +668,12 @@ export default function HistoryShow({ generation, autostream }: ShowProps) {
                 const data = JSON.parse(event.data);
                 if (data.token) {
                     setHumanizedContent((prev) => prev + data.token);
-                    if (isHumanizerAutoScrollRef.current && humanizedScrollRef.current) {
-                        humanizedScrollRef.current.scrollTop = humanizedScrollRef.current.scrollHeight;
+                    if (
+                        isHumanizerAutoScrollRef.current &&
+                        humanizedScrollRef.current
+                    ) {
+                        humanizedScrollRef.current.scrollTop =
+                            humanizedScrollRef.current.scrollHeight;
                     }
                 }
                 if (data.done) {
@@ -613,14 +698,17 @@ export default function HistoryShow({ generation, autostream }: ShowProps) {
             setIsHumanizing(false);
             es.close();
             humanizerEventSourceRef.current = null;
-            setHumanizerError('Connection interrupted while streaming humanized rewrite.');
+            setHumanizerError(
+                'Connection interrupted while streaming humanized rewrite.',
+            );
             toast.error('Connection interrupted.');
         };
     };
 
     const handleHumanizerScroll = () => {
         if (!humanizedScrollRef.current) return;
-        const { scrollTop, scrollHeight, clientHeight } = humanizedScrollRef.current;
+        const { scrollTop, scrollHeight, clientHeight } =
+            humanizedScrollRef.current;
         const distanceBottom = scrollHeight - (scrollTop + clientHeight);
         if (distanceBottom > 60) {
             isHumanizerAutoScrollRef.current = false;
@@ -635,14 +723,18 @@ export default function HistoryShow({ generation, autostream }: ShowProps) {
         if (!humanizedContent) return;
 
         editForm.setData('edited_content', humanizedContent);
-        router.put(historyUpdate.url({ generation: generation.id }), {
-            edited_content: humanizedContent,
-        }, {
-            onSuccess: () => {
-                setIsHumanizerOpen(false);
-                toast.success('Humanized copy accepted and saved!');
+        router.put(
+            historyUpdate.url({ generation: generation.id }),
+            {
+                edited_content: humanizedContent,
             },
-        });
+            {
+                onSuccess: () => {
+                    setIsHumanizerOpen(false);
+                    toast.success('Humanized copy accepted and saved!');
+                },
+            },
+        );
     };
 
     const handleCopyHumanized = () => {
@@ -664,7 +756,10 @@ export default function HistoryShow({ generation, autostream }: ShowProps) {
     useEffect(() => {
         if (typeof window !== 'undefined') {
             const params = new URLSearchParams(window.location.search);
-            if (params.get('humanize') === '1' && (generation.ai_content || generation.edited_content)) {
+            if (
+                params.get('humanize') === '1' &&
+                (generation.ai_content || generation.edited_content)
+            ) {
                 handleOpenHumanizer();
             }
         }
@@ -678,22 +773,22 @@ export default function HistoryShow({ generation, autostream }: ShowProps) {
 
     const statusBadge = {
         pending: (
-            <Badge className="bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 animate-pulse">
+            <Badge className="animate-pulse border border-amber-500/20 bg-amber-500/10 text-amber-600 dark:text-amber-400">
                 Pending
             </Badge>
         ),
         streaming: (
-            <Badge className="bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 animate-pulse flex items-center gap-1.5 font-bold">
+            <Badge className="flex animate-pulse items-center gap-1.5 border border-indigo-500/20 bg-indigo-500/10 font-bold text-indigo-600 dark:text-indigo-400">
                 <RefreshCw className="size-3 animate-spin" /> Streaming Copy...
             </Badge>
         ),
         completed: (
-            <Badge className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 font-bold">
+            <Badge className="border border-emerald-500/20 bg-emerald-500/10 font-bold text-emerald-600 dark:text-emerald-400">
                 Completed
             </Badge>
         ),
         failed: (
-            <Badge className="bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20 font-bold">
+            <Badge className="border border-rose-500/20 bg-rose-500/10 font-bold text-rose-600 dark:text-rose-400">
                 Failed
             </Badge>
         ),
@@ -713,48 +808,53 @@ export default function HistoryShow({ generation, autostream }: ShowProps) {
 
     return (
         <>
-            <Head title={`Copy - ${generation.content_type.replace('_', ' ')}`} />
-            <div className="mx-auto flex h-full w-full max-w-7xl flex-1 flex-col gap-5 sm:gap-6 p-3.5 sm:p-6 lg:p-8">
+            <Head
+                title={`Copy - ${generation.content_type.replace('_', ' ')}`}
+            />
+            <div className="mx-auto flex h-full w-full max-w-7xl flex-1 flex-col gap-5 p-3.5 sm:gap-6 sm:p-6 lg:p-8">
                 {/* Header Section */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200/80 pb-4 sm:pb-5 dark:border-slate-800/80">
+                <div className="flex flex-col justify-between gap-4 border-b border-slate-200/80 pb-4 sm:flex-row sm:items-center sm:pb-5 dark:border-slate-800/80">
                     <div>
                         <Link
                             href={historyIndex.url()}
-                            className="text-xs font-bold text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-white flex items-center gap-1 mb-1.5 transition"
+                            className="mb-1.5 flex items-center gap-1 text-xs font-bold text-slate-500 transition hover:text-indigo-600 dark:text-slate-400 dark:hover:text-white"
                         >
                             <ArrowLeft className="size-3.5" />
                             Back to History
                         </Link>
-                        <h1 className="text-xl sm:text-2xl sm:text-3xl font-black text-slate-900 dark:text-white capitalize flex items-center gap-2.5">
+                        <h1 className="flex items-center gap-2.5 text-xl font-black text-slate-900 capitalize sm:text-2xl sm:text-3xl dark:text-white">
                             {generation.content_type.replace('_', ' ')}
                         </h1>
-                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 sm:mt-1">
-                            Generated on {new Date(generation.created_at).toLocaleString()}
+                        <p className="mt-0.5 text-xs text-slate-500 sm:mt-1 dark:text-slate-400">
+                            Generated on{' '}
+                            {new Date(generation.created_at).toLocaleString()}
                         </p>
                     </div>
 
                     {/* Action Bar */}
                     <div className="flex items-center gap-2">
                         {/* Mobile Actions (< sm) */}
-                        <div className="flex sm:hidden items-center gap-1.5">
+                        <div className="flex items-center gap-1.5 sm:hidden">
                             {Boolean(activeText) && (
                                 <>
                                     <Button
                                         variant="outline"
                                         onClick={handleCopy}
-                                        className="rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-[#0c0e1a] h-10 px-3 flex items-center gap-1.5 cursor-pointer text-xs font-bold transition hover:border-indigo-400 hover:text-indigo-600 dark:hover:text-indigo-400 shadow-2xs active:scale-95"
+                                        className="flex h-10 cursor-pointer items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 text-xs font-bold shadow-2xs transition hover:border-indigo-400 hover:text-indigo-600 active:scale-95 dark:border-slate-800 dark:bg-[#0c0e1a] dark:hover:text-indigo-400"
                                     >
                                         {isCopied ? (
                                             <Check className="size-4 text-emerald-500" />
                                         ) : (
                                             <Copy className="size-4 text-indigo-500" />
                                         )}
-                                        <span>{isCopied ? 'Copied' : 'Copy'}</span>
+                                        <span>
+                                            {isCopied ? 'Copied' : 'Copy'}
+                                        </span>
                                     </Button>
                                     <Button
                                         variant="outline"
                                         onClick={handleOpenHumanizer}
-                                        className="rounded-xl border border-indigo-200 bg-indigo-50/60 dark:border-indigo-900/40 dark:bg-indigo-950/20 text-indigo-600 dark:text-indigo-400 h-10 px-3 flex items-center gap-1.5 cursor-pointer text-xs font-bold transition hover:bg-indigo-100 dark:hover:bg-indigo-900/30 shadow-2xs active:scale-95"
+                                        className="flex h-10 cursor-pointer items-center gap-1.5 rounded-xl border border-indigo-200 bg-indigo-50/60 px-3 text-xs font-bold text-indigo-600 shadow-2xs transition hover:bg-indigo-100 active:scale-95 dark:border-indigo-900/40 dark:bg-indigo-950/20 dark:text-indigo-400 dark:hover:bg-indigo-900/30"
                                     >
                                         <Sparkles className="size-4 text-indigo-500" />
                                         <span>Humanize</span>
@@ -763,7 +863,7 @@ export default function HistoryShow({ generation, autostream }: ShowProps) {
                             )}
                             <Link
                                 href={generateCreate.url()}
-                                className="inline-flex items-center gap-1.5 rounded-xl bg-indigo-600 px-3.5 h-10 text-xs font-bold text-white shadow-md shadow-indigo-600/20 hover:bg-indigo-500 transition active:scale-95"
+                                className="inline-flex h-10 items-center gap-1.5 rounded-xl bg-indigo-600 px-3.5 text-xs font-bold text-white shadow-md shadow-indigo-600/20 transition hover:bg-indigo-500 active:scale-95"
                             >
                                 <PenTool className="size-3.5" />
                                 New
@@ -773,13 +873,16 @@ export default function HistoryShow({ generation, autostream }: ShowProps) {
                                     <Button
                                         variant="outline"
                                         size="icon"
-                                        className="size-10 rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-[#0c0e1a] shadow-2xs cursor-pointer active:scale-95"
+                                        className="size-10 cursor-pointer rounded-xl border border-slate-200 bg-white shadow-2xs active:scale-95 dark:border-slate-800 dark:bg-[#0c0e1a]"
                                         aria-label="More actions"
                                     >
                                         <MoreVertical className="size-4" />
                                     </Button>
                                 </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end" className="w-48 rounded-2xl p-1.5 shadow-xl">
+                                <DropdownMenuContent
+                                    align="end"
+                                    className="w-48 rounded-2xl p-1.5 shadow-xl"
+                                >
                                     {Boolean(activeText) && (
                                         <>
                                             <DropdownMenuItem
@@ -790,7 +893,9 @@ export default function HistoryShow({ generation, autostream }: ShowProps) {
                                                 Humanize Copy
                                             </DropdownMenuItem>
                                             <DropdownMenuItem
-                                                onClick={() => handleDownload('md')}
+                                                onClick={() =>
+                                                    handleDownload('md')
+                                                }
                                                 className="cursor-pointer gap-2 rounded-xl py-2 text-xs font-semibold"
                                             >
                                                 <Download className="size-4 text-slate-500" />
@@ -799,12 +904,17 @@ export default function HistoryShow({ generation, autostream }: ShowProps) {
                                             <DropdownMenuItem
                                                 onClick={() => {
                                                     setIsEditing(!isEditing);
-                                                    editForm.setData('edited_content', activeText || '');
+                                                    editForm.setData(
+                                                        'edited_content',
+                                                        activeText || '',
+                                                    );
                                                 }}
                                                 className="cursor-pointer gap-2 rounded-xl py-2 text-xs font-semibold"
                                             >
                                                 <Edit3 className="size-4 text-slate-500" />
-                                                {isEditing ? 'View Mode' : 'Edit Content'}
+                                                {isEditing
+                                                    ? 'View Mode'
+                                                    : 'Edit Content'}
                                             </DropdownMenuItem>
                                             <DropdownMenuSeparator />
                                         </>
@@ -821,24 +931,26 @@ export default function HistoryShow({ generation, autostream }: ShowProps) {
                         </div>
 
                         {/* Desktop Actions (>= sm) */}
-                        <div className="hidden sm:flex items-center gap-2">
+                        <div className="hidden items-center gap-2 sm:flex">
                             {Boolean(activeText) && (
                                 <>
                                     <Button
                                         variant="outline"
                                         onClick={handleCopy}
-                                        className="rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-[#0c0e1a] h-10 px-3 flex items-center gap-1.5 cursor-pointer text-xs font-bold transition hover:border-indigo-400 hover:text-indigo-600 dark:hover:text-indigo-400 shadow-2xs active:scale-95"
+                                        className="flex h-10 cursor-pointer items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 text-xs font-bold shadow-2xs transition hover:border-indigo-400 hover:text-indigo-600 active:scale-95 dark:border-slate-800 dark:bg-[#0c0e1a] dark:hover:text-indigo-400"
                                     >
                                         {isCopied ? (
                                             <Check className="size-4 text-emerald-500" />
                                         ) : (
                                             <Copy className="size-4 text-indigo-500" />
                                         )}
-                                        <span>{isCopied ? 'Copied' : 'Copy'}</span>
+                                        <span>
+                                            {isCopied ? 'Copied' : 'Copy'}
+                                        </span>
                                     </Button>
                                     <Button
                                         onClick={handleOpenHumanizer}
-                                        className="rounded-xl bg-gradient-to-r from-violet-600 via-indigo-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white h-10 px-3.5 flex items-center gap-1.5 cursor-pointer text-xs font-bold shadow-md shadow-indigo-600/20 active:scale-95 transition"
+                                        className="flex h-10 cursor-pointer items-center gap-1.5 rounded-xl bg-gradient-to-r from-violet-600 via-indigo-600 to-purple-600 px-3.5 text-xs font-bold text-white shadow-md shadow-indigo-600/20 transition hover:from-violet-500 hover:to-purple-500 active:scale-95"
                                     >
                                         <Sparkles className="size-4" />
                                         <span>Humanize</span>
@@ -846,7 +958,7 @@ export default function HistoryShow({ generation, autostream }: ShowProps) {
                                     <Button
                                         variant="outline"
                                         onClick={() => handleDownload('md')}
-                                        className="rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-[#0c0e1a] h-10 px-3 flex items-center gap-1.5 cursor-pointer text-xs font-bold shadow-2xs active:scale-95"
+                                        className="flex h-10 cursor-pointer items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 text-xs font-bold shadow-2xs active:scale-95 dark:border-slate-800 dark:bg-[#0c0e1a]"
                                     >
                                         <Download className="size-4" />
                                         .md
@@ -855,19 +967,24 @@ export default function HistoryShow({ generation, autostream }: ShowProps) {
                                         variant="outline"
                                         onClick={() => {
                                             setIsEditing(!isEditing);
-                                            editForm.setData('edited_content', activeText || '');
+                                            editForm.setData(
+                                                'edited_content',
+                                                activeText || '',
+                                            );
                                         }}
-                                        className="rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-[#0c0e1a] h-10 px-3 flex items-center gap-1.5 cursor-pointer text-xs font-bold shadow-2xs active:scale-95"
+                                        className="flex h-10 cursor-pointer items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 text-xs font-bold shadow-2xs active:scale-95 dark:border-slate-800 dark:bg-[#0c0e1a]"
                                     >
                                         <Edit3 className="size-4" />
-                                        <span>{isEditing ? 'View' : 'Edit'}</span>
+                                        <span>
+                                            {isEditing ? 'View' : 'Edit'}
+                                        </span>
                                     </Button>
                                 </>
                             )}
 
                             <Link
                                 href={generateCreate.url()}
-                                className="inline-flex items-center gap-1.5 rounded-xl bg-indigo-600 px-3.5 sm:px-4 h-10 text-xs font-bold text-white shadow-md shadow-indigo-600/20 hover:bg-indigo-500 transition active:scale-95"
+                                className="inline-flex h-10 items-center gap-1.5 rounded-xl bg-indigo-600 px-3.5 text-xs font-bold text-white shadow-md shadow-indigo-600/20 transition hover:bg-indigo-500 active:scale-95 sm:px-4"
                             >
                                 <PenTool className="size-3.5" />
                                 New Copy
@@ -876,7 +993,7 @@ export default function HistoryShow({ generation, autostream }: ShowProps) {
                             <Button
                                 variant="outline"
                                 onClick={handleDelete}
-                                className="rounded-xl border border-rose-200 bg-rose-50/50 hover:bg-rose-100 text-rose-600 dark:border-rose-900/40 dark:bg-rose-950/20 dark:hover:bg-rose-950/40 dark:text-rose-400 h-10 px-3 flex items-center gap-1.5 cursor-pointer text-xs font-bold active:scale-95"
+                                className="flex h-10 cursor-pointer items-center gap-1.5 rounded-xl border border-rose-200 bg-rose-50/50 px-3 text-xs font-bold text-rose-600 hover:bg-rose-100 active:scale-95 dark:border-rose-900/40 dark:bg-rose-950/20 dark:text-rose-400 dark:hover:bg-rose-950/40"
                             >
                                 <Trash2 className="size-4" />
                             </Button>
@@ -885,30 +1002,47 @@ export default function HistoryShow({ generation, autostream }: ShowProps) {
                 </div>
 
                 {/* Status and Configuration Metadata Cards */}
-                <div className="grid gap-2 sm:gap-3 grid-cols-2 lg:grid-cols-4">
-                    <div className="p-3 sm:p-4 rounded-2xl border border-slate-200/80 bg-white/80 dark:border-slate-800/80 dark:bg-[#0c0e1a]/80 shadow-xs backdrop-blur-xl">
-                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Status</span>
+                <div className="grid grid-cols-2 gap-2 sm:gap-3 lg:grid-cols-4">
+                    <div className="rounded-2xl border border-slate-200/80 bg-white/80 p-3 shadow-xs backdrop-blur-xl sm:p-4 dark:border-slate-800/80 dark:bg-[#0c0e1a]/80">
+                        <span className="block text-[10px] font-bold tracking-wider text-slate-400 uppercase">
+                            Status
+                        </span>
                         <div className="mt-1 sm:mt-1.5">{statusBadge}</div>
                     </div>
-                    <div className="p-3 sm:p-4 rounded-2xl border border-slate-200/80 bg-white/80 dark:border-slate-800/80 dark:bg-[#0c0e1a]/80 shadow-xs backdrop-blur-xl">
-                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Language</span>
-                        <div className="mt-1 sm:mt-1.5 flex items-center gap-1.5 text-xs font-bold text-slate-900 dark:text-slate-100 uppercase font-mono">
-                            <Languages className="size-3.5 sm:size-4 text-indigo-500" />
+                    <div className="rounded-2xl border border-slate-200/80 bg-white/80 p-3 shadow-xs backdrop-blur-xl sm:p-4 dark:border-slate-800/80 dark:bg-[#0c0e1a]/80">
+                        <span className="block text-[10px] font-bold tracking-wider text-slate-400 uppercase">
+                            Language
+                        </span>
+                        <div className="mt-1 flex items-center gap-1.5 font-mono text-xs font-bold text-slate-900 uppercase sm:mt-1.5 dark:text-slate-100">
+                            <Languages className="size-3.5 text-indigo-500 sm:size-4" />
                             {generation.output_language}
                         </div>
                     </div>
-                    <div className="p-3 sm:p-4 rounded-2xl border border-slate-200/80 bg-white/80 dark:border-slate-800/80 dark:bg-[#0c0e1a]/80 shadow-xs backdrop-blur-xl">
-                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Voice Tone</span>
-                        <div className="mt-1 sm:mt-1.5 flex items-center gap-1.5 text-xs font-bold text-slate-900 dark:text-slate-100 truncate">
-                            <Sparkles className="size-3.5 sm:size-4 text-indigo-500 shrink-0" />
-                            <span className="truncate">{generation.tone_snapshot ? generation.tone_snapshot.split(':')[0] : 'Default'}</span>
+                    <div className="rounded-2xl border border-slate-200/80 bg-white/80 p-3 shadow-xs backdrop-blur-xl sm:p-4 dark:border-slate-800/80 dark:bg-[#0c0e1a]/80">
+                        <span className="block text-[10px] font-bold tracking-wider text-slate-400 uppercase">
+                            Voice Tone
+                        </span>
+                        <div className="mt-1 flex items-center gap-1.5 truncate text-xs font-bold text-slate-900 sm:mt-1.5 dark:text-slate-100">
+                            <Sparkles className="size-3.5 shrink-0 text-indigo-500 sm:size-4" />
+                            <span className="truncate">
+                                {generation.tone_snapshot
+                                    ? generation.tone_snapshot.split(':')[0]
+                                    : 'Default'}
+                            </span>
                         </div>
                     </div>
-                    <div className="p-3 sm:p-4 rounded-2xl border border-slate-200/80 bg-white/80 dark:border-slate-800/80 dark:bg-[#0c0e1a]/80 shadow-xs backdrop-blur-xl">
-                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">AI Engine</span>
-                        <div className="mt-1 sm:mt-1.5 flex items-center gap-1.5 text-xs font-bold text-slate-900 dark:text-slate-100 font-mono truncate">
-                            <Zap className="size-3.5 sm:size-4 text-emerald-500 shrink-0" />
-                            <span className="truncate">{generation.ai_provider || 'gemini'} {generation.ai_model ? `(${generation.ai_model})` : ''}</span>
+                    <div className="rounded-2xl border border-slate-200/80 bg-white/80 p-3 shadow-xs backdrop-blur-xl sm:p-4 dark:border-slate-800/80 dark:bg-[#0c0e1a]/80">
+                        <span className="block text-[10px] font-bold tracking-wider text-slate-400 uppercase">
+                            AI Engine
+                        </span>
+                        <div className="mt-1 flex items-center gap-1.5 truncate font-mono text-xs font-bold text-slate-900 sm:mt-1.5 dark:text-slate-100">
+                            <Zap className="size-3.5 shrink-0 text-emerald-500 sm:size-4" />
+                            <span className="truncate">
+                                {generation.ai_provider || 'gemini'}{' '}
+                                {generation.ai_model
+                                    ? `(${generation.ai_model})`
+                                    : ''}
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -916,16 +1050,16 @@ export default function HistoryShow({ generation, autostream }: ShowProps) {
                 {/* Main Split Layout */}
                 <div className="grid gap-6 lg:grid-cols-12">
                     {/* Primary Text Content Viewer / Editor */}
-                    <div className="lg:col-span-8 space-y-6">
+                    <div className="space-y-6 lg:col-span-8">
                         {status === 'failed' && (
-                            <Card className="border-rose-500/20 bg-rose-500/10 rounded-3xl p-6 backdrop-blur-xl">
+                            <Card className="rounded-3xl border-rose-500/20 bg-rose-500/10 p-6 backdrop-blur-xl">
                                 <div className="flex gap-3.5">
-                                    <AlertCircle className="size-6 text-rose-600 dark:text-rose-400 shrink-0" />
+                                    <AlertCircle className="size-6 shrink-0 text-rose-600 dark:text-rose-400" />
                                     <div>
                                         <h3 className="text-sm font-bold text-rose-950 dark:text-rose-200">
                                             Generation Stream Failed
                                         </h3>
-                                        <p className="text-xs text-rose-800 dark:text-rose-300 mt-1">
+                                        <p className="mt-1 text-xs text-rose-800 dark:text-rose-300">
                                             {error ||
                                                 'The connection to the AI generation provider failed. Please verify that your API key is valid and has access to the requested model.'}
                                         </p>
@@ -934,20 +1068,24 @@ export default function HistoryShow({ generation, autostream }: ShowProps) {
                             </Card>
                         )}
 
-                        <Card ref={canvasCardRef} className="relative rounded-3xl border border-slate-200/90 bg-white/90 dark:border-slate-800/90 dark:bg-[#0c0e1a]/90 shadow-xl backdrop-blur-2xl overflow-hidden min-h-[350px] flex flex-col justify-between glow-indigo">
-                            {(status === 'streaming' || status === 'pending') && (
-                                <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-indigo-500 via-purple-500 to-cyan-400 bg-[length:200%_auto] animate-pulse" />
+                        <Card
+                            ref={canvasCardRef}
+                            className="glow-indigo relative flex min-h-[350px] flex-col justify-between overflow-hidden rounded-3xl border border-slate-200/90 bg-white/90 shadow-xl backdrop-blur-2xl dark:border-slate-800/90 dark:bg-[#0c0e1a]/90"
+                        >
+                            {(status === 'streaming' ||
+                                status === 'pending') && (
+                                <div className="absolute top-0 right-0 left-0 h-[3px] animate-pulse bg-gradient-to-r from-indigo-500 via-purple-500 to-cyan-400 bg-[length:200%_auto]" />
                             )}
 
                             {/* Canvas Responsive Toolbar: Title, Telemetry, View Mode, Style Dropdown, Direct Copy */}
-                            <CardHeader className="bg-slate-50/70 dark:bg-[#080911]/70 py-2.5 sm:py-3 px-3.5 sm:px-6 border-b border-slate-200/60 dark:border-slate-800/60">
-                                <div className="flex flex-wrap items-center justify-between w-full gap-2 sm:gap-3">
+                            <CardHeader className="border-b border-slate-200/60 bg-slate-50/70 px-3.5 py-2.5 sm:px-6 sm:py-3 dark:border-slate-800/60 dark:bg-[#080911]/70">
+                                <div className="flex w-full flex-wrap items-center justify-between gap-2 sm:gap-3">
                                     {/* Left: Card Title & Telemetry */}
-                                    <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
+                                    <div className="flex min-w-0 items-center gap-2 sm:gap-2.5">
                                         <div
-                                            className={`size-2 rounded-full shrink-0 ${
+                                            className={`size-2 shrink-0 rounded-full ${
                                                 status === 'streaming'
-                                                    ? 'bg-indigo-500 animate-pulse'
+                                                    ? 'animate-pulse bg-indigo-500'
                                                     : status === 'completed'
                                                       ? 'bg-emerald-500'
                                                       : status === 'failed'
@@ -955,16 +1093,18 @@ export default function HistoryShow({ generation, autostream }: ShowProps) {
                                                         : 'bg-slate-400'
                                             }`}
                                         />
-                                        <CardTitle className="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white truncate">
-                                            {isEditing ? 'Editing Content' : 'AI Output'}
+                                        <CardTitle className="truncate text-xs font-extrabold text-slate-900 sm:text-sm dark:text-white">
+                                            {isEditing
+                                                ? 'Editing Content'
+                                                : 'AI Output'}
                                         </CardTitle>
 
                                         {!isEditing && activeText && (
-                                            <div className="flex items-center gap-1.5 shrink-0">
-                                                <span className="text-[10px] font-mono font-bold text-slate-600 dark:text-slate-300 bg-slate-200/60 dark:bg-slate-800 px-2 py-0.5 rounded-md">
+                                            <div className="flex shrink-0 items-center gap-1.5">
+                                                <span className="rounded-md bg-slate-200/60 px-2 py-0.5 font-mono text-[10px] font-bold text-slate-600 dark:bg-slate-800 dark:text-slate-300">
                                                     {wordCount}w
                                                 </span>
-                                                <span className="hidden sm:inline-block text-[10px] font-mono font-medium text-slate-500 dark:text-slate-400">
+                                                <span className="hidden font-mono text-[10px] font-medium text-slate-500 sm:inline-block dark:text-slate-400">
                                                     • {readTimeMin}m read
                                                 </span>
                                             </div>
@@ -973,15 +1113,17 @@ export default function HistoryShow({ generation, autostream }: ShowProps) {
 
                                     {/* Right: Controls & Actions */}
                                     {!isEditing && (
-                                        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+                                        <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
                                             {/* View Mode Toggle: Preview / Raw MD */}
-                                            <div className="flex items-center bg-slate-200/60 dark:bg-slate-900 p-0.5 rounded-xl border border-slate-300/40 dark:border-slate-800 text-[11px] font-bold">
+                                            <div className="flex items-center rounded-xl border border-slate-300/40 bg-slate-200/60 p-0.5 text-[11px] font-bold dark:border-slate-800 dark:bg-slate-900">
                                                 <button
                                                     type="button"
-                                                    onClick={() => setViewMode('preview')}
-                                                    className={`px-2 sm:px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
+                                                    onClick={() =>
+                                                        setViewMode('preview')
+                                                    }
+                                                    className={`cursor-pointer rounded-lg px-2 py-1 transition-all sm:px-2.5 ${
                                                         viewMode === 'preview'
-                                                            ? 'bg-white dark:bg-[#0c0e1a] text-indigo-600 dark:text-indigo-400 shadow-2xs'
+                                                            ? 'bg-white text-indigo-600 shadow-2xs dark:bg-[#0c0e1a] dark:text-indigo-400'
                                                             : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
                                                     }`}
                                                 >
@@ -989,10 +1131,12 @@ export default function HistoryShow({ generation, autostream }: ShowProps) {
                                                 </button>
                                                 <button
                                                     type="button"
-                                                    onClick={() => setViewMode('raw')}
-                                                    className={`px-2 sm:px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
+                                                    onClick={() =>
+                                                        setViewMode('raw')
+                                                    }
+                                                    className={`cursor-pointer rounded-lg px-2 py-1 transition-all sm:px-2.5 ${
                                                         viewMode === 'raw'
-                                                            ? 'bg-white dark:bg-[#0c0e1a] text-indigo-600 dark:text-indigo-400 shadow-2xs'
+                                                            ? 'bg-white text-indigo-600 shadow-2xs dark:bg-[#0c0e1a] dark:text-indigo-400'
                                                             : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
                                                     }`}
                                                 >
@@ -1007,49 +1151,69 @@ export default function HistoryShow({ generation, autostream }: ShowProps) {
                                                         type="button"
                                                         variant="outline"
                                                         size="sm"
-                                                        className="h-8 px-2.5 sm:px-3 rounded-xl text-xs font-semibold flex items-center gap-1.5 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0c0e1a] shadow-2xs hover:border-indigo-400 hover:text-indigo-600 dark:hover:text-indigo-400 cursor-pointer"
+                                                        className="flex h-8 cursor-pointer items-center gap-1.5 rounded-xl border-slate-200 bg-white px-2.5 text-xs font-semibold text-slate-700 shadow-2xs hover:border-indigo-400 hover:text-indigo-600 sm:px-3 dark:border-slate-800 dark:bg-[#0c0e1a] dark:text-slate-300 dark:hover:text-indigo-400"
                                                     >
-                                                        <SlidersHorizontal className="size-3.5 text-indigo-500 shrink-0" />
-                                                        <span className="hidden sm:inline">Style</span>
-                                                        <span className="text-[10px] font-mono text-slate-400 uppercase">
+                                                        <SlidersHorizontal className="size-3.5 shrink-0 text-indigo-500" />
+                                                        <span className="hidden sm:inline">
+                                                            Style
+                                                        </span>
+                                                        <span className="font-mono text-[10px] text-slate-400 uppercase">
                                                             ({fontFamily})
                                                         </span>
                                                     </Button>
                                                 </DropdownMenuTrigger>
-                                                <DropdownMenuContent align="end" className="w-56 p-2 rounded-2xl shadow-xl">
-                                                    <DropdownMenuLabel className="text-[11px] font-bold text-slate-400 uppercase tracking-wider py-1">
+                                                <DropdownMenuContent
+                                                    align="end"
+                                                    className="w-56 rounded-2xl p-2 shadow-xl"
+                                                >
+                                                    <DropdownMenuLabel className="py-1 text-[11px] font-bold tracking-wider text-slate-400 uppercase">
                                                         Font Family
                                                     </DropdownMenuLabel>
-                                                    <div className="grid grid-cols-3 gap-1 mb-2">
+                                                    <div className="mb-2 grid grid-cols-3 gap-1">
                                                         <button
                                                             type="button"
-                                                            onClick={() => handleFontFamilyChange('sans')}
-                                                            className={`h-7 text-xs font-bold rounded-lg transition-all cursor-pointer ${
-                                                                fontFamily === 'sans'
+                                                            onClick={() =>
+                                                                handleFontFamilyChange(
+                                                                    'sans',
+                                                                )
+                                                            }
+                                                            className={`h-7 cursor-pointer rounded-lg text-xs font-bold transition-all ${
+                                                                fontFamily ===
+                                                                'sans'
                                                                     ? 'bg-indigo-600 text-white shadow-xs'
-                                                                    : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
+                                                                    : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300'
                                                             }`}
                                                         >
                                                             Sans
                                                         </button>
                                                         <button
                                                             type="button"
-                                                            onClick={() => handleFontFamilyChange('padauk')}
-                                                            className={`h-7 text-xs font-bold rounded-lg transition-all cursor-pointer ${
-                                                                fontFamily === 'padauk'
+                                                            onClick={() =>
+                                                                handleFontFamilyChange(
+                                                                    'padauk',
+                                                                )
+                                                            }
+                                                            className={`h-7 cursor-pointer rounded-lg text-xs font-bold transition-all ${
+                                                                fontFamily ===
+                                                                'padauk'
                                                                     ? 'bg-indigo-600 text-white shadow-xs'
-                                                                    : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
+                                                                    : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300'
                                                             }`}
                                                         >
                                                             Padauk
                                                         </button>
                                                         <button
                                                             type="button"
-                                                            onClick={() => handleFontFamilyChange('serif')}
-                                                            className={`h-7 text-xs font-bold rounded-lg transition-all cursor-pointer ${
-                                                                fontFamily === 'serif'
+                                                            onClick={() =>
+                                                                handleFontFamilyChange(
+                                                                    'serif',
+                                                                )
+                                                            }
+                                                            className={`h-7 cursor-pointer rounded-lg text-xs font-bold transition-all ${
+                                                                fontFamily ===
+                                                                'serif'
                                                                     ? 'bg-indigo-600 text-white shadow-xs'
-                                                                    : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
+                                                                    : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300'
                                                             }`}
                                                         >
                                                             Serif
@@ -1058,39 +1222,54 @@ export default function HistoryShow({ generation, autostream }: ShowProps) {
 
                                                     <DropdownMenuSeparator />
 
-                                                    <DropdownMenuLabel className="text-[11px] font-bold text-slate-400 uppercase tracking-wider py-1">
+                                                    <DropdownMenuLabel className="py-1 text-[11px] font-bold tracking-wider text-slate-400 uppercase">
                                                         Text Size
                                                     </DropdownMenuLabel>
                                                     <div className="grid grid-cols-3 gap-1">
                                                         <button
                                                             type="button"
-                                                            onClick={() => handleFontSizeChange('sm')}
-                                                            className={`h-7 text-xs font-bold rounded-lg transition-all cursor-pointer ${
-                                                                fontSize === 'sm'
+                                                            onClick={() =>
+                                                                handleFontSizeChange(
+                                                                    'sm',
+                                                                )
+                                                            }
+                                                            className={`h-7 cursor-pointer rounded-lg text-xs font-bold transition-all ${
+                                                                fontSize ===
+                                                                'sm'
                                                                     ? 'bg-indigo-600 text-white shadow-xs'
-                                                                    : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
+                                                                    : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300'
                                                             }`}
                                                         >
                                                             A-
                                                         </button>
                                                         <button
                                                             type="button"
-                                                            onClick={() => handleFontSizeChange('base')}
-                                                            className={`h-7 text-xs font-bold rounded-lg transition-all cursor-pointer ${
-                                                                fontSize === 'base'
+                                                            onClick={() =>
+                                                                handleFontSizeChange(
+                                                                    'base',
+                                                                )
+                                                            }
+                                                            className={`h-7 cursor-pointer rounded-lg text-xs font-bold transition-all ${
+                                                                fontSize ===
+                                                                'base'
                                                                     ? 'bg-indigo-600 text-white shadow-xs'
-                                                                    : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
+                                                                    : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300'
                                                             }`}
                                                         >
                                                             A
                                                         </button>
                                                         <button
                                                             type="button"
-                                                            onClick={() => handleFontSizeChange('lg')}
-                                                            className={`h-7 text-xs font-bold rounded-lg transition-all cursor-pointer ${
-                                                                fontSize === 'lg'
+                                                            onClick={() =>
+                                                                handleFontSizeChange(
+                                                                    'lg',
+                                                                )
+                                                            }
+                                                            className={`h-7 cursor-pointer rounded-lg text-xs font-bold transition-all ${
+                                                                fontSize ===
+                                                                'lg'
                                                                     ? 'bg-indigo-600 text-white shadow-xs'
-                                                                    : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
+                                                                    : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300'
                                                             }`}
                                                         >
                                                             A+
@@ -1105,12 +1284,14 @@ export default function HistoryShow({ generation, autostream }: ShowProps) {
                                                 size="sm"
                                                 onClick={handleCopy}
                                                 disabled={!activeText}
-                                                className="h-8 px-2.5 sm:px-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition cursor-pointer flex items-center gap-1.5 shadow-xs shadow-indigo-600/20 active:scale-95 disabled:opacity-50"
+                                                className="flex h-8 cursor-pointer items-center gap-1.5 rounded-xl bg-indigo-600 px-2.5 text-xs font-bold text-white shadow-xs shadow-indigo-600/20 transition hover:bg-indigo-500 active:scale-95 disabled:opacity-50 sm:px-3"
                                             >
                                                 {isCopied ? (
                                                     <>
                                                         <Check className="size-3.5 text-emerald-300" />
-                                                        <span className="hidden sm:inline">Copied</span>
+                                                        <span className="hidden sm:inline">
+                                                            Copied
+                                                        </span>
                                                     </>
                                                 ) : (
                                                     <>
@@ -1124,31 +1305,43 @@ export default function HistoryShow({ generation, autostream }: ShowProps) {
                                 </div>
                             </CardHeader>
 
-                            <CardContent className="p-4 sm:p-8 flex-1">
+                            <CardContent className="flex-1 p-4 sm:p-8">
                                 {isEditing ? (
-                                    <form onSubmit={handleSaveEdit} className="space-y-4 h-full flex flex-col justify-between">
+                                    <form
+                                        onSubmit={handleSaveEdit}
+                                        className="flex h-full flex-col justify-between space-y-4"
+                                    >
                                         <textarea
                                             value={editForm.data.edited_content}
-                                            onChange={(e) => editForm.setData('edited_content', e.target.value)}
+                                            onChange={(e) =>
+                                                editForm.setData(
+                                                    'edited_content',
+                                                    e.target.value,
+                                                )
+                                            }
                                             rows={14}
-                                            className={`w-full rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#07080e] p-3.5 sm:p-5 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none shadow-xs text-base sm:text-sm ${fontFamilyClass} ${fontSizeClass}`}
+                                            className={`w-full resize-none rounded-2xl border border-slate-200 bg-white p-3.5 text-base text-slate-900 shadow-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none sm:p-5 sm:text-sm dark:border-slate-800 dark:bg-[#07080e] dark:text-slate-100 ${fontFamilyClass} ${fontSizeClass}`}
                                             required
                                         />
                                         <div className="flex justify-end gap-3 pt-2">
                                             <Button
                                                 type="button"
                                                 variant="outline"
-                                                onClick={() => setIsEditing(false)}
-                                                className="rounded-xl border border-slate-200 dark:border-slate-800 cursor-pointer"
+                                                onClick={() =>
+                                                    setIsEditing(false)
+                                                }
+                                                className="cursor-pointer rounded-xl border border-slate-200 dark:border-slate-800"
                                             >
                                                 Cancel
                                             </Button>
                                             <Button
                                                 type="submit"
                                                 disabled={editForm.processing}
-                                                className="bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-bold cursor-pointer shadow-md"
+                                                className="cursor-pointer rounded-xl bg-indigo-600 font-bold text-white shadow-md hover:bg-indigo-500"
                                             >
-                                                {editForm.processing ? 'Saving...' : 'Save Edits'}
+                                                {editForm.processing
+                                                    ? 'Saving...'
+                                                    : 'Save Edits'}
                                             </Button>
                                         </div>
                                     </form>
@@ -1160,26 +1353,32 @@ export default function HistoryShow({ generation, autostream }: ShowProps) {
                                                     className={`ai-response-canvas ${fontFamilyClass} ${fontSizeClass} text-slate-900 dark:text-slate-100`}
                                                     dangerouslySetInnerHTML={{
                                                         __html:
-                                                            parseMarkdown(activeText, fontSize) +
-                                                            (status === 'streaming'
+                                                            parseMarkdown(
+                                                                activeText,
+                                                                fontSize,
+                                                            ) +
+                                                            (status ===
+                                                            'streaming'
                                                                 ? '<span class="inline-block w-2.5 h-4.5 ml-1 bg-indigo-600 dark:bg-indigo-400 animate-cursor align-middle rounded-xs"></span>'
                                                                 : ''),
                                                     }}
                                                 />
                                             ) : (
                                                 <div
-                                                    className={`whitespace-pre-wrap font-mono text-xs sm:text-sm text-slate-800 dark:text-slate-200 bg-slate-900/5 dark:bg-black/40 p-5 rounded-2xl border border-slate-200/60 dark:border-slate-800/60 leading-relaxed overflow-x-auto`}
+                                                    className={`overflow-x-auto rounded-2xl border border-slate-200/60 bg-slate-900/5 p-5 font-mono text-xs leading-relaxed whitespace-pre-wrap text-slate-800 sm:text-sm dark:border-slate-800/60 dark:bg-black/40 dark:text-slate-200`}
                                                 >
                                                     {activeText}
                                                     {status === 'streaming' && (
-                                                        <span className="inline-block w-2 h-4 ml-1 bg-indigo-600 dark:bg-indigo-400 animate-cursor align-middle rounded-xs" />
+                                                        <span className="animate-cursor ml-1 inline-block h-4 w-2 rounded-xs bg-indigo-600 align-middle dark:bg-indigo-400" />
                                                     )}
                                                 </div>
                                             )
                                         ) : (
-                                            <div className="flex flex-col items-center justify-center py-16 text-slate-400 animate-pulse">
-                                                <RefreshCw className="size-7 animate-spin text-indigo-600 dark:text-indigo-400 mb-3" />
-                                                <span className="text-xs font-semibold">Streaming response tokens...</span>
+                                            <div className="flex animate-pulse flex-col items-center justify-center py-16 text-slate-400">
+                                                <RefreshCw className="mb-3 size-7 animate-spin text-indigo-600 dark:text-indigo-400" />
+                                                <span className="text-xs font-semibold">
+                                                    Streaming response tokens...
+                                                </span>
                                             </div>
                                         )}
                                         <div ref={bottomRef} className="h-2" />
@@ -1190,22 +1389,22 @@ export default function HistoryShow({ generation, autostream }: ShowProps) {
                     </div>
 
                     {/* Right Context & Prompt Sidebar */}
-                    <div className="lg:col-span-4 space-y-6">
-                        <Card className="rounded-3xl border border-slate-200/80 bg-white/80 dark:border-slate-800/80 dark:bg-[#0c0e1a]/80 shadow-md backdrop-blur-xl p-6">
-                            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 border-b border-slate-100 dark:border-slate-800 pb-2">
+                    <div className="space-y-6 lg:col-span-4">
+                        <Card className="rounded-3xl border border-slate-200/80 bg-white/80 p-6 shadow-md backdrop-blur-xl dark:border-slate-800/80 dark:bg-[#0c0e1a]/80">
+                            <h3 className="mb-3 border-b border-slate-100 pb-2 text-xs font-bold tracking-wider text-slate-400 uppercase dark:border-slate-800">
                                 Prompt Topic Given
                             </h3>
-                            <p className="text-xs text-slate-700 dark:text-slate-300 leading-relaxed whitespace-pre-line bg-slate-50 dark:bg-[#07080e] p-3.5 rounded-2xl border border-slate-200/70 dark:border-slate-800/70 font-medium">
+                            <p className="rounded-2xl border border-slate-200/70 bg-slate-50 p-3.5 text-xs leading-relaxed font-medium whitespace-pre-line text-slate-700 dark:border-slate-800/70 dark:bg-[#07080e] dark:text-slate-300">
                                 "{generation.user_prompt}"
                             </p>
                         </Card>
 
                         {generation.tone_snapshot && (
-                            <Card className="rounded-3xl border border-slate-200/80 bg-white/80 dark:border-slate-800/80 dark:bg-[#0c0e1a]/80 shadow-md backdrop-blur-xl p-6">
-                                <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 border-b border-slate-100 dark:border-slate-800 pb-2">
+                            <Card className="rounded-3xl border border-slate-200/80 bg-white/80 p-6 shadow-md backdrop-blur-xl dark:border-slate-800/80 dark:bg-[#0c0e1a]/80">
+                                <h3 className="mb-3 border-b border-slate-100 pb-2 text-xs font-bold tracking-wider text-slate-400 uppercase dark:border-slate-800">
                                     Voice Guidelines Applied
                                 </h3>
-                                <p className="text-xs text-slate-700 dark:text-slate-300 leading-relaxed whitespace-pre-line bg-slate-50 dark:bg-[#07080e] p-3.5 rounded-2xl border border-slate-200/70 dark:border-slate-800/70 font-medium">
+                                <p className="rounded-2xl border border-slate-200/70 bg-slate-50 p-3.5 text-xs leading-relaxed font-medium whitespace-pre-line text-slate-700 dark:border-slate-800/70 dark:bg-[#07080e] dark:text-slate-300">
                                     {generation.tone_snapshot}
                                 </p>
                             </Card>
@@ -1215,11 +1414,11 @@ export default function HistoryShow({ generation, autostream }: ShowProps) {
 
                 {/* Floating Quick Action for Mobile Readers */}
                 {!isEditing && activeText && (
-                    <div className="fixed bottom-20 right-4 z-30 sm:hidden">
+                    <div className="fixed right-4 bottom-20 z-30 sm:hidden">
                         <Button
                             type="button"
                             onClick={handleCopy}
-                            className="h-11 px-4 rounded-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-xl shadow-indigo-600/30 flex items-center gap-2 font-bold text-xs border border-white/20 active:scale-95 transition-transform cursor-pointer"
+                            className="flex h-11 cursor-pointer items-center gap-2 rounded-full border border-white/20 bg-gradient-to-r from-indigo-600 to-purple-600 px-4 text-xs font-bold text-white shadow-xl shadow-indigo-600/30 transition-transform active:scale-95"
                         >
                             {isCopied ? (
                                 <>
@@ -1240,21 +1439,27 @@ export default function HistoryShow({ generation, autostream }: ShowProps) {
                 {Boolean(activeText) && (
                     <div
                         style={{
-                            left: canvasCenterLeft ? `${canvasCenterLeft}px` : '50%',
+                            left: canvasCenterLeft
+                                ? `${canvasCenterLeft}px`
+                                : '50%',
                         }}
-                        className={`fixed bottom-20 sm:bottom-10 -translate-x-1/2 z-40 transition-all duration-300 ease-out ${
-                            (status === 'streaming' ? showStreamingScrollDown : showScrollTop)
-                                ? 'opacity-100 translate-y-0 pointer-events-auto'
-                                : 'opacity-0 translate-y-4 pointer-events-none'
+                        className={`fixed bottom-20 z-40 -translate-x-1/2 transition-all duration-300 ease-out sm:bottom-10 ${
+                            (
+                                status === 'streaming'
+                                    ? showStreamingScrollDown
+                                    : showScrollTop
+                            )
+                                ? 'pointer-events-auto translate-y-0 opacity-100'
+                                : 'pointer-events-none translate-y-4 opacity-0'
                         }`}
                     >
                         {status === 'streaming' ? (
                             <button
                                 type="button"
                                 onClick={handleScrollToBottom}
-                                className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-slate-900/95 dark:bg-white/95 text-white dark:text-slate-900 font-bold text-xs shadow-2xl shadow-indigo-500/25 border border-slate-700/50 dark:border-slate-200/50 hover:scale-105 active:scale-95 transition-all cursor-pointer backdrop-blur-md"
+                                className="flex cursor-pointer items-center gap-2 rounded-full border border-slate-700/50 bg-slate-900/95 px-4 py-2.5 text-xs font-bold text-white shadow-2xl shadow-indigo-500/25 backdrop-blur-md transition-all hover:scale-105 active:scale-95 dark:border-slate-200/50 dark:bg-white/95 dark:text-slate-900"
                             >
-                                <span className="size-2 rounded-full bg-indigo-400 animate-ping" />
+                                <span className="size-2 animate-ping rounded-full bg-indigo-400" />
                                 <span>New content streaming below</span>
                                 <ArrowDown className="size-3.5 animate-bounce text-indigo-400 dark:text-indigo-600" />
                             </button>
@@ -1262,7 +1467,7 @@ export default function HistoryShow({ generation, autostream }: ShowProps) {
                             <button
                                 type="button"
                                 onClick={handleScrollToTop}
-                                className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-slate-900/95 dark:bg-white/95 text-white dark:text-slate-900 font-bold text-xs shadow-2xl shadow-indigo-500/25 border border-slate-700/50 dark:border-slate-200/50 hover:scale-105 active:scale-95 transition-all cursor-pointer backdrop-blur-md"
+                                className="flex cursor-pointer items-center gap-2 rounded-full border border-slate-700/50 bg-slate-900/95 px-4 py-2.5 text-xs font-bold text-white shadow-2xl shadow-indigo-500/25 backdrop-blur-md transition-all hover:scale-105 active:scale-95 dark:border-slate-200/50 dark:bg-white/95 dark:text-slate-900"
                             >
                                 <ArrowUp className="size-3.5 text-indigo-400 dark:text-indigo-600" />
                                 <span>Scroll to top</span>
@@ -1272,44 +1477,54 @@ export default function HistoryShow({ generation, autostream }: ShowProps) {
                 )}
 
                 {/* Humanizer Side-by-Side Review Dialog */}
-                <Dialog open={isHumanizerOpen} onOpenChange={(open) => {
-                    if (!open && humanizerEventSourceRef.current) {
-                        humanizerEventSourceRef.current.close();
-                        humanizerEventSourceRef.current = null;
-                        setIsHumanizing(false);
-                    }
-                    setIsHumanizerOpen(open);
-                }}>
-                    <DialogContent className="!max-w-6xl sm:!max-w-6xl w-[96vw] max-w-[96vw] h-[88vh] max-h-[88vh] flex flex-col p-4 sm:p-6 rounded-3xl bg-white/95 dark:bg-[#0c0e1a]/95 backdrop-blur-2xl border border-slate-200/80 dark:border-slate-800 shadow-2xl overflow-hidden">
-                        <DialogHeader className="shrink-0 border-b border-slate-200/80 dark:border-slate-800 pb-3 sm:pb-4">
-                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                                <div className="flex items-center gap-2.5 min-w-0">
-                                    <div className="flex size-9 sm:size-10 items-center justify-center rounded-2xl bg-gradient-to-tr from-violet-600 to-indigo-600 text-white shadow-md shadow-indigo-500/20 shrink-0">
+                <Dialog
+                    open={isHumanizerOpen}
+                    onOpenChange={(open) => {
+                        if (!open && humanizerEventSourceRef.current) {
+                            humanizerEventSourceRef.current.close();
+                            humanizerEventSourceRef.current = null;
+                            setIsHumanizing(false);
+                        }
+                        setIsHumanizerOpen(open);
+                    }}
+                >
+                    <DialogContent className="flex h-[88vh] max-h-[88vh] w-[96vw] !max-w-6xl max-w-[96vw] flex-col overflow-hidden rounded-3xl border border-slate-200/80 bg-white/95 p-4 shadow-2xl backdrop-blur-2xl sm:!max-w-6xl sm:p-6 dark:border-slate-800 dark:bg-[#0c0e1a]/95">
+                        <DialogHeader className="shrink-0 border-b border-slate-200/80 pb-3 sm:pb-4 dark:border-slate-800">
+                            <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
+                                <div className="flex min-w-0 items-center gap-2.5">
+                                    <div className="flex size-9 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-tr from-violet-600 to-indigo-600 text-white shadow-md shadow-indigo-500/20 sm:size-10">
                                         <Sparkles className="size-5" />
                                     </div>
                                     <div className="min-w-0">
-                                        <DialogTitle className="text-base sm:text-lg font-black text-slate-900 dark:text-white flex items-center gap-2">
+                                        <DialogTitle className="flex items-center gap-2 text-base font-black text-slate-900 sm:text-lg dark:text-white">
                                             Humanize & Naturalize Copy
                                         </DialogTitle>
-                                        <DialogDescription className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                                            Strip AI clichés, inject natural sentence burstiness, and refine authentic tone.
+                                        <DialogDescription className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
+                                            Strip AI clichés, inject natural
+                                            sentence burstiness, and refine
+                                            authentic tone.
                                         </DialogDescription>
                                     </div>
                                 </div>
 
                                 {/* 3-Pill Preset Selector & Regenerate */}
-                                <div className="flex flex-wrap items-center gap-2 shrink-0">
-                                    <div className="flex items-center p-1 rounded-2xl bg-slate-100 dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 text-xs font-bold">
+                                <div className="flex shrink-0 flex-wrap items-center gap-2">
+                                    <div className="flex items-center rounded-2xl border border-slate-200/80 bg-slate-100 p-1 text-xs font-bold dark:border-slate-800 dark:bg-slate-900">
                                         <button
                                             type="button"
                                             disabled={isHumanizing}
                                             onClick={() => {
-                                                setHumanizerPreset('conversational');
-                                                startHumanizer('conversational');
+                                                setHumanizerPreset(
+                                                    'conversational',
+                                                );
+                                                startHumanizer(
+                                                    'conversational',
+                                                );
                                             }}
-                                            className={`px-3 py-1.5 rounded-xl transition-all cursor-pointer whitespace-nowrap ${
-                                                humanizerPreset === 'conversational'
-                                                    ? 'bg-white dark:bg-[#141728] text-indigo-600 dark:text-indigo-400 shadow-2xs font-extrabold'
+                                            className={`cursor-pointer rounded-xl px-3 py-1.5 whitespace-nowrap transition-all ${
+                                                humanizerPreset ===
+                                                'conversational'
+                                                    ? 'bg-white font-extrabold text-indigo-600 shadow-2xs dark:bg-[#141728] dark:text-indigo-400'
                                                     : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
                                             }`}
                                         >
@@ -1322,9 +1537,9 @@ export default function HistoryShow({ generation, autostream }: ShowProps) {
                                                 setHumanizerPreset('punchy');
                                                 startHumanizer('punchy');
                                             }}
-                                            className={`px-3 py-1.5 rounded-xl transition-all cursor-pointer whitespace-nowrap ${
+                                            className={`cursor-pointer rounded-xl px-3 py-1.5 whitespace-nowrap transition-all ${
                                                 humanizerPreset === 'punchy'
-                                                    ? 'bg-white dark:bg-[#141728] text-indigo-600 dark:text-indigo-400 shadow-2xs font-extrabold'
+                                                    ? 'bg-white font-extrabold text-indigo-600 shadow-2xs dark:bg-[#141728] dark:text-indigo-400'
                                                     : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
                                             }`}
                                         >
@@ -1337,9 +1552,9 @@ export default function HistoryShow({ generation, autostream }: ShowProps) {
                                                 setHumanizerPreset('executive');
                                                 startHumanizer('executive');
                                             }}
-                                            className={`px-3 py-1.5 rounded-xl transition-all cursor-pointer whitespace-nowrap ${
+                                            className={`cursor-pointer rounded-xl px-3 py-1.5 whitespace-nowrap transition-all ${
                                                 humanizerPreset === 'executive'
-                                                    ? 'bg-white dark:bg-[#141728] text-indigo-600 dark:text-indigo-400 shadow-2xs font-extrabold'
+                                                    ? 'bg-white font-extrabold text-indigo-600 shadow-2xs dark:bg-[#141728] dark:text-indigo-400'
                                                     : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
                                             }`}
                                         >
@@ -1352,94 +1567,117 @@ export default function HistoryShow({ generation, autostream }: ShowProps) {
                                         variant="outline"
                                         onClick={() => startHumanizer()}
                                         disabled={isHumanizing}
-                                        className="h-9 rounded-xl text-xs font-bold gap-1.5 cursor-pointer shrink-0"
+                                        className="h-9 shrink-0 cursor-pointer gap-1.5 rounded-xl text-xs font-bold"
                                     >
-                                        <RefreshCw className={`size-3.5 ${isHumanizing ? 'animate-spin text-indigo-500' : ''}`} />
-                                        <span className="hidden sm:inline">Regenerate</span>
+                                        <RefreshCw
+                                            className={`size-3.5 ${isHumanizing ? 'animate-spin text-indigo-500' : ''}`}
+                                        />
+                                        <span className="hidden sm:inline">
+                                            Regenerate
+                                        </span>
                                     </Button>
                                 </div>
                             </div>
                         </DialogHeader>
 
                         {/* Comparison Container: No outer scroll, independent column scrolling */}
-                        <div className="flex-1 min-h-0 grid grid-cols-1 md:grid-cols-2 gap-4 py-3">
+                        <div className="grid min-h-0 flex-1 grid-cols-1 gap-4 py-3 md:grid-cols-2">
                             {/* Original Draft Box */}
-                            <div className="flex flex-col h-full rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-900/40 p-4 min-h-0 overflow-hidden">
-                                <div className="shrink-0 flex items-center justify-between border-b border-slate-200/80 dark:border-slate-800/80 pb-2 mb-2">
-                                    <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                            <div className="flex h-full min-h-0 flex-col overflow-hidden rounded-2xl border border-slate-200/80 bg-slate-50/70 p-4 dark:border-slate-800 dark:bg-slate-900/40">
+                                <div className="mb-2 flex shrink-0 items-center justify-between border-b border-slate-200/80 pb-2 dark:border-slate-800/80">
+                                    <span className="text-xs font-bold tracking-wider text-slate-500 uppercase dark:text-slate-400">
                                         Original Draft
                                     </span>
-                                    <span className="text-[11px] font-mono text-slate-400">
+                                    <span className="font-mono text-[11px] text-slate-400">
                                         {wordCount} words
                                     </span>
                                 </div>
-                                <div className="flex-1 min-h-0 overflow-y-auto pr-2 pt-1.5 pb-4 text-xs sm:text-sm text-slate-700 dark:text-slate-300 whitespace-pre-wrap leading-[2] font-padauk select-text">
+                                <div className="min-h-0 flex-1 overflow-y-auto pt-1.5 pr-2 pb-4 font-padauk text-xs leading-[2] whitespace-pre-wrap text-slate-700 select-text sm:text-sm dark:text-slate-300">
                                     {activeText}
                                 </div>
                             </div>
 
                             {/* Humanized Rewrite Box */}
-                            <div className="flex flex-col h-full rounded-2xl border border-indigo-200 dark:border-indigo-950/70 bg-indigo-50/30 dark:bg-indigo-950/10 p-4 min-h-0 overflow-hidden relative">
-                                <div className="shrink-0 flex items-center justify-between border-b border-indigo-100 dark:border-indigo-900/40 pb-2 mb-2">
+                            <div className="relative flex h-full min-h-0 flex-col overflow-hidden rounded-2xl border border-indigo-200 bg-indigo-50/30 p-4 dark:border-indigo-950/70 dark:bg-indigo-950/10">
+                                <div className="mb-2 flex shrink-0 items-center justify-between border-b border-indigo-100 pb-2 dark:border-indigo-900/40">
                                     <div className="flex items-center gap-1.5">
-                                        <span className="text-xs font-extrabold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
+                                        <span className="text-xs font-extrabold tracking-wider text-indigo-600 uppercase dark:text-indigo-400">
                                             Humanized Rewrite
                                         </span>
                                         {isHumanizing && (
-                                            <span className="flex size-2 rounded-full bg-indigo-500 animate-ping" />
+                                            <span className="flex size-2 animate-ping rounded-full bg-indigo-500" />
                                         )}
                                     </div>
                                     <div className="flex items-center gap-2">
-                                        {Boolean(humanizedContent) && (
+                                        {Boolean(humanizedContent) &&
                                             (() => {
-                                                const hwCount = humanizedContent.trim().split(/\s+/).length;
-                                                const diff = hwCount - wordCount;
+                                                const hwCount = humanizedContent
+                                                    .trim()
+                                                    .split(/\s+/).length;
+                                                const diff =
+                                                    hwCount - wordCount;
                                                 if (diff < 0) {
                                                     return (
-                                                        <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-1.5 py-0.5 rounded-md">
-                                                            {diff} words ({Math.round((Math.abs(diff) / (wordCount || 1)) * 100)}% crisper)
+                                                        <span className="rounded-md border border-emerald-500/20 bg-emerald-500/10 px-1.5 py-0.5 text-[10px] font-bold text-emerald-600 dark:text-emerald-400">
+                                                            {diff} words (
+                                                            {Math.round(
+                                                                (Math.abs(
+                                                                    diff,
+                                                                ) /
+                                                                    (wordCount ||
+                                                                        1)) *
+                                                                    100,
+                                                            )}
+                                                            % crisper)
                                                         </span>
                                                     );
                                                 }
                                                 if (diff > 0) {
                                                     return (
-                                                        <span className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-500/10 border border-indigo-500/20 px-1.5 py-0.5 rounded-md">
+                                                        <span className="rounded-md border border-indigo-500/20 bg-indigo-500/10 px-1.5 py-0.5 text-[10px] font-bold text-indigo-600 dark:text-indigo-400">
                                                             +{diff} words
                                                         </span>
                                                     );
                                                 }
                                                 return null;
-                                            })()
-                                        )}
-                                        <span className="text-[11px] font-mono text-indigo-500 font-semibold">
-                                            {humanizedContent ? `${humanizedContent.trim().split(/\s+/).length} words` : isHumanizing ? 'Streaming...' : 'Ready'}
+                                            })()}
+                                        <span className="font-mono text-[11px] font-semibold text-indigo-500">
+                                            {humanizedContent
+                                                ? `${humanizedContent.trim().split(/\s+/).length} words`
+                                                : isHumanizing
+                                                  ? 'Streaming...'
+                                                  : 'Ready'}
                                         </span>
                                     </div>
                                 </div>
                                 <div
                                     ref={humanizedScrollRef}
                                     onScroll={handleHumanizerScroll}
-                                    className="flex-1 min-h-0 overflow-y-auto pr-2 pt-1.5 pb-4 text-xs sm:text-sm text-slate-900 dark:text-slate-100 whitespace-pre-wrap leading-[2] font-padauk select-text"
+                                    className="min-h-0 flex-1 overflow-y-auto pt-1.5 pr-2 pb-4 font-padauk text-xs leading-[2] whitespace-pre-wrap text-slate-900 select-text sm:text-sm dark:text-slate-100"
                                 >
                                     {humanizedContent ? (
                                         <>
                                             {humanizedContent}
                                             {isHumanizing && (
-                                                <span className="inline-block w-1.5 h-4 ml-0.5 bg-indigo-600 dark:bg-indigo-400 animate-pulse align-middle" />
+                                                <span className="ml-0.5 inline-block h-4 w-1.5 animate-pulse bg-indigo-600 align-middle dark:bg-indigo-400" />
                                             )}
                                         </>
                                     ) : isHumanizing ? (
-                                        <div className="flex flex-col items-center justify-center h-full text-slate-400 py-10 gap-2">
+                                        <div className="flex h-full flex-col items-center justify-center gap-2 py-10 text-slate-400">
                                             <RefreshCw className="size-5 animate-spin text-indigo-500" />
-                                            <p className="text-xs font-semibold">Humanizing tone & stripping AI clichés...</p>
+                                            <p className="text-xs font-semibold">
+                                                Humanizing tone & stripping AI
+                                                clichés...
+                                            </p>
                                         </div>
                                     ) : humanizerError ? (
-                                        <div className="text-rose-500 text-xs p-3 rounded-xl bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900/40">
+                                        <div className="rounded-xl border border-rose-200 bg-rose-50 p-3 text-xs text-rose-500 dark:border-rose-900/40 dark:bg-rose-950/30">
                                             {humanizerError}
                                         </div>
                                     ) : (
-                                        <div className="text-slate-400 text-xs italic text-center py-10">
-                                            Click "Regenerate" or change the preset to start humanizing.
+                                        <div className="py-10 text-center text-xs text-slate-400 italic">
+                                            Click "Regenerate" or change the
+                                            preset to start humanizing.
                                         </div>
                                     )}
                                 </div>
@@ -1451,10 +1689,11 @@ export default function HistoryShow({ generation, autostream }: ShowProps) {
                                             isHumanizerAutoScrollRef.current = true;
                                             setShowHumanizerScrollDown(false);
                                             if (humanizedScrollRef.current) {
-                                                humanizedScrollRef.current.scrollTop = humanizedScrollRef.current.scrollHeight;
+                                                humanizedScrollRef.current.scrollTop =
+                                                    humanizedScrollRef.current.scrollHeight;
                                             }
                                         }}
-                                        className="absolute bottom-4 right-4 z-20 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-indigo-600 text-white text-xs font-bold shadow-lg shadow-indigo-600/30 hover:bg-indigo-500 active:scale-95 transition-all cursor-pointer"
+                                        className="absolute right-4 bottom-4 z-20 flex cursor-pointer items-center gap-1.5 rounded-full bg-indigo-600 px-3 py-1.5 text-xs font-bold text-white shadow-lg shadow-indigo-600/30 transition-all hover:bg-indigo-500 active:scale-95"
                                     >
                                         <span>Follow Stream</span>
                                         <ArrowDown className="size-3 animate-bounce" />
@@ -1463,7 +1702,7 @@ export default function HistoryShow({ generation, autostream }: ShowProps) {
                             </div>
                         </div>
 
-                        <DialogFooter className="shrink-0 flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-2.5 pt-3 border-t border-slate-200/80 dark:border-slate-800">
+                        <DialogFooter className="flex shrink-0 flex-col-reverse gap-2.5 border-t border-slate-200/80 pt-3 sm:flex-row sm:items-center sm:justify-between dark:border-slate-800">
                             <Button
                                 variant="ghost"
                                 onClick={() => setIsHumanizerOpen(false)}
@@ -1477,9 +1716,13 @@ export default function HistoryShow({ generation, autostream }: ShowProps) {
                                     <Button
                                         variant="outline"
                                         onClick={handleCopyHumanized}
-                                        className="rounded-xl text-xs font-bold gap-1.5"
+                                        className="gap-1.5 rounded-xl text-xs font-bold"
                                     >
-                                        {isHumanizedCopied ? <Check className="size-3.5 text-emerald-500" /> : <Copy className="size-3.5" />}
+                                        {isHumanizedCopied ? (
+                                            <Check className="size-3.5 text-emerald-500" />
+                                        ) : (
+                                            <Copy className="size-3.5" />
+                                        )}
                                         {isHumanizedCopied ? 'Copied' : 'Copy'}
                                     </Button>
                                 )}
@@ -1487,12 +1730,48 @@ export default function HistoryShow({ generation, autostream }: ShowProps) {
                                 <Button
                                     onClick={handleAcceptHumanized}
                                     disabled={!humanizedContent || isHumanizing}
-                                    className="rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-black text-xs px-4 h-9 shadow-md shadow-emerald-600/20 gap-1.5 cursor-pointer"
+                                    className="h-9 cursor-pointer gap-1.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 px-4 text-xs font-black text-white shadow-md shadow-emerald-600/20 hover:from-emerald-500 hover:to-teal-500"
                                 >
                                     <Check className="size-4" />
                                     Accept & Save Changes
                                 </Button>
                             </div>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
+
+                {/* Delete Confirmation Dialog */}
+                <Dialog
+                    open={isDeleteDialogOpen}
+                    onOpenChange={setIsDeleteDialogOpen}
+                >
+                    <DialogContent className="rounded-3xl border border-slate-200/80 bg-white/95 p-6 shadow-2xl backdrop-blur-2xl sm:max-w-md dark:border-slate-800 dark:bg-[#0c0e1a]/95">
+                        <DialogHeader>
+                            <DialogTitle className="flex items-center gap-2 text-base font-extrabold text-rose-600 dark:text-rose-400">
+                                <Trash2 className="size-5" />
+                                Delete Generation
+                            </DialogTitle>
+                            <DialogDescription className="mt-1.5 text-xs leading-relaxed text-slate-500 dark:text-slate-400">
+                                Are you sure you want to permanently delete this
+                                generated copy from your archive? This action
+                                cannot be undone.
+                            </DialogDescription>
+                        </DialogHeader>
+                        <DialogFooter className="mt-3 flex flex-row items-center justify-end gap-2 border-t border-slate-100 pt-4 dark:border-slate-800/60">
+                            <Button
+                                variant="outline"
+                                onClick={() => setIsDeleteDialogOpen(false)}
+                                className="cursor-pointer rounded-xl border border-slate-200 text-xs font-semibold dark:border-slate-800"
+                            >
+                                Cancel
+                            </Button>
+                            <Button
+                                variant="destructive"
+                                onClick={confirmDelete}
+                                className="cursor-pointer rounded-xl bg-rose-600 text-xs font-bold text-white shadow-md hover:bg-rose-500"
+                            >
+                                Delete Permanently
+                            </Button>
                         </DialogFooter>
                     </DialogContent>
                 </Dialog>

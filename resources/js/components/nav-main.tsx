@@ -22,7 +22,7 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
 
     return (
         <SidebarGroup className="px-3 py-2">
-            <SidebarGroupLabel className="text-[10px] font-extrabold uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-1">
+            <SidebarGroupLabel className="mb-1 text-[10px] font-extrabold tracking-widest text-slate-400 uppercase dark:text-slate-500">
                 Studio Platform
             </SidebarGroupLabel>
             <SidebarMenu className="gap-1.5">
@@ -34,9 +34,9 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                                 asChild
                                 isActive={active}
                                 tooltip={{ children: item.title }}
-                                className={`rounded-xl px-3 py-2.5 min-h-[44px] flex items-center transition-all text-xs font-semibold ${
+                                className={`flex min-h-[44px] items-center rounded-xl px-3 py-2.5 text-xs font-semibold transition-all ${
                                     active
-                                        ? 'bg-indigo-50 text-indigo-700 shadow-xs border border-indigo-200/60 font-bold dark:bg-indigo-950/50 dark:text-indigo-300 dark:border-indigo-500/30'
+                                        ? 'border border-indigo-200/60 bg-indigo-50 font-bold text-indigo-700 shadow-xs dark:border-indigo-500/30 dark:bg-indigo-950/50 dark:text-indigo-300'
                                         : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-900/60 dark:hover:text-slate-200'
                                 }`}
                             >
@@ -44,7 +44,7 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                                     href={item.href}
                                     prefetch
                                     onClick={handleLinkClick}
-                                    className="flex items-center gap-3 w-full"
+                                    className="flex w-full items-center gap-3"
                                 >
                                     {item.icon && (
                                         <item.icon
@@ -55,7 +55,9 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                                             }`}
                                         />
                                     )}
-                                    <span className="truncate">{item.title}</span>
+                                    <span className="truncate">
+                                        {item.title}
+                                    </span>
                                     {active && (
                                         <span className="ml-auto size-1.5 rounded-full bg-indigo-600 dark:bg-indigo-400" />
                                     )}

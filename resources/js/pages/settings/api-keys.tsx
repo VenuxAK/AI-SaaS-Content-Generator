@@ -74,7 +74,8 @@ export default function ApiKeysSettings({
     const initialProvider = activeProvider || currentProvider || 'gemini';
     const initialModel = activeModel || currentModel || 'gemini-2.5-flash';
 
-    const [selectedProvider, setSelectedProvider] = useState<string>(initialProvider);
+    const [selectedProvider, setSelectedProvider] =
+        useState<string>(initialProvider);
     const [showKey, setShowKey] = useState<boolean>(false);
     const [customModelMode, setCustomModelMode] = useState<boolean>(false);
     const [testLoading, setTestLoading] = useState<boolean>(false);
@@ -126,7 +127,7 @@ export default function ApiKeysSettings({
                     'X-CSRF-TOKEN':
                         (
                             document.querySelector(
-                                'meta[name="csrf-token"]'
+                                'meta[name="csrf-token"]',
                             ) as HTMLMetaElement
                         )?.content || '',
                 },
@@ -143,7 +144,8 @@ export default function ApiKeysSettings({
                 setTestResult({
                     valid: true,
                     message:
-                        result.message || 'Key connected and verified successfully!',
+                        result.message ||
+                        'Key connected and verified successfully!',
                 });
                 toast.success(result.message || 'API Key connection verified!');
             } else {
@@ -200,13 +202,17 @@ export default function ApiKeysSettings({
                     <Alert className="border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-300">
                         <Zap className="h-4 w-4 text-amber-600 dark:text-amber-400" />
                         <AlertTitle>API Key Required</AlertTitle>
-                        <AlertDescription>{pageErrors.api_key}</AlertDescription>
+                        <AlertDescription>
+                            {pageErrors.api_key}
+                        </AlertDescription>
                     </Alert>
                 )}
 
                 {/* Provider Selector Cards */}
                 <div className="space-y-3">
-                    <Label className="text-sm font-medium">Select Active AI Provider</Label>
+                    <Label className="text-sm font-medium">
+                        Select Active AI Provider
+                    </Label>
                     <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
                         {Object.entries(providers).map(([key, provider]) => {
                             const isSelected = selectedProvider === key;
@@ -221,8 +227,8 @@ export default function ApiKeysSettings({
                                     className={cn(
                                         'relative flex flex-col items-start justify-between rounded-xl border p-4 text-left transition-all',
                                         isSelected
-                                            ? 'border-primary ring-2 ring-primary/20 bg-primary/5 shadow-xs'
-                                            : 'border-border/60 hover:border-border hover:bg-muted/40'
+                                            ? 'border-primary bg-primary/5 shadow-xs ring-2 ring-primary/20'
+                                            : 'border-border/60 hover:border-border hover:bg-muted/40',
                                     )}
                                 >
                                     <div className="flex w-full items-center justify-between">
@@ -236,14 +242,14 @@ export default function ApiKeysSettings({
                                             {key === 'openrouter' && (
                                                 <Zap className="h-4 w-4 text-purple-500" />
                                             )}
-                                            <span className="font-semibold text-sm">
+                                            <span className="text-sm font-semibold">
                                                 {provider.name}
                                             </span>
                                         </div>
                                         {isSavedActive && (
                                             <Badge
                                                 variant="default"
-                                                className="text-[10px] px-1.5 py-0 h-5"
+                                                className="h-5 px-1.5 py-0 text-[10px]"
                                             >
                                                 Active
                                             </Badge>
@@ -251,10 +257,14 @@ export default function ApiKeysSettings({
                                     </div>
 
                                     <div className="mt-3 flex items-center gap-1.5 text-xs text-muted-foreground">
-                                        {status?.is_set || (selectedProvider === key && testResult?.valid) ? (
-                                            <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-medium">
+                                        {status?.is_set ||
+                                        (selectedProvider === key &&
+                                            testResult?.valid) ? (
+                                            <span className="inline-flex items-center gap-1 font-medium text-emerald-600 dark:text-emerald-400">
                                                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                                                {selectedProvider === key && testResult?.valid && !status?.is_set
+                                                {selectedProvider === key &&
+                                                testResult?.valid &&
+                                                !status?.is_set
                                                     ? 'Verified (Click Save)'
                                                     : 'Configured'}
                                             </span>
@@ -277,9 +287,13 @@ export default function ApiKeysSettings({
                         <CardHeader className="pb-4">
                             <div className="flex items-start justify-between">
                                 <div>
-                                    <CardTitle className="text-base font-semibold flex items-center gap-2">
-                                        <span>{activeProviderMeta.name} Configuration</span>
-                                        {data.ai_provider === selectedProvider && (
+                                    <CardTitle className="flex items-center gap-2 text-base font-semibold">
+                                        <span>
+                                            {activeProviderMeta.name}{' '}
+                                            Configuration
+                                        </span>
+                                        {data.ai_provider ===
+                                            selectedProvider && (
                                             <Badge
                                                 variant="secondary"
                                                 className="text-xs"
@@ -288,7 +302,7 @@ export default function ApiKeysSettings({
                                             </Badge>
                                         )}
                                     </CardTitle>
-                                    <CardDescription className="text-xs mt-1">
+                                    <CardDescription className="mt-1 text-xs">
                                         {activeProviderMeta.description}
                                     </CardDescription>
                                 </div>
@@ -296,7 +310,7 @@ export default function ApiKeysSettings({
                                     href={activeProviderMeta.key_help_url}
                                     target="_blank"
                                     rel="noreferrer"
-                                    className="inline-flex items-center gap-1 text-xs text-primary hover:underline font-medium shrink-0"
+                                    className="inline-flex shrink-0 items-center gap-1 text-xs font-medium text-primary hover:underline"
                                 >
                                     <span>Get Key</span>
                                     <ExternalLink className="h-3 w-3" />
@@ -315,11 +329,16 @@ export default function ApiKeysSettings({
                                         >
                                             API Key
                                         </Label>
-                                        {keysStatus[selectedProvider]?.is_set && (
+                                        {keysStatus[selectedProvider]
+                                            ?.is_set && (
                                             <span className="text-xs text-muted-foreground">
                                                 Saved:{' '}
                                                 <code className="rounded bg-muted px-1 py-0.5 font-mono text-[11px]">
-                                                    {keysStatus[selectedProvider]?.masked}
+                                                    {
+                                                        keysStatus[
+                                                            selectedProvider
+                                                        ]?.masked
+                                                    }
                                                 </code>
                                             </span>
                                         )}
@@ -330,7 +349,8 @@ export default function ApiKeysSettings({
                                             id={`${selectedProvider}_api_key`}
                                             type={showKey ? 'text' : 'password'}
                                             placeholder={
-                                                keysStatus[selectedProvider]?.is_set
+                                                keysStatus[selectedProvider]
+                                                    ?.is_set
                                                     ? '•••••••• (leave blank to keep existing)'
                                                     : activeProviderMeta.key_placeholder
                                             }
@@ -342,19 +362,23 @@ export default function ApiKeysSettings({
                                             onChange={(e) =>
                                                 setData(
                                                     `${selectedProvider}_api_key` as keyof typeof data,
-                                                    e.target.value
+                                                    e.target.value,
                                                 )
                                             }
                                             className="pr-20 font-mono text-base sm:text-sm"
                                             autoComplete="off"
                                         />
-                                        <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                                        <div className="absolute top-1/2 right-2 flex -translate-y-1/2 items-center gap-1">
                                             <button
                                                 type="button"
-                                                onClick={() => setShowKey(!showKey)}
-                                                className="rounded p-1.5 text-muted-foreground hover:text-foreground transition-colors min-h-[36px] min-w-[36px] flex items-center justify-center"
+                                                onClick={() =>
+                                                    setShowKey(!showKey)
+                                                }
+                                                className="flex min-h-[36px] min-w-[36px] items-center justify-center rounded p-1.5 text-muted-foreground transition-colors hover:text-foreground"
                                                 title={
-                                                    showKey ? 'Hide key' : 'Show key'
+                                                    showKey
+                                                        ? 'Hide key'
+                                                        : 'Show key'
                                                 }
                                             >
                                                 {showKey ? (
@@ -374,7 +398,7 @@ export default function ApiKeysSettings({
                                         }
                                     />
 
-                                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pt-1">
+                                    <div className="flex flex-col justify-between gap-2.5 pt-1 sm:flex-row sm:items-center">
                                         <Button
                                             type="button"
                                             variant="outline"
@@ -385,9 +409,11 @@ export default function ApiKeysSettings({
                                                 (!data[
                                                     `${selectedProvider}_api_key` as keyof typeof data
                                                 ] &&
-                                                    !keysStatus[selectedProvider]?.is_set)
+                                                    !keysStatus[
+                                                        selectedProvider
+                                                    ]?.is_set)
                                             }
-                                            className="text-xs min-h-[38px] sm:h-8 gap-1.5 w-full sm:w-auto font-medium"
+                                            className="min-h-[38px] w-full gap-1.5 text-xs font-medium sm:h-8 sm:w-auto"
                                         >
                                             {testLoading ? (
                                                 <Spinner className="h-3 w-3" />
@@ -397,7 +423,7 @@ export default function ApiKeysSettings({
                                             Test Key Connection
                                         </Button>
 
-                                        <p className="text-[11px] text-muted-foreground text-center sm:text-right">
+                                        <p className="text-center text-[11px] text-muted-foreground sm:text-right">
                                             Encrypted at rest with AES-256
                                         </p>
                                     </div>
@@ -405,10 +431,10 @@ export default function ApiKeysSettings({
                                     {testResult && (
                                         <div
                                             className={cn(
-                                                'mt-3 flex items-center gap-2.5 rounded-xl border p-3.5 text-xs font-medium transition-all shadow-xs',
+                                                'mt-3 flex items-center gap-2.5 rounded-xl border p-3.5 text-xs font-medium shadow-xs transition-all',
                                                 testResult.valid
                                                     ? 'border-emerald-500/40 bg-emerald-500/15 text-emerald-800 dark:text-emerald-300'
-                                                    : 'border-destructive/40 bg-destructive/15 text-destructive'
+                                                    : 'border-destructive/40 bg-destructive/15 text-destructive',
                                             )}
                                         >
                                             {testResult.valid ? (
@@ -424,13 +450,20 @@ export default function ApiKeysSettings({
                                 {/* Model Selector */}
                                 <div className="space-y-2">
                                     <div className="flex items-center justify-between">
-                                        <Label htmlFor="ai_model" className="text-sm font-medium">
+                                        <Label
+                                            htmlFor="ai_model"
+                                            className="text-sm font-medium"
+                                        >
                                             Default Model
                                         </Label>
                                         <button
                                             type="button"
-                                            onClick={() => setCustomModelMode(!customModelMode)}
-                                            className="text-xs text-primary hover:underline font-medium min-h-[32px] flex items-center"
+                                            onClick={() =>
+                                                setCustomModelMode(
+                                                    !customModelMode,
+                                                )
+                                            }
+                                            className="flex min-h-[32px] items-center text-xs font-medium text-primary hover:underline"
                                         >
                                             {customModelMode
                                                 ? 'Pick from curated list'
@@ -446,12 +479,16 @@ export default function ApiKeysSettings({
                                                 placeholder="e.g. gemini-3.8-flash, custom fine-tuned model"
                                                 value={data.ai_model}
                                                 onChange={(e) =>
-                                                    setData('ai_model', e.target.value)
+                                                    setData(
+                                                        'ai_model',
+                                                        e.target.value,
+                                                    )
                                                 }
-                                                className="font-mono text-base sm:text-sm min-h-[44px] sm:min-h-9"
+                                                className="min-h-[44px] font-mono text-base sm:min-h-9 sm:text-sm"
                                             />
                                             <p className="text-[11px] text-muted-foreground">
-                                                Specify any valid model ID supported by your API key.
+                                                Specify any valid model ID
+                                                supported by your API key.
                                             </p>
                                         </div>
                                     ) : (
@@ -461,33 +498,44 @@ export default function ApiKeysSettings({
                                                 setData('ai_model', val)
                                             }
                                         >
-                                            <SelectTrigger id="ai_model" className="w-full min-h-[44px] sm:min-h-9">
+                                            <SelectTrigger
+                                                id="ai_model"
+                                                className="min-h-[44px] w-full sm:min-h-9"
+                                            >
                                                 <SelectValue placeholder="Choose a model" />
                                             </SelectTrigger>
                                             <SelectContent>
                                                 {Object.entries(
-                                                    activeProviderMeta.models || {}
-                                                ).map(([modelKey, modelLabel]) => (
-                                                    <SelectItem
-                                                        key={modelKey}
-                                                        value={modelKey}
-                                                    >
-                                                        {modelLabel}
-                                                    </SelectItem>
-                                                ))}
+                                                    activeProviderMeta.models ||
+                                                        {},
+                                                ).map(
+                                                    ([
+                                                        modelKey,
+                                                        modelLabel,
+                                                    ]) => (
+                                                        <SelectItem
+                                                            key={modelKey}
+                                                            value={modelKey}
+                                                        >
+                                                            {modelLabel}
+                                                        </SelectItem>
+                                                    ),
+                                                )}
                                             </SelectContent>
                                         </Select>
                                     )}
                                     <InputError message={errors.ai_model} />
                                 </div>
 
-                                <div className="flex flex-col sm:flex-row items-center gap-3 pt-2">
+                                <div className="flex flex-col items-center gap-3 pt-2 sm:flex-row">
                                     <Button
                                         type="submit"
                                         disabled={processing}
-                                        className="gap-2 min-h-[44px] w-full sm:w-auto"
+                                        className="min-h-[44px] w-full gap-2 sm:w-auto"
                                     >
-                                        {processing && <Spinner className="h-4 w-4" />}
+                                        {processing && (
+                                            <Spinner className="h-4 w-4" />
+                                        )}
                                         Save AI Settings
                                     </Button>
 
@@ -504,16 +552,17 @@ export default function ApiKeysSettings({
 
                 {/* Privacy & Security Guarantee */}
                 <div className="flex items-start gap-3 rounded-xl border border-border/50 bg-muted/30 p-4 text-xs text-muted-foreground">
-                    <Lock className="h-4 w-4 shrink-0 text-primary mt-0.5" />
+                    <Lock className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
                     <div className="space-y-1">
                         <p className="font-medium text-foreground">
                             Zero Middleman & Direct Streaming
                         </p>
                         <p>
-                            Your API keys are encrypted at rest using Laravel&apos;s
-                            application key and never logged. Content generation
-                            requests stream directly between your server and the AI
-                            provider without any usage tracking or credit fees.
+                            Your API keys are encrypted at rest using
+                            Laravel&apos;s application key and never logged.
+                            Content generation requests stream directly between
+                            your server and the AI provider without any usage
+                            tracking or credit fees.
                         </p>
                     </div>
                 </div>
