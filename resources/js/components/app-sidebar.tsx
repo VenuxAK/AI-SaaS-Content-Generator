@@ -11,6 +11,7 @@ import {
 import AppLogo from '@/components/app-logo';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
+import { PwaInstallButton } from '@/components/pwa-install-button';
 import {
     Sidebar,
     SidebarContent,
@@ -22,10 +23,10 @@ import {
     useSidebar,
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
-import { index as tonesIndex } from '@/routes/tones';
-import { index as historyIndex } from '@/routes/history';
 import { index as adminUsersIndex } from '@/routes/admin/users';
 import { create as generateCreate } from '@/routes/generate';
+import { index as historyIndex } from '@/routes/history';
+import { index as tonesIndex } from '@/routes/tones';
 import type { NavItem } from '@/types';
 
 export function AppSidebar() {
@@ -130,6 +131,7 @@ export function AppSidebar() {
             </SidebarContent>
 
             <SidebarFooter className="border-t border-slate-100 p-2 dark:border-slate-800/60">
+                <PwaInstallButton collapsed={isCollapsed} className="mb-2" />
                 <NavUser />
             </SidebarFooter>
         </Sidebar>

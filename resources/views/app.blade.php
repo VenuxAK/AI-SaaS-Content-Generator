@@ -32,7 +32,17 @@
 
         <link rel="icon" href="/favicon.ico" sizes="any">
         <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-        <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+        <link rel="apple-touch-icon" href="/icons/apple-touch-icon-180x180.png">
+        <link rel="manifest" href="/manifest.webmanifest">
+
+        {{-- PWA & Mobile Web App Meta Tags --}}
+        <meta name="application-name" content="{{ config('app.name', 'AI Content') }}">
+        <meta name="apple-mobile-web-app-title" content="{{ config('app.name', 'AI Content') }}">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="theme-color" content="#07080e" media="(prefers-color-scheme: dark)">
+        <meta name="theme-color" content="#f8fafc" media="(prefers-color-scheme: light)">
 
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
