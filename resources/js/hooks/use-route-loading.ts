@@ -4,20 +4,17 @@ import { useEffect, useRef, useState } from 'react';
 export interface RouteLoadingState {
     isLoading: boolean;
     progress: number;
-    showBadge: boolean;
 }
 
 /**
  * Hook to track whether an Inertia page navigation/visit is currently in progress
- * with realistic smooth progress trickling and delayed badge display.
+ * with realistic smooth progress trickling.
  */
 export function useRouteLoading(): RouteLoadingState {
     const [isLoading, setIsLoading] = useState(false);
     const [progress, setProgress] = useState(0);
-    const [showBadge, setShowBadge] = useState(false);
 
     const trickleTimer = useRef<NodeJS.Timeout | null>(null);
-    const badgeTimer = useRef<NodeJS.Timeout | null>(null);
     const finishTimer = useRef<NodeJS.Timeout | null>(null);
 
     useEffect(() => {
@@ -32,16 +29,7 @@ export function useRouteLoading(): RouteLoadingState {
 
             document.documentElement.classList.add('cursor-progress');
 
-            // Show floating indicator if navigation takes longer than 120ms
-            if (badgeTimer.current) {
-                clearTimeout(badgeTimer.current);
-            }
-
-            badgeTimer.current = setTimeout(() => {
-                setShowBadge(true);
-            }, 120);
-
-            // Smooth trickle progress
+            // Smooth trickle progress forward
             let current = 20;
 
             const trickle = () => {
@@ -85,11 +73,6 @@ export function useRouteLoading(): RouteLoadingState {
                 trickleTimer.current = null;
             }
 
-            if (badgeTimer.current) {
-                clearTimeout(badgeTimer.current);
-                badgeTimer.current = null;
-            }
-
             setProgress(100);
 
             if (finishTimer.current) {
@@ -98,7 +81,6 @@ export function useRouteLoading(): RouteLoadingState {
 
             finishTimer.current = setTimeout(() => {
                 setIsLoading(false);
-                setShowBadge(false);
                 setProgress(0);
                 document.documentElement.classList.remove('cursor-progress');
             }, 250);
@@ -117,10 +99,6 @@ export function useRouteLoading(): RouteLoadingState {
                 clearTimeout(trickleTimer.current);
             }
 
-            if (badgeTimer.current) {
-                clearTimeout(badgeTimer.current);
-            }
-
             if (finishTimer.current) {
                 clearTimeout(finishTimer.current);
             }
@@ -129,5 +107,5 @@ export function useRouteLoading(): RouteLoadingState {
         };
     }, []);
 
-    return { isLoading, progress, showBadge };
+    return { isLoading, progress };
 }

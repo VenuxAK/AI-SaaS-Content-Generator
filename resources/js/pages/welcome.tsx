@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -7,9 +6,6 @@ import {
     Copy,
     Check,
     Cpu,
-    ExternalLink,
-    Flame,
-    Key,
     Layers,
     Lock,
     Moon,
@@ -28,8 +24,9 @@ import {
     ArrowUp,
     Menu,
 } from 'lucide-react';
+import { useState, useEffect, useRef, useSyncExternalStore } from 'react';
 
-import { AuroraBackground } from '@/components/ui/aurora-background';
+import { GridBackground } from '@/components/ui/grid-background';
 import { useAppearance } from '@/hooks/use-appearance';
 import { dashboard, login, register } from '@/routes';
 
@@ -144,43 +141,69 @@ Here is what happens when you strip away the middleman.`,
 export default function Welcome() {
     const { auth } = usePage().props as { auth?: { user?: any } };
     const { resolvedAppearance, updateAppearance } = useAppearance();
-    const [mounted, setMounted] = useState(false);
+
+    const mounted = useSyncExternalStore(
+        () => () => {},
+        () => true,
+        () => false,
+    );
 
     const [activePreset, setActivePreset] = useState<DemoPreset>(
         DEMO_PRESETS[0],
     );
-    const [displayedOutput, setDisplayedOutput] = useState('');
+    const [displayedOutput, setDisplayedOutput] = useState(
+        DEMO_PRESETS[0].output,
+    );
     const [isTyping, setIsTyping] = useState(false);
     const [copied, setCopied] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const typingTimerRef = useRef<NodeJS.Timeout | null>(null);
 
     useEffect(() => {
-        setMounted(true);
+        return () => {
+            if (typingTimerRef.current) {
+                clearInterval(typingTimerRef.current);
+            }
+        };
     }, []);
 
-    // Simulated typewriter stream on preset change
-    useEffect(() => {
-        let index = 0;
-        const text = activePreset.output;
+    const handlePresetChange = (preset: DemoPreset) => {
+        if (preset.id === activePreset.id) {
+            return;
+        }
+
+        if (typingTimerRef.current) {
+            clearInterval(typingTimerRef.current);
+        }
+
+        setActivePreset(preset);
         setDisplayedOutput('');
         setIsTyping(true);
 
-        const interval = setInterval(() => {
+        let index = 0;
+        const text = preset.output;
+
+        typingTimerRef.current = setInterval(() => {
             if (index < text.length) {
                 setDisplayedOutput(text.slice(0, index + 3));
                 index += 3;
             } else {
                 setDisplayedOutput(text);
                 setIsTyping(false);
-                clearInterval(interval);
+
+                if (typingTimerRef.current) {
+                    clearInterval(typingTimerRef.current);
+                    typingTimerRef.current = null;
+                }
             }
         }, 16);
-
-        return () => clearInterval(interval);
-    }, [activePreset]);
+    };
 
     const handleCopy = () => {
-        if (!displayedOutput) return;
+        if (!displayedOutput) {
+            return;
+        }
+
         navigator.clipboard.writeText(displayedOutput);
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
@@ -198,6 +221,7 @@ export default function Welcome() {
         };
 
         window.addEventListener('scroll', handleScroll, { passive: true });
+
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
@@ -213,7 +237,7 @@ export default function Welcome() {
 
             <div className="min-h-screen scroll-smooth bg-[#f8fafc] text-slate-900 transition-colors duration-300 selection:bg-indigo-500/20 selection:text-indigo-600 dark:bg-[#07080e] dark:text-slate-100 dark:selection:text-indigo-300">
                 {/* 1. Header Navigation */}
-                <header className="sticky top-0 z-50 w-full border-b border-slate-200/80 bg-white/70 backdrop-blur-xl dark:border-slate-800/80 dark:bg-[#07080e]/75">
+                <header className="sticky top-0 z-50 w-full border-b border-slate-200/80 bg-white/80 backdrop-blur-md dark:border-slate-800/80 dark:bg-[#07080e]/80">
                     <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
                         {/* Logo */}
                         <Link
@@ -232,35 +256,35 @@ export default function Welcome() {
                                         AI
                                     </span>
                                 </span>
-                                <span className="-mt-1 text-[10px] font-semibold tracking-wider text-indigo-600 uppercase dark:text-indigo-400">
+                                <span className="-mt-1 text-[10px] font-semibold tracking-wider text-slate-500 uppercase dark:text-slate-400">
                                     BYOK Studio
                                 </span>
                             </div>
                         </Link>
 
                         {/* Navigation Links */}
-                        <nav className="hidden items-center gap-8 text-sm font-semibold text-slate-600 md:flex dark:text-slate-300">
+                        <nav className="hidden items-center gap-8 text-sm font-medium text-slate-600 md:flex dark:text-slate-300">
                             <a
                                 href="#playground"
-                                className="transition hover:text-indigo-600 dark:hover:text-white"
+                                className="transition hover:text-slate-900 dark:hover:text-white"
                             >
                                 Live Studio Demo
                             </a>
                             <a
                                 href="#models"
-                                className="transition hover:text-indigo-600 dark:hover:text-white"
+                                className="transition hover:text-slate-900 dark:hover:text-white"
                             >
                                 Supported Models
                             </a>
                             <a
                                 href="#why-byok"
-                                className="transition hover:text-indigo-600 dark:hover:text-white"
+                                className="transition hover:text-slate-900 dark:hover:text-white"
                             >
                                 Why BYOK?
                             </a>
                             <a
                                 href="#features"
-                                className="transition hover:text-indigo-600 dark:hover:text-white"
+                                className="transition hover:text-slate-900 dark:hover:text-white"
                             >
                                 Features
                             </a>
@@ -271,57 +295,62 @@ export default function Welcome() {
                             {/* Theme Toggle */}
                             <button
                                 onClick={toggleTheme}
+                                className="flex size-9 cursor-pointer items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 shadow-xs transition hover:bg-slate-50 hover:text-slate-900 dark:border-slate-800 dark:bg-slate-900/60 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white"
                                 aria-label="Toggle theme"
-                                className="flex size-9 cursor-pointer items-center justify-center rounded-xl border border-slate-200/80 bg-white/50 text-slate-700 transition hover:bg-slate-100 hover:text-slate-900 dark:border-slate-800/80 dark:bg-slate-900/50 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white"
+                                title="Toggle light and dark mode"
                             >
-                                {mounted && resolvedAppearance === 'dark' ? (
-                                    <Sun className="size-4 text-amber-400" />
+                                {mounted ? (
+                                    resolvedAppearance === 'dark' ? (
+                                        <Sun className="size-4 text-amber-400" />
+                                    ) : (
+                                        <Moon className="size-4 text-slate-700" />
+                                    )
                                 ) : (
-                                    <Moon className="size-4 text-indigo-500" />
+                                    <span className="size-4" />
                                 )}
                             </button>
 
-                            {auth?.user ? (
-                                <Link
-                                    href={dashboard()}
-                                    className="inline-flex h-9.5 items-center gap-1.5 rounded-xl bg-indigo-600 px-3.5 text-xs font-bold text-white shadow-md shadow-indigo-600/20 transition hover:bg-indigo-500 sm:gap-2 sm:px-4 sm:text-sm"
-                                >
-                                    <span>Dashboard</span>
-                                    <ArrowRight className="size-3.5 sm:size-4" />
-                                </Link>
-                            ) : (
-                                <>
+                            {/* Authentication CTAs */}
+                            <div className="hidden items-center gap-2 sm:flex">
+                                {auth?.user ? (
                                     <Link
-                                        href={login()}
-                                        className="inline-flex px-2 py-2 text-xs font-semibold text-slate-700 transition hover:text-slate-900 sm:px-3 sm:text-sm dark:text-slate-300 dark:hover:text-white"
+                                        href={dashboard()}
+                                        className="flex h-9 items-center justify-center gap-1.5 rounded-xl bg-indigo-600 px-4 text-xs font-semibold text-white shadow-xs transition hover:bg-indigo-500 active:scale-[0.98]"
                                     >
-                                        Log in
+                                        Dashboard
+                                        <ArrowRight className="size-3.5" />
                                     </Link>
-                                    <Link
-                                        href={register()}
-                                        className="inline-flex h-9.5 items-center gap-1.5 rounded-xl bg-indigo-600 px-3 text-xs font-bold text-white shadow-md shadow-indigo-600/25 transition hover:bg-indigo-500 active:scale-95 sm:gap-2 sm:px-4 sm:text-sm"
-                                    >
-                                        <span className="xs:inline hidden">
-                                            Get Started
-                                        </span>
-                                        <span className="xs:hidden">Join</span>
-                                        <ArrowRight className="size-3.5 sm:size-4" />
-                                    </Link>
-                                </>
-                            )}
+                                ) : (
+                                    <>
+                                        <Link
+                                            href={login()}
+                                            className="px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:text-slate-950 dark:text-slate-300 dark:hover:text-white"
+                                        >
+                                            Log in
+                                        </Link>
+                                        <Link
+                                            href={register()}
+                                            className="flex h-9 items-center justify-center gap-1.5 rounded-xl bg-indigo-600 px-4 text-xs font-semibold text-white shadow-xs transition hover:bg-indigo-500 active:scale-[0.98]"
+                                        >
+                                            Join
+                                            <ArrowRight className="size-3.5" />
+                                        </Link>
+                                    </>
+                                )}
+                            </div>
 
                             {/* Mobile Menu Hamburger Toggle */}
                             <button
                                 onClick={() =>
                                     setMobileMenuOpen(!mobileMenuOpen)
                                 }
-                                aria-label="Toggle navigation menu"
-                                className="flex size-9 cursor-pointer items-center justify-center rounded-xl border border-slate-200/80 bg-white/50 text-slate-700 transition hover:bg-slate-100 md:hidden dark:border-slate-800/80 dark:bg-slate-900/50 dark:text-slate-300 dark:hover:bg-slate-800"
+                                className="flex size-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-700 md:hidden dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300"
+                                aria-label="Toggle mobile menu"
                             >
                                 {mobileMenuOpen ? (
-                                    <CloseIcon className="size-5 text-indigo-600 dark:text-indigo-400" />
+                                    <CloseIcon className="size-4.5" />
                                 ) : (
-                                    <Menu className="size-5" />
+                                    <Menu className="size-4.5" />
                                 )}
                             </button>
                         </div>
@@ -334,68 +363,70 @@ export default function Welcome() {
                                 initial={{ opacity: 0, height: 0 }}
                                 animate={{ opacity: 1, height: 'auto' }}
                                 exit={{ opacity: 0, height: 0 }}
-                                transition={{ duration: 0.2 }}
-                                className="overflow-hidden border-b border-slate-200/80 bg-white/95 px-4 py-4 shadow-xl backdrop-blur-2xl md:hidden dark:border-slate-800/80 dark:bg-[#07080e]/95"
+                                className="border-b border-slate-200 bg-white px-4 py-4 md:hidden dark:border-slate-800 dark:bg-[#0c0e1a]"
                             >
-                                <nav className="flex flex-col gap-2 text-sm font-semibold text-slate-700 dark:text-slate-200">
+                                <nav className="flex flex-col gap-3 text-sm font-semibold text-slate-700 dark:text-slate-300">
                                     <a
                                         href="#playground"
-                                        onClick={() => setMobileMenuOpen(false)}
-                                        className="flex items-center justify-between rounded-xl px-3 py-2.5 hover:bg-slate-100 dark:hover:bg-slate-800/60"
+                                        onClick={() =>
+                                            setMobileMenuOpen(false)
+                                        }
+                                        className="py-1 hover:text-indigo-600 dark:hover:text-white"
                                     >
-                                        <span>Live Studio Demo</span>
-                                        <ArrowRight className="size-4 text-slate-400" />
+                                        Live Studio Demo
                                     </a>
                                     <a
                                         href="#models"
-                                        onClick={() => setMobileMenuOpen(false)}
-                                        className="flex items-center justify-between rounded-xl px-3 py-2.5 hover:bg-slate-100 dark:hover:bg-slate-800/60"
+                                        onClick={() =>
+                                            setMobileMenuOpen(false)
+                                        }
+                                        className="py-1 hover:text-indigo-600 dark:hover:text-white"
                                     >
-                                        <span>Supported Models</span>
-                                        <ArrowRight className="size-4 text-slate-400" />
+                                        Supported Models
                                     </a>
                                     <a
                                         href="#why-byok"
-                                        onClick={() => setMobileMenuOpen(false)}
-                                        className="flex items-center justify-between rounded-xl px-3 py-2.5 hover:bg-slate-100 dark:hover:bg-slate-800/60"
+                                        onClick={() =>
+                                            setMobileMenuOpen(false)
+                                        }
+                                        className="py-1 hover:text-indigo-600 dark:hover:text-white"
                                     >
-                                        <span>Why BYOK?</span>
-                                        <ArrowRight className="size-4 text-slate-400" />
+                                        Why BYOK?
                                     </a>
                                     <a
                                         href="#features"
-                                        onClick={() => setMobileMenuOpen(false)}
-                                        className="flex items-center justify-between rounded-xl px-3 py-2.5 hover:bg-slate-100 dark:hover:bg-slate-800/60"
+                                        onClick={() =>
+                                            setMobileMenuOpen(false)
+                                        }
+                                        className="py-1 hover:text-indigo-600 dark:hover:text-white"
                                     >
-                                        <span>Features</span>
-                                        <ArrowRight className="size-4 text-slate-400" />
+                                        Features
                                     </a>
-
-                                    <div className="flex flex-col gap-2 border-t border-slate-200/80 pt-2 dark:border-slate-800/80">
+                                    <div className="mt-2 flex flex-col gap-2 border-t border-slate-100 pt-3 dark:border-slate-800">
                                         {auth?.user ? (
                                             <Link
                                                 href={dashboard()}
-                                                className="flex min-h-[44px] items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 text-sm font-bold text-white shadow-md shadow-indigo-600/25"
+                                                className="flex h-10 items-center justify-center gap-1.5 rounded-xl bg-indigo-600 text-xs font-semibold text-white"
                                             >
-                                                Open Dashboard
-                                                <ArrowRight className="size-4" />
+                                                Dashboard
+                                                <ArrowRight className="size-3.5" />
                                             </Link>
                                         ) : (
-                                            <div className="grid grid-cols-2 gap-2">
+                                            <>
                                                 <Link
                                                     href={login()}
-                                                    className="flex min-h-[44px] items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-xs font-bold text-slate-800 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
+                                                    className="flex h-10 items-center justify-center rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 dark:border-slate-800 dark:text-slate-300"
                                                 >
                                                     Log in
                                                 </Link>
                                                 <Link
                                                     href={register()}
-                                                    className="flex min-h-[44px] items-center justify-center gap-1.5 rounded-xl bg-indigo-600 text-xs font-bold text-white shadow-md shadow-indigo-600/25"
+                                                    className="flex h-10 items-center justify-center gap-1.5 rounded-xl bg-indigo-600 text-xs font-semibold text-white"
                                                 >
-                                                    Get Started
+                                                    Join
                                                     <ArrowRight className="size-3.5" />
                                                 </Link>
-                                            </div>
+                                            </>
                                         )}
                                     </div>
                                 </nav>
@@ -404,32 +435,18 @@ export default function Welcome() {
                     </AnimatePresence>
                 </header>
 
-                {/* 2. Hero Section with Aurora Background */}
-                <AuroraBackground className="flex min-h-[calc(100dvh-4rem)] min-h-[calc(100vh-4rem)] flex-col items-center justify-center px-4 py-10 sm:px-6 sm:py-16 lg:px-8">
+                {/* 2. Hero Section with Grid Background */}
+                <GridBackground className="flex min-h-[calc(100dvh-4rem)] min-h-[calc(100vh-4rem)] flex-col items-center justify-center px-4 py-12 sm:px-6 sm:py-20 lg:px-8">
                     <div className="mx-auto max-w-5xl text-center">
-                        {/* Glow Badge */}
-                        <motion.div
-                            initial={{ opacity: 0, y: 15 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.5 }}
-                            className="mb-6 inline-flex items-center gap-1.5 rounded-full border border-indigo-500/30 bg-indigo-500/10 px-3 py-1.5 text-center text-[11px] font-semibold text-indigo-700 backdrop-blur-md sm:mb-8 sm:gap-2 sm:px-4 sm:text-xs dark:text-indigo-300"
-                        >
-                            <span className="flex size-2 shrink-0 animate-pulse rounded-full bg-emerald-400" />
-                            <span>
-                                Zero Token Markup • BYOK Freedom • Gemini, GPT-5
-                                & Claude
-                            </span>
-                        </motion.div>
-
                         {/* Main Title */}
                         <motion.h1
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.6, delay: 0.1 }}
-                            className="text-3xl leading-tight font-black tracking-tight sm:text-5xl lg:text-7xl"
+                            className="text-4xl leading-[1.1] font-black tracking-tight text-slate-950 sm:text-6xl lg:text-7xl dark:text-white"
                         >
                             Supercharge Your Copy with{' '}
-                            <span className="bg-gradient-to-r from-indigo-500 via-purple-500 to-cyan-400 bg-clip-text text-transparent">
+                            <span className="text-indigo-600 dark:text-indigo-400">
                                 Your Own AI Keys
                             </span>
                         </motion.h1>
@@ -439,7 +456,7 @@ export default function Welcome() {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.6, delay: 0.2 }}
-                            className="mx-auto mt-4 max-w-3xl px-1 text-sm leading-relaxed font-normal text-slate-600 sm:mt-6 sm:px-0 sm:text-xl dark:text-slate-300"
+                            className="mx-auto mt-5 max-w-2xl px-1 text-base leading-relaxed font-normal text-slate-600 sm:mt-6 sm:px-0 sm:text-lg dark:text-slate-400"
                         >
                             Stop renting marked-up AI tokens at $49/month. Nexus
                             AI connects directly to your Google Gemini, OpenAI,
@@ -457,9 +474,9 @@ export default function Welcome() {
                         >
                             <Link
                                 href={auth?.user ? dashboard() : register()}
-                                className="flex h-12 w-full items-center justify-center gap-2.5 rounded-2xl bg-indigo-600 px-6 text-sm font-bold text-white shadow-xl shadow-indigo-600/30 transition hover:bg-indigo-500 hover:shadow-indigo-600/40 active:scale-95 sm:h-13 sm:w-auto sm:px-8 sm:text-base"
+                                className="flex h-12 w-full items-center justify-center gap-2.5 rounded-xl border border-indigo-500/30 bg-indigo-600 px-7 text-sm font-semibold text-white shadow-xs transition hover:bg-indigo-500 active:scale-[0.98] sm:h-12.5 sm:w-auto"
                             >
-                                <Zap className="size-4.5 sm:size-5" />
+                                <Zap className="size-4" />
                                 {auth?.user
                                     ? 'Enter AI Studio'
                                     : 'Start Generating Free'}
@@ -467,9 +484,9 @@ export default function Welcome() {
 
                             <a
                                 href="#playground"
-                                className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl border border-slate-300/80 bg-white/70 px-6 text-sm font-semibold text-slate-800 backdrop-blur-md transition hover:bg-white hover:text-slate-950 sm:h-13 sm:w-auto sm:px-7 sm:text-base dark:border-slate-800 dark:bg-slate-900/60 dark:text-slate-200 dark:hover:bg-slate-800 dark:hover:text-white"
+                                className="flex h-12 w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-6 text-sm font-semibold text-slate-700 shadow-xs transition hover:bg-slate-50 hover:text-slate-950 active:scale-[0.98] sm:h-12.5 sm:w-auto dark:border-slate-800 dark:bg-slate-900/60 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white"
                             >
-                                <Sparkles className="size-4.5 text-indigo-500 sm:size-5" />
+                                <Sparkles className="size-4 text-indigo-500" />
                                 Live Playground
                             </a>
                         </motion.div>
@@ -479,18 +496,18 @@ export default function Welcome() {
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             transition={{ duration: 0.6, delay: 0.4 }}
-                            className="mt-10 flex flex-wrap items-center justify-center gap-4 text-[11px] font-semibold text-slate-500 sm:mt-12 sm:gap-10 sm:text-xs dark:text-slate-400"
+                            className="mt-10 flex flex-wrap items-center justify-center gap-4 text-[11px] font-semibold text-slate-500 sm:mt-12 sm:gap-8 sm:text-xs dark:text-slate-400"
                         >
                             <div className="flex items-center gap-1.5 sm:gap-2">
-                                <CheckCircle2 className="size-3.5 shrink-0 text-emerald-500 sm:size-4" />
+                                <CheckCircle2 className="size-3.5 shrink-0 text-slate-400 sm:size-4 dark:text-slate-500" />
                                 <span>100% Raw API Direct Cost</span>
                             </div>
                             <div className="flex items-center gap-1.5 sm:gap-2">
-                                <Shield className="size-3.5 shrink-0 text-indigo-500 sm:size-4" />
+                                <Shield className="size-3.5 shrink-0 text-slate-400 sm:size-4 dark:text-slate-500" />
                                 <span>AES-256 Encrypted Keys</span>
                             </div>
                             <div className="flex items-center gap-1.5 sm:gap-2">
-                                <Cpu className="size-3.5 shrink-0 text-cyan-500 sm:size-4" />
+                                <Cpu className="size-3.5 shrink-0 text-slate-400 sm:size-4 dark:text-slate-500" />
                                 <span>SSE Sub-Second Streaming</span>
                             </div>
                         </motion.div>
@@ -505,16 +522,16 @@ export default function Welcome() {
                             <a
                                 href="#playground"
                                 aria-label="Scroll to interactive studio demo"
-                                className="group inline-flex flex-col items-center gap-1.5 text-slate-400 transition-colors hover:text-indigo-600 dark:hover:text-indigo-400"
+                                className="group inline-flex flex-col items-center gap-1.5 text-slate-400 transition-colors hover:text-slate-700 dark:hover:text-slate-200"
                             >
                                 <span className="text-[11px] font-semibold tracking-wider uppercase opacity-75 group-hover:opacity-100">
                                     Explore Studio Demo
                                 </span>
-                                <ChevronDown className="size-4 animate-bounce text-indigo-500/80 group-hover:text-indigo-500" />
+                                <ChevronDown className="size-4 text-slate-400 transition-transform group-hover:translate-y-0.5" />
                             </a>
                         </motion.div>
                     </div>
-                </AuroraBackground>
+                </GridBackground>
 
                 {/* 3. Interactive Studio Demo Showcase */}
                 <section
@@ -526,17 +543,17 @@ export default function Welcome() {
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                         transition={{ duration: 0.7 }}
-                        className="glow-indigo rounded-3xl border border-slate-200/90 bg-white/90 p-4 shadow-2xl backdrop-blur-2xl sm:p-8 dark:border-slate-800/90 dark:bg-[#0c0e1a]/90"
+                        className="rounded-3xl border border-slate-200/80 bg-white p-5 shadow-xs sm:p-8 dark:border-slate-800/80 dark:bg-[#0c0e1a]"
                     >
                         {/* Demo Top Bar */}
                         <div className="flex flex-col justify-between gap-4 border-b border-slate-200/70 pb-6 lg:flex-row lg:items-center dark:border-slate-800/70">
                             <div>
                                 <div className="flex items-center gap-2">
-                                    <span className="flex size-3 animate-ping rounded-full bg-emerald-500" />
-                                    <h3 className="text-lg font-extrabold tracking-tight text-slate-900 dark:text-white">
+                                    <span className="size-2 rounded-full bg-emerald-500" />
+                                    <h3 className="text-base font-extrabold tracking-tight text-slate-900 sm:text-lg dark:text-white">
                                         Interactive Studio Simulation
                                     </h3>
-                                    <span className="rounded-md bg-indigo-500/10 px-2 py-0.5 text-xs font-bold text-indigo-600 dark:text-indigo-400">
+                                    <span className="rounded-md border border-slate-200 bg-slate-100 px-2 py-0.5 text-xs font-semibold text-slate-600 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-400">
                                         Live Preview
                                     </span>
                                 </div>
@@ -552,19 +569,20 @@ export default function Welcome() {
                                     const IconComponent = preset.icon;
                                     const isSelected =
                                         activePreset.id === preset.id;
+
                                     return (
                                         <button
                                             key={preset.id}
                                             onClick={() =>
-                                                setActivePreset(preset)
+                                                handlePresetChange(preset)
                                             }
-                                            className={`flex min-h-[38px] shrink-0 cursor-pointer items-center gap-2 rounded-xl px-3.5 py-2 text-xs font-bold whitespace-nowrap transition-all active:scale-95 ${
+                                            className={`flex min-h-[38px] shrink-0 cursor-pointer items-center gap-2 rounded-xl px-3.5 py-2 text-xs font-semibold whitespace-nowrap transition-all active:scale-95 ${
                                                 isSelected
-                                                    ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
+                                                    ? 'bg-slate-900 text-white shadow-xs dark:bg-white dark:text-slate-950'
                                                     : 'border border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-900/60 dark:text-slate-300 dark:hover:bg-slate-800'
                                             }`}
                                         >
-                                            <IconComponent className="size-4 shrink-0" />
+                                            <IconComponent className="size-3.5 shrink-0" />
                                             <span>{preset.label}</span>
                                         </button>
                                     );
@@ -575,12 +593,12 @@ export default function Welcome() {
                         {/* Workspace View */}
                         <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-12">
                             {/* Left Config Card */}
-                            <div className="flex flex-col gap-4 rounded-2xl border border-slate-200/70 bg-slate-50/70 p-5 lg:col-span-4 dark:border-slate-800/70 dark:bg-slate-900/40">
+                            <div className="flex flex-col gap-4 rounded-2xl border border-slate-200/80 bg-slate-50/70 p-5 lg:col-span-4 dark:border-slate-800/80 dark:bg-slate-900/30">
                                 <div className="flex items-center justify-between text-xs">
                                     <span className="font-semibold text-slate-500 dark:text-slate-400">
                                         Active Engine
                                     </span>
-                                    <span className="flex items-center gap-1 font-mono font-bold text-emerald-600 dark:text-emerald-400">
+                                    <span className="flex items-center gap-1 font-mono font-bold text-slate-800 dark:text-slate-200">
                                         <span className="size-1.5 rounded-full bg-emerald-500" />
                                         {activePreset.model}
                                     </span>
@@ -590,7 +608,7 @@ export default function Welcome() {
                                     <span className="font-semibold text-slate-500 dark:text-slate-400">
                                         Voice Tone
                                     </span>
-                                    <span className="rounded-lg bg-indigo-500/15 px-2.5 py-1 text-xs font-bold text-indigo-700 dark:text-indigo-300">
+                                    <span className="rounded-md border border-slate-200/80 bg-white px-2 py-0.5 text-xs font-semibold text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300">
                                         {activePreset.tone}
                                     </span>
                                 </div>
@@ -625,8 +643,8 @@ export default function Welcome() {
                                             </strong>
                                         </span>
                                     </div>
-                                    <div className="flex items-start gap-2 rounded-lg bg-amber-500/10 p-2.5 text-[11px] text-amber-800 dark:text-amber-300">
-                                        <Lock className="mt-0.5 size-3.5 shrink-0 text-amber-600 dark:text-amber-400" />
+                                    <div className="flex items-start gap-2 rounded-lg border border-slate-200/60 bg-white p-2.5 text-[11px] text-slate-600 dark:border-slate-800/60 dark:bg-[#07080e] dark:text-slate-400">
+                                        <Lock className="mt-0.5 size-3.5 shrink-0 text-slate-400 dark:text-slate-500" />
                                         <span>
                                             Your API key is sent directly to
                                             Google/OpenAI endpoints with 0%
@@ -637,7 +655,7 @@ export default function Welcome() {
                             </div>
 
                             {/* Right Output Window */}
-                            <div className="flex flex-col rounded-2xl border border-slate-200/70 bg-white p-5 lg:col-span-8 dark:border-slate-800/70 dark:bg-[#07080e]">
+                            <div className="flex flex-col rounded-2xl border border-slate-200/80 bg-white p-5 lg:col-span-8 dark:border-slate-800/80 dark:bg-[#07080e]">
                                 <div className="mb-4 flex items-center justify-between border-b border-slate-200/60 pb-3 dark:border-slate-800/60">
                                     <div className="flex items-center gap-2">
                                         <div className="size-2 rounded-full bg-indigo-500" />
@@ -674,7 +692,7 @@ export default function Welcome() {
 
                                 <div className="mt-auto flex items-center justify-between border-t border-slate-100 pt-4 text-xs text-slate-500 dark:border-slate-900 dark:text-slate-400">
                                     <span className="flex items-center gap-1">
-                                        <Sparkles className="size-3.5 text-indigo-500" />
+                                        <Sparkles className="size-3.5 text-slate-400 dark:text-slate-500" />
                                         Formatted Markdown Preview
                                     </span>
                                     <Link
@@ -683,7 +701,7 @@ export default function Welcome() {
                                                 ? dashboard()
                                                 : register()
                                         }
-                                        className="inline-flex items-center gap-1 text-xs font-bold text-indigo-600 hover:underline dark:text-indigo-400"
+                                        className="inline-flex items-center gap-1 text-xs font-semibold text-indigo-600 hover:underline dark:text-indigo-400"
                                     >
                                         Customize prompts in Studio{' '}
                                         <ArrowRight className="size-3" />
@@ -701,10 +719,10 @@ export default function Welcome() {
                 >
                     <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
                         <div className="mx-auto mb-16 max-w-3xl text-center">
-                            <h2 className="text-xs font-bold tracking-widest text-indigo-600 uppercase dark:text-indigo-400">
+                            <h2 className="text-xs font-semibold tracking-wider text-indigo-600 uppercase dark:text-indigo-400">
                                 Unrestricted Model Access
                             </h2>
-                            <p className="mt-3 text-3xl font-black tracking-tight text-slate-900 sm:text-4xl dark:text-white">
+                            <p className="mt-3 text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl dark:text-white">
                                 Plug In the Most Powerful AI Models on Earth
                             </p>
                             <p className="mt-4 text-base text-slate-600 dark:text-slate-400">
@@ -716,16 +734,17 @@ export default function Welcome() {
                         <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
                             {/* Google Gemini Card */}
                             <motion.div
-                                whileHover={{ y: -5 }}
-                                className="glow-indigo flex flex-col rounded-3xl border border-slate-200/80 bg-white p-7 shadow-lg transition-all dark:border-slate-800/80 dark:bg-[#0c0e1a]"
+                                whileHover={{ y: -4 }}
+                                transition={{ duration: 0.2 }}
+                                className="flex flex-col rounded-2xl border border-slate-200/80 bg-white p-7 shadow-xs transition hover:border-slate-300 dark:border-slate-800/80 dark:bg-[#0c0e1a] dark:hover:border-slate-700"
                             >
                                 <div className="mb-4 flex items-center justify-between">
                                     <div className="flex items-center gap-3">
-                                        <div className="flex size-11 items-center justify-center rounded-2xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400">
-                                            <Zap className="size-6" />
+                                        <div className="flex size-10 items-center justify-center rounded-xl border border-slate-200/60 bg-slate-100 text-slate-800 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200">
+                                            <Zap className="size-5" />
                                         </div>
                                         <div>
-                                            <h3 className="text-lg font-extrabold text-slate-900 dark:text-white">
+                                            <h3 className="text-base font-extrabold text-slate-900 dark:text-white">
                                                 Google Gemini
                                             </h3>
                                             <p className="text-xs text-slate-500 dark:text-slate-400">
@@ -733,7 +752,7 @@ export default function Welcome() {
                                             </p>
                                         </div>
                                     </div>
-                                    <span className="rounded-full bg-emerald-500/10 px-2.5 py-1 text-xs font-bold text-emerald-600 dark:text-emerald-400">
+                                    <span className="rounded-md border border-slate-200/80 bg-slate-100/80 px-2 py-0.5 text-xs font-medium text-slate-600 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300">
                                         Recommended
                                     </span>
                                 </div>
@@ -743,27 +762,27 @@ export default function Welcome() {
                                     streaming.
                                 </p>
                                 <div className="mt-auto flex flex-col gap-2">
-                                    <div className="flex items-center justify-between rounded-xl bg-slate-50 p-2.5 font-mono text-xs font-semibold dark:bg-slate-900/60">
+                                    <div className="flex items-center justify-between rounded-lg bg-slate-50 px-3 py-2 font-mono text-xs font-medium dark:bg-slate-900/50">
                                         <span className="text-slate-700 dark:text-slate-300">
                                             gemini-3.8-flash
                                         </span>
-                                        <span className="font-bold text-indigo-600 dark:text-indigo-400">
+                                        <span className="text-xs text-slate-500 dark:text-slate-400">
                                             Fastest
                                         </span>
                                     </div>
-                                    <div className="flex items-center justify-between rounded-xl bg-slate-50 p-2.5 font-mono text-xs font-semibold dark:bg-slate-900/60">
+                                    <div className="flex items-center justify-between rounded-lg bg-slate-50 px-3 py-2 font-mono text-xs font-medium dark:bg-slate-900/50">
                                         <span className="text-slate-700 dark:text-slate-300">
                                             gemini-3.5-flash-lite
                                         </span>
-                                        <span className="text-slate-500">
+                                        <span className="text-xs text-slate-500 dark:text-slate-400">
                                             Lowest Cost
                                         </span>
                                     </div>
-                                    <div className="flex items-center justify-between rounded-xl bg-slate-50 p-2.5 font-mono text-xs font-semibold dark:bg-slate-900/60">
+                                    <div className="flex items-center justify-between rounded-lg bg-slate-50 px-3 py-2 font-mono text-xs font-medium dark:bg-slate-900/50">
                                         <span className="text-slate-700 dark:text-slate-300">
                                             gemini-2.5-flash
                                         </span>
-                                        <span className="text-slate-500">
+                                        <span className="text-xs text-slate-500 dark:text-slate-400">
                                             Battle-Tested
                                         </span>
                                     </div>
@@ -772,16 +791,17 @@ export default function Welcome() {
 
                             {/* OpenAI Card */}
                             <motion.div
-                                whileHover={{ y: -5 }}
-                                className="glow-cyan flex flex-col rounded-3xl border border-slate-200/80 bg-white p-7 shadow-lg transition-all dark:border-slate-800/80 dark:bg-[#0c0e1a]"
+                                whileHover={{ y: -4 }}
+                                transition={{ duration: 0.2 }}
+                                className="flex flex-col rounded-2xl border border-slate-200/80 bg-white p-7 shadow-xs transition hover:border-slate-300 dark:border-slate-800/80 dark:bg-[#0c0e1a] dark:hover:border-slate-700"
                             >
                                 <div className="mb-4 flex items-center justify-between">
                                     <div className="flex items-center gap-3">
-                                        <div className="flex size-11 items-center justify-center rounded-2xl bg-cyan-500/10 text-cyan-600 dark:text-cyan-400">
-                                            <Cpu className="size-6" />
+                                        <div className="flex size-10 items-center justify-center rounded-xl border border-slate-200/60 bg-slate-100 text-slate-800 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200">
+                                            <Cpu className="size-5" />
                                         </div>
                                         <div>
-                                            <h3 className="text-lg font-extrabold text-slate-900 dark:text-white">
+                                            <h3 className="text-base font-extrabold text-slate-900 dark:text-white">
                                                 OpenAI
                                             </h3>
                                             <p className="text-xs text-slate-500 dark:text-slate-400">
@@ -789,7 +809,7 @@ export default function Welcome() {
                                             </p>
                                         </div>
                                     </div>
-                                    <span className="rounded-full bg-cyan-500/10 px-2.5 py-1 text-xs font-bold text-cyan-600 dark:text-cyan-400">
+                                    <span className="rounded-md border border-slate-200/80 bg-slate-100/80 px-2 py-0.5 text-xs font-medium text-slate-600 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300">
                                         Flagship
                                     </span>
                                 </div>
@@ -799,27 +819,27 @@ export default function Welcome() {
                                     persuasive copywriting.
                                 </p>
                                 <div className="mt-auto flex flex-col gap-2">
-                                    <div className="flex items-center justify-between rounded-xl bg-slate-50 p-2.5 font-mono text-xs font-semibold dark:bg-slate-900/60">
+                                    <div className="flex items-center justify-between rounded-lg bg-slate-50 px-3 py-2 font-mono text-xs font-medium dark:bg-slate-900/50">
                                         <span className="text-slate-700 dark:text-slate-300">
                                             gpt-5 / gpt-4.5
                                         </span>
-                                        <span className="font-bold text-cyan-600 dark:text-cyan-400">
+                                        <span className="text-xs text-slate-500 dark:text-slate-400">
                                             Next-Gen
                                         </span>
                                     </div>
-                                    <div className="flex items-center justify-between rounded-xl bg-slate-50 p-2.5 font-mono text-xs font-semibold dark:bg-slate-900/60">
+                                    <div className="flex items-center justify-between rounded-lg bg-slate-50 px-3 py-2 font-mono text-xs font-medium dark:bg-slate-900/50">
                                         <span className="text-slate-700 dark:text-slate-300">
                                             gpt-4o / gpt-4o-mini
                                         </span>
-                                        <span className="text-slate-500">
+                                        <span className="text-xs text-slate-500 dark:text-slate-400">
                                             High Speed
                                         </span>
                                     </div>
-                                    <div className="flex items-center justify-between rounded-xl bg-slate-50 p-2.5 font-mono text-xs font-semibold dark:bg-slate-900/60">
+                                    <div className="flex items-center justify-between rounded-lg bg-slate-50 px-3 py-2 font-mono text-xs font-medium dark:bg-slate-900/50">
                                         <span className="text-slate-700 dark:text-slate-300">
                                             o3-mini / o1
                                         </span>
-                                        <span className="text-slate-500">
+                                        <span className="text-xs text-slate-500 dark:text-slate-400">
                                             Reasoning
                                         </span>
                                     </div>
@@ -828,16 +848,17 @@ export default function Welcome() {
 
                             {/* OpenRouter Card */}
                             <motion.div
-                                whileHover={{ y: -5 }}
-                                className="glow-violet flex flex-col rounded-3xl border border-slate-200/80 bg-white p-7 shadow-lg transition-all dark:border-slate-800/80 dark:bg-[#0c0e1a]"
+                                whileHover={{ y: -4 }}
+                                transition={{ duration: 0.2 }}
+                                className="flex flex-col rounded-2xl border border-slate-200/80 bg-white p-7 shadow-xs transition hover:border-slate-300 dark:border-slate-800/80 dark:bg-[#0c0e1a] dark:hover:border-slate-700"
                             >
                                 <div className="mb-4 flex items-center justify-between">
                                     <div className="flex items-center gap-3">
-                                        <div className="flex size-11 items-center justify-center rounded-2xl bg-purple-500/10 text-purple-600 dark:text-purple-400">
-                                            <Layers className="size-6" />
+                                        <div className="flex size-10 items-center justify-center rounded-xl border border-slate-200/60 bg-slate-100 text-slate-800 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200">
+                                            <Layers className="size-5" />
                                         </div>
                                         <div>
-                                            <h3 className="text-lg font-extrabold text-slate-900 dark:text-white">
+                                            <h3 className="text-base font-extrabold text-slate-900 dark:text-white">
                                                 OpenRouter
                                             </h3>
                                             <p className="text-xs text-slate-500 dark:text-slate-400">
@@ -845,7 +866,7 @@ export default function Welcome() {
                                             </p>
                                         </div>
                                     </div>
-                                    <span className="rounded-full bg-purple-500/10 px-2.5 py-1 text-xs font-bold text-purple-600 dark:text-purple-400">
+                                    <span className="rounded-md border border-slate-200/80 bg-slate-100/80 px-2 py-0.5 text-xs font-medium text-slate-600 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300">
                                         Multi-Model
                                     </span>
                                 </div>
@@ -855,27 +876,27 @@ export default function Welcome() {
                                     single API key.
                                 </p>
                                 <div className="mt-auto flex flex-col gap-2">
-                                    <div className="flex items-center justify-between rounded-xl bg-slate-50 p-2.5 font-mono text-xs font-semibold dark:bg-slate-900/60">
+                                    <div className="flex items-center justify-between rounded-lg bg-slate-50 px-3 py-2 font-mono text-xs font-medium dark:bg-slate-900/50">
                                         <span className="text-slate-700 dark:text-slate-300">
                                             claude-3.7-sonnet
                                         </span>
-                                        <span className="font-bold text-purple-600 dark:text-purple-400">
+                                        <span className="text-xs text-slate-500 dark:text-slate-400">
                                             Top Prose
                                         </span>
                                     </div>
-                                    <div className="flex items-center justify-between rounded-xl bg-slate-50 p-2.5 font-mono text-xs font-semibold dark:bg-slate-900/60">
+                                    <div className="flex items-center justify-between rounded-lg bg-slate-50 px-3 py-2 font-mono text-xs font-medium dark:bg-slate-900/50">
                                         <span className="text-slate-700 dark:text-slate-300">
                                             deepseek/deepseek-r1
                                         </span>
-                                        <span className="text-slate-500">
+                                        <span className="text-xs text-slate-500 dark:text-slate-400">
                                             Open Weights
                                         </span>
                                     </div>
-                                    <div className="flex items-center justify-between rounded-xl bg-slate-50 p-2.5 font-mono text-xs font-semibold dark:bg-slate-900/60">
+                                    <div className="flex items-center justify-between rounded-lg bg-slate-50 px-3 py-2 font-mono text-xs font-medium dark:bg-slate-900/50">
                                         <span className="text-slate-700 dark:text-slate-300">
                                             meta-llama/llama-3.3-70b
                                         </span>
-                                        <span className="text-slate-500">
+                                        <span className="text-xs text-slate-500 dark:text-slate-400">
                                             Ultra-Value
                                         </span>
                                     </div>
@@ -891,10 +912,10 @@ export default function Welcome() {
                     className="mx-auto flex min-h-screen w-full max-w-6xl scroll-mt-16 flex-col justify-center px-4 py-16 sm:px-6 sm:py-20 lg:px-8"
                 >
                     <div className="mx-auto mb-16 max-w-3xl text-center">
-                        <h2 className="text-xs font-bold tracking-widest text-indigo-600 uppercase dark:text-indigo-400">
+                        <h2 className="text-xs font-semibold tracking-wider text-indigo-600 uppercase dark:text-indigo-400">
                             The Math is Simple
                         </h2>
-                        <p className="mt-3 text-3xl font-black tracking-tight text-slate-900 sm:text-4xl dark:text-white">
+                        <p className="mt-3 text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl dark:text-white">
                             Why You Should Stop Paying for "Credits"
                         </p>
                         <p className="mt-4 text-base text-slate-600 dark:text-slate-400">
@@ -905,8 +926,8 @@ export default function Welcome() {
 
                     <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
                         {/* Old Way */}
-                        <div className="relative overflow-hidden rounded-3xl border border-rose-500/20 bg-rose-500/5 p-8">
-                            <span className="mb-4 inline-block rounded-lg bg-rose-500/10 px-3 py-1 text-xs font-bold text-rose-600 dark:text-rose-400">
+                        <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-slate-50/70 p-8 dark:border-slate-800 dark:bg-slate-900/30">
+                            <span className="mb-4 inline-block rounded-md border border-slate-200/80 bg-slate-200/70 px-2.5 py-1 text-xs font-semibold text-slate-700 dark:border-slate-800 dark:bg-slate-800 dark:text-slate-300">
                                 The Old SaaS Subscription Way
                             </span>
                             <div className="mb-6 text-2xl font-black text-slate-900 dark:text-white">
@@ -917,28 +938,28 @@ export default function Welcome() {
                             </div>
                             <ul className="space-y-4 text-sm text-slate-600 dark:text-slate-300">
                                 <li className="flex items-start gap-3">
-                                    <CloseIcon className="mt-0.5 size-5 shrink-0 text-rose-500" />
+                                    <CloseIcon className="mt-0.5 size-4.5 shrink-0 text-slate-400 dark:text-slate-500" />
                                     <span>
                                         Arbitrary monthly "credit" caps that
                                         expire if unused
                                     </span>
                                 </li>
                                 <li className="flex items-start gap-3">
-                                    <CloseIcon className="mt-0.5 size-5 shrink-0 text-rose-500" />
+                                    <CloseIcon className="mt-0.5 size-4.5 shrink-0 text-slate-400 dark:text-slate-500" />
                                     <span>
                                         500% to 1,000% markup on top of raw API
                                         token costs
                                     </span>
                                 </li>
                                 <li className="flex items-start gap-3">
-                                    <CloseIcon className="mt-0.5 size-5 shrink-0 text-rose-500" />
+                                    <CloseIcon className="mt-0.5 size-4.5 shrink-0 text-slate-400 dark:text-slate-500" />
                                     <span>
                                         Locked into outdated models chosen by
                                         the provider
                                     </span>
                                 </li>
                                 <li className="flex items-start gap-3">
-                                    <CloseIcon className="mt-0.5 size-5 shrink-0 text-rose-500" />
+                                    <CloseIcon className="mt-0.5 size-4.5 shrink-0 text-slate-400 dark:text-slate-500" />
                                     <span>
                                         Recurring monthly bill even during quiet
                                         periods
@@ -948,8 +969,8 @@ export default function Welcome() {
                         </div>
 
                         {/* Nexus AI BYOK */}
-                        <div className="glow-indigo relative overflow-hidden rounded-3xl border border-emerald-500/30 bg-emerald-500/5 p-8">
-                            <span className="mb-4 inline-block rounded-lg bg-emerald-500/10 px-3 py-1 text-xs font-bold text-emerald-600 dark:text-emerald-400">
+                        <div className="relative overflow-hidden rounded-2xl border border-indigo-500/40 bg-white p-8 shadow-xs dark:border-indigo-500/40 dark:bg-[#0c0e1a]">
+                            <span className="mb-4 inline-block rounded-md border border-indigo-500/20 bg-indigo-500/10 px-2.5 py-1 text-xs font-semibold text-indigo-700 dark:text-indigo-300">
                                 The Nexus AI BYOK Way
                             </span>
                             <div className="mb-6 text-2xl font-black text-slate-900 dark:text-white">
@@ -960,7 +981,7 @@ export default function Welcome() {
                             </div>
                             <ul className="space-y-4 text-sm text-slate-600 dark:text-slate-300">
                                 <li className="flex items-start gap-3">
-                                    <Check className="mt-0.5 size-5 shrink-0 text-emerald-500" />
+                                    <Check className="mt-0.5 size-4.5 shrink-0 text-indigo-600 dark:text-indigo-400" />
                                     <span>
                                         <strong>0% Token Markup:</strong> Pay
                                         fractions of a penny directly to Google
@@ -968,7 +989,7 @@ export default function Welcome() {
                                     </span>
                                 </li>
                                 <li className="flex items-start gap-3">
-                                    <Check className="mt-0.5 size-5 shrink-0 text-emerald-500" />
+                                    <Check className="mt-0.5 size-4.5 shrink-0 text-indigo-600 dark:text-indigo-400" />
                                     <span>
                                         <strong>Unlimited Generations:</strong>{' '}
                                         Generate millions of words without
@@ -976,7 +997,7 @@ export default function Welcome() {
                                     </span>
                                 </li>
                                 <li className="flex items-start gap-3">
-                                    <Check className="mt-0.5 size-5 shrink-0 text-emerald-500" />
+                                    <Check className="mt-0.5 size-4.5 shrink-0 text-indigo-600 dark:text-indigo-400" />
                                     <span>
                                         <strong>Immediate Model Access:</strong>{' '}
                                         Switch to Gemini 3.8 Flash or GPT-5
@@ -984,7 +1005,7 @@ export default function Welcome() {
                                     </span>
                                 </li>
                                 <li className="flex items-start gap-3">
-                                    <Check className="mt-0.5 size-5 shrink-0 text-emerald-500" />
+                                    <Check className="mt-0.5 size-4.5 shrink-0 text-indigo-600 dark:text-indigo-400" />
                                     <span>
                                         <strong>Data Sovereignty:</strong> Your
                                         prompts travel directly under your own
@@ -1003,20 +1024,20 @@ export default function Welcome() {
                 >
                     <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
                         <div className="mx-auto mb-16 max-w-3xl text-center">
-                            <h2 className="text-xs font-bold tracking-widest text-indigo-600 uppercase dark:text-indigo-400">
+                            <h2 className="text-xs font-semibold tracking-wider text-indigo-600 uppercase dark:text-indigo-400">
                                 Built for Speed & Precision
                             </h2>
-                            <p className="mt-3 text-3xl font-black tracking-tight text-slate-900 sm:text-4xl dark:text-white">
+                            <p className="mt-3 text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl dark:text-white">
                                 Everything You Need in a Content Studio
                             </p>
                         </div>
 
                         <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
-                            <div className="rounded-3xl border border-slate-200/80 bg-white p-7 dark:border-slate-800/80 dark:bg-[#0c0e1a]">
-                                <div className="mb-5 flex size-12 items-center justify-center rounded-2xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400">
-                                    <Sparkles className="size-6" />
+                            <div className="rounded-2xl border border-slate-200/80 bg-white p-7 shadow-xs transition hover:border-slate-300 dark:border-slate-800/80 dark:bg-[#0c0e1a] dark:hover:border-slate-700">
+                                <div className="mb-5 flex size-10 items-center justify-center rounded-xl border border-slate-200/60 bg-slate-100 text-slate-800 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200">
+                                    <Sparkles className="size-5" />
                                 </div>
-                                <h3 className="mb-2 text-lg font-extrabold text-slate-900 dark:text-white">
+                                <h3 className="mb-2 text-base font-extrabold text-slate-900 dark:text-white">
                                     Custom Voice Tones
                                 </h3>
                                 <p className="text-xs leading-relaxed text-slate-600 dark:text-slate-400">
@@ -1026,11 +1047,11 @@ export default function Welcome() {
                                 </p>
                             </div>
 
-                            <div className="rounded-3xl border border-slate-200/80 bg-white p-7 dark:border-slate-800/80 dark:bg-[#0c0e1a]">
-                                <div className="mb-5 flex size-12 items-center justify-center rounded-2xl bg-cyan-500/10 text-cyan-600 dark:text-cyan-400">
-                                    <Zap className="size-6" />
+                            <div className="rounded-2xl border border-slate-200/80 bg-white p-7 shadow-xs transition hover:border-slate-300 dark:border-slate-800/80 dark:bg-[#0c0e1a] dark:hover:border-slate-700">
+                                <div className="mb-5 flex size-10 items-center justify-center rounded-xl border border-slate-200/60 bg-slate-100 text-slate-800 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200">
+                                    <Zap className="size-5" />
                                 </div>
-                                <h3 className="mb-2 text-lg font-extrabold text-slate-900 dark:text-white">
+                                <h3 className="mb-2 text-base font-extrabold text-slate-900 dark:text-white">
                                     Real-Time SSE Streaming
                                 </h3>
                                 <p className="text-xs leading-relaxed text-slate-600 dark:text-slate-400">
@@ -1040,11 +1061,11 @@ export default function Welcome() {
                                 </p>
                             </div>
 
-                            <div className="rounded-3xl border border-slate-200/80 bg-white p-7 dark:border-slate-800/80 dark:bg-[#0c0e1a]">
-                                <div className="mb-5 flex size-12 items-center justify-center rounded-2xl bg-purple-500/10 text-purple-600 dark:text-purple-400">
-                                    <TrendingUp className="size-6" />
+                            <div className="rounded-2xl border border-slate-200/80 bg-white p-7 shadow-xs transition hover:border-slate-300 dark:border-slate-800/80 dark:bg-[#0c0e1a] dark:hover:border-slate-700">
+                                <div className="mb-5 flex size-10 items-center justify-center rounded-xl border border-slate-200/60 bg-slate-100 text-slate-800 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200">
+                                    <TrendingUp className="size-5" />
                                 </div>
-                                <h3 className="mb-2 text-lg font-extrabold text-slate-900 dark:text-white">
+                                <h3 className="mb-2 text-base font-extrabold text-slate-900 dark:text-white">
                                     Multi-Platform Presets
                                 </h3>
                                 <p className="text-xs leading-relaxed text-slate-600 dark:text-slate-400">
@@ -1054,11 +1075,11 @@ export default function Welcome() {
                                 </p>
                             </div>
 
-                            <div className="rounded-3xl border border-slate-200/80 bg-white p-7 dark:border-slate-800/80 dark:bg-[#0c0e1a]">
-                                <div className="mb-5 flex size-12 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
-                                    <Lock className="size-6" />
+                            <div className="rounded-2xl border border-slate-200/80 bg-white p-7 shadow-xs transition hover:border-slate-300 dark:border-slate-800/80 dark:bg-[#0c0e1a] dark:hover:border-slate-700">
+                                <div className="mb-5 flex size-10 items-center justify-center rounded-xl border border-slate-200/60 bg-slate-100 text-slate-800 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200">
+                                    <Lock className="size-5" />
                                 </div>
-                                <h3 className="mb-2 text-lg font-extrabold text-slate-900 dark:text-white">
+                                <h3 className="mb-2 text-base font-extrabold text-slate-900 dark:text-white">
                                     Encrypted Key Vault
                                 </h3>
                                 <p className="text-xs leading-relaxed text-slate-600 dark:text-slate-400">
@@ -1068,11 +1089,11 @@ export default function Welcome() {
                                 </p>
                             </div>
 
-                            <div className="rounded-3xl border border-slate-200/80 bg-white p-7 dark:border-slate-800/80 dark:bg-[#0c0e1a]">
-                                <div className="mb-5 flex size-12 items-center justify-center rounded-2xl bg-amber-500/10 text-amber-600 dark:text-amber-400">
-                                    <FileText className="size-6" />
+                            <div className="rounded-2xl border border-slate-200/80 bg-white p-7 shadow-xs transition hover:border-slate-300 dark:border-slate-800/80 dark:bg-[#0c0e1a] dark:hover:border-slate-700">
+                                <div className="mb-5 flex size-10 items-center justify-center rounded-xl border border-slate-200/60 bg-slate-100 text-slate-800 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200">
+                                    <FileText className="size-5" />
                                 </div>
-                                <h3 className="mb-2 text-lg font-extrabold text-slate-900 dark:text-white">
+                                <h3 className="mb-2 text-base font-extrabold text-slate-900 dark:text-white">
                                     Telemetry & Word Counting
                                 </h3>
                                 <p className="text-xs leading-relaxed text-slate-600 dark:text-slate-400">
@@ -1083,11 +1104,11 @@ export default function Welcome() {
                                 </p>
                             </div>
 
-                            <div className="rounded-3xl border border-slate-200/80 bg-white p-7 dark:border-slate-800/80 dark:bg-[#0c0e1a]">
-                                <div className="mb-5 flex size-12 items-center justify-center rounded-2xl bg-rose-500/10 text-rose-600 dark:text-rose-400">
-                                    <PenTool className="size-6" />
+                            <div className="rounded-2xl border border-slate-200/80 bg-white p-7 shadow-xs transition hover:border-slate-300 dark:border-slate-800/80 dark:bg-[#0c0e1a] dark:hover:border-slate-700">
+                                <div className="mb-5 flex size-10 items-center justify-center rounded-xl border border-slate-200/60 bg-slate-100 text-slate-800 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200">
+                                    <PenTool className="size-5" />
                                 </div>
-                                <h3 className="mb-2 text-lg font-extrabold text-slate-900 dark:text-white">
+                                <h3 className="mb-2 text-base font-extrabold text-slate-900 dark:text-white">
                                     Persistent History Archive
                                 </h3>
                                 <p className="text-xs leading-relaxed text-slate-600 dark:text-slate-400">
@@ -1102,13 +1123,13 @@ export default function Welcome() {
 
                 {/* 7. Bottom CTA Banner */}
                 <section className="px-4 py-20 sm:px-6 sm:py-24 lg:px-8">
-                    <div className="glow-indigo relative mx-auto max-w-5xl overflow-hidden rounded-3xl border border-indigo-500/30 bg-gradient-to-br from-indigo-900/40 via-purple-900/30 to-[#07080e] p-10 text-center shadow-2xl sm:p-16">
+                    <div className="relative mx-auto max-w-5xl overflow-hidden rounded-3xl border border-slate-200 bg-slate-900 p-10 text-center text-white shadow-xl sm:p-16 dark:border-slate-800 dark:bg-[#0c0e1a]">
                         <div className="relative z-10">
-                            <span className="mb-4 inline-flex items-center gap-1.5 rounded-full bg-indigo-500/20 px-3.5 py-1 text-xs font-bold text-indigo-300">
+                            <span className="mb-4 inline-flex items-center gap-1.5 rounded-full border border-slate-700 bg-slate-800/80 px-3.5 py-1 text-xs font-semibold text-slate-300">
                                 <Sparkles className="size-3.5" />
                                 Setup in Under 60 Seconds
                             </span>
-                            <h2 className="text-3xl font-black tracking-tight text-white sm:text-5xl">
+                            <h2 className="text-3xl font-extrabold tracking-tight text-white sm:text-5xl">
                                 Ready to Take Full Control of Your AI Copy?
                             </h2>
                             <p className="mx-auto mt-4 max-w-2xl text-base text-slate-300 sm:text-lg">
@@ -1118,12 +1139,12 @@ export default function Welcome() {
                             <div className="mt-8 flex justify-center">
                                 <Link
                                     href={auth?.user ? dashboard() : register()}
-                                    className="inline-flex h-13 items-center gap-2 rounded-2xl bg-indigo-600 px-8 text-base font-bold text-white shadow-xl shadow-indigo-600/30 transition hover:bg-indigo-500 active:scale-95"
+                                    className="inline-flex h-12 items-center gap-2 rounded-xl bg-indigo-600 px-8 text-sm font-semibold text-white shadow-xs transition hover:bg-indigo-500 active:scale-[0.98]"
                                 >
                                     {auth?.user
                                         ? 'Open Dashboard'
                                         : 'Create Free Account'}
-                                    <ArrowRight className="size-5" />
+                                    <ArrowRight className="size-4" />
                                 </Link>
                             </div>
                         </div>
@@ -1132,64 +1153,42 @@ export default function Welcome() {
 
                 {/* 8. Footer */}
                 <footer className="border-t border-slate-200/80 bg-white py-10 dark:border-slate-800/80 dark:bg-[#07080e]">
-                    <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-6 px-4 sm:px-6 md:flex-row lg:px-8">
-                        <div className="flex items-center gap-2.5">
+                    <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-6 px-4 sm:flex-row sm:px-6 lg:px-8">
+                        <div className="flex items-center gap-3">
                             <img
                                 src={`/images/logo/icon-only-${logoTheme}.png`}
                                 alt="Nexus AI"
-                                className="size-6 object-contain"
+                                className="size-7 object-contain"
                             />
-                            <span className="text-sm font-extrabold text-slate-900 dark:text-white">
+                            <span className="text-sm font-extrabold tracking-tight text-slate-900 dark:text-white">
                                 Nexus AI Content Studio
                             </span>
                         </div>
 
-                        <div className="flex flex-col items-center gap-2 text-center text-xs text-slate-500 sm:flex-row sm:gap-3 dark:text-slate-400">
-                            <span>
-                                Bring Your Own Key AI SaaS. AES-256-GCM
-                                Encrypted.
-                            </span>
-                            <span className="hidden text-slate-300 sm:inline dark:text-slate-700">
-                                •
-                            </span>
-                            <a
-                                href="https://venuxlabs.com"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-flex items-center gap-1.5 font-semibold text-slate-700 transition-colors hover:text-indigo-600 dark:text-slate-300 dark:hover:text-indigo-400"
-                            >
-                                <span>Powered by</span>
-                                <span className="font-bold text-indigo-600 underline decoration-indigo-400/50 underline-offset-4 hover:decoration-indigo-400 dark:text-indigo-400">
-                                    Venux Labs
-                                </span>
-                                <ExternalLink className="size-3 text-indigo-500" />
-                            </a>
-                        </div>
+                        <p className="text-xs text-slate-500 dark:text-slate-400">
+                            © {new Date().getFullYear()} Nexus AI. Built for
+                            creators with pure API freedom.
+                        </p>
 
-                        <div className="flex items-center gap-4 text-xs font-semibold text-slate-600 dark:text-slate-400">
-                            {auth?.user ? (
-                                <Link
-                                    href={dashboard()}
-                                    className="hover:text-indigo-600 dark:hover:text-white"
-                                >
-                                    Dashboard
-                                </Link>
-                            ) : (
-                                <>
-                                    <Link
-                                        href={login()}
-                                        className="hover:text-indigo-600 dark:hover:text-white"
-                                    >
-                                        Log in
-                                    </Link>
-                                    <Link
-                                        href={register()}
-                                        className="hover:text-indigo-600 dark:hover:text-white"
-                                    >
-                                        Register
-                                    </Link>
-                                </>
-                            )}
+                        <div className="flex items-center gap-6 text-xs font-semibold text-slate-600 dark:text-slate-400">
+                            <Link
+                                href={login()}
+                                className="transition hover:text-slate-900 dark:hover:text-white"
+                            >
+                                Log in
+                            </Link>
+                            <Link
+                                href={register()}
+                                className="transition hover:text-slate-900 dark:hover:text-white"
+                            >
+                                Register
+                            </Link>
+                            <a
+                                href="#playground"
+                                className="transition hover:text-slate-900 dark:hover:text-white"
+                            >
+                                Playground
+                            </a>
                         </div>
                     </div>
                 </footer>
@@ -1198,16 +1197,15 @@ export default function Welcome() {
                 <AnimatePresence>
                     {showScrollTop && (
                         <motion.button
+                            initial={{ opacity: 0, scale: 0.8 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.8 }}
                             onClick={scrollToTop}
-                            initial={{ opacity: 0, scale: 0.7, y: 15 }}
-                            animate={{ opacity: 1, scale: 1, y: 0 }}
-                            exit={{ opacity: 0, scale: 0.7, y: 15 }}
-                            whileHover={{ scale: 1.1 }}
-                            whileTap={{ scale: 0.95 }}
-                            aria-label="Scroll to top"
-                            className="fixed right-6 bottom-6 z-50 flex size-11 cursor-pointer items-center justify-center rounded-2xl border border-indigo-500/30 bg-white/90 text-indigo-600 shadow-xl shadow-indigo-600/20 backdrop-blur-xl transition-colors duration-200 hover:bg-indigo-600 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 dark:border-indigo-500/30 dark:bg-slate-900/90 dark:text-indigo-400 dark:hover:bg-indigo-600 dark:hover:text-white"
+                            className="fixed right-6 bottom-6 z-40 flex size-10 cursor-pointer items-center justify-center rounded-xl border border-slate-200 bg-white/90 text-slate-700 shadow-sm backdrop-blur-md transition hover:bg-slate-100 hover:text-slate-900 dark:border-slate-800 dark:bg-slate-900/80 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white"
+                            aria-label="Scroll back to top"
+                            title="Scroll back to top"
                         >
-                            <ArrowUp className="size-5" />
+                            <ArrowUp className="size-4" />
                         </motion.button>
                     )}
                 </AnimatePresence>
